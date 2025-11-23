@@ -14,6 +14,10 @@ import CreateCurriculum from './pages/CreateCurriculum';
 import AssessmentList from './pages/AssessmentList';
 import AssessmentTake from './pages/AssessmentTake';
 import CreateAssessment from './pages/CreateAssessment';
+import StudentSignup from './pages/StudentSignup';
+import StudentLogin from './pages/StudentLogin';
+import StudentDashboard from './pages/StudentDashboard';
+import StudentProfile from './pages/StudentProfile';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 
 const ProtectedRoute = ({ children }) => {
@@ -40,6 +44,10 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+      <Route path="/student/signup" element={<StudentSignup />} />
+      <Route path="/student/login" element={<StudentLogin />} />
+      <Route path="/student/dashboard" element={<StudentDashboard />} />
+      <Route path="/student/profile" element={<StudentProfile />} />
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route
         path="/dashboard"
