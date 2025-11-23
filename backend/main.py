@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, curriculum, assessment, analytics
+from app.api import auth, curriculum, assessment, analytics, learning_paths
 from app.core.database import engine
 from app.models import Base
 
@@ -22,6 +22,7 @@ app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(curriculum.router, prefix="/api/curriculum", tags=["curriculum"])
 app.include_router(assessment.router, prefix="/api/assessment", tags=["assessment"])
 app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
+app.include_router(learning_paths.router, prefix="/api/learning-paths", tags=["learning-paths"])
 
 @app.get("/")
 async def root():

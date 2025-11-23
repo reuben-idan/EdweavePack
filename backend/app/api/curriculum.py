@@ -7,11 +7,13 @@ from app.models.user import User
 from app.schemas.curriculum import CurriculumCreate, CurriculumResponse, LearningPathResponse
 from app.api.auth import get_current_user
 from app.services.ai_service import AIService
+from app.services.content_extractor import ContentExtractor
 import PyPDF2
 import io
 
 router = APIRouter()
 ai_service = AIService()
+content_extractor = ContentExtractor()
 
 @router.post("/", response_model=CurriculumResponse)
 async def create_curriculum(
@@ -108,16 +110,36 @@ async def get_learning_paths(
 @router.post("/upload")
 async def upload_content(
     file: UploadFile = File(...),
+    url: str = None,
     current_user: User = Depends(get_current_user)
 ):
-    content = ""
+    try:
+        if url:
+            # Extract from URL
+            extracted_data = content_extractor.extract_from_url(url)
+        else:
+            # Extract from uploaded file
+            file_content = await file.read()
+            
+            if file.content_type == "application/pdf":
+                extracted_data = content_extractor.extract_from_pdf(file_content)
+            elif file.content_type in ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"]:
+                extracted_data = content_extractor.extract_from_docx(file_content)
+            elif file.content_type.startswith("text/"):
+                text_content = file_content.decode("utf-8")
+                extracted_data = content_extractor.extract_from_text(text_content)
+            else:
+                # Try as text fallback
+                text_content = file_content.decode("utf-8", errors="ignore")
+                extracted_data = content_extractor.extract_from_text(text_content)
+        
+        return {
+            "content": extracted_data["content"][:5000],
+            "full_content": extracted_data["content"],
+            "metadata": extracted_data["metadata"],
+            "learning_objectives": extracted_data["learning_objectives"],
+            "filename": file.filename if file else url
+        }
     
-    if file.content_type == "application/pdf":
-        pdf_content = await file.read()
-        pdf_reader = PyPDF2.PdfReader(io.BytesIO(pdf_content))
-        for page in pdf_reader.pages:
-            content += page.extract_text()
-    else:
-        content = (await file.read()).decode("utf-8")
-    
-    return {"content": content[:5000], "filename": file.filename}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Content extraction failed: {str(e)}")
