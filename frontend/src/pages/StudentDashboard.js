@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BookOpen, Target, Calendar, TrendingUp, Clock, Award, User, Settings } from 'lucide-react';
+import { BookOpen, Target, Calendar, TrendingUp, Clock, Award, User, Settings, Upload } from 'lucide-react';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -177,7 +177,7 @@ const StudentDashboard = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <button className="glass-button bg-gradient-primary text-white hover-lift">
                   <BookOpen className="h-5 w-5 mr-2" />
                   Continue Learning
@@ -185,6 +185,13 @@ const StudentDashboard = () => {
                 <button className="glass-button bg-gradient-success text-white hover-lift">
                   <Target className="h-5 w-5 mr-2" />
                   Practice Quiz
+                </button>
+                <button 
+                  onClick={() => navigate('/student/upload')}
+                  className="glass-button bg-gradient-secondary text-white hover-lift"
+                >
+                  <Upload className="h-5 w-5 mr-2" />
+                  Upload Goals
                 </button>
               </div>
             </div>
