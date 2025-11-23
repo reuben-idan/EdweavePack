@@ -3,8 +3,9 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import Layout from './components/Layout';
 import Login from './pages/Login';
-import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import UploadPage from './pages/UploadPage';
+import CurriculumPage from './pages/CurriculumPage';
 import CreateCurriculum from './pages/CreateCurriculum';
 
 const ProtectedRoute = ({ children }) => {
@@ -27,7 +28,6 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route
         path="/dashboard"
@@ -35,6 +35,26 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <Layout>
               <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/upload"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <UploadPage />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/curriculum/:id"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <CurriculumPage />
             </Layout>
           </ProtectedRoute>
         }
