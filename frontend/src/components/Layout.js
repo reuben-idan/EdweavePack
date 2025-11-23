@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
-import { BookOpen, LogOut, BarChart3, FileText, Upload, Home, User } from 'lucide-react';
+import { BookOpen, LogOut, BarChart3, FileText, Upload, Home, User, Users } from 'lucide-react';
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
@@ -20,6 +20,7 @@ const Layout = ({ children }) => {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/curriculum', label: 'Curriculum', icon: BookOpen },
+    { path: '/students', label: 'Students', icon: Users },
     { path: '/assessments', label: 'Assessments', icon: FileText },
     { path: '/upload', label: 'Upload', icon: Upload },
   ];

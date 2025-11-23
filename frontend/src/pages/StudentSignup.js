@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Eye, EyeOff, Mail, Lock, User, Calendar, Target, BookOpen } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, Calendar, Target, BookOpen, AlertCircle, CheckCircle, ArrowLeft, ArrowRight } from 'lucide-react';
+import { useStudentAuth } from '../hooks/useStudentAuth';
 
 const StudentSignup = () => {
   const navigate = useNavigate();
+  const { register, loading, isAuthenticated } = useStudentAuth();
   const [step, setStep] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,6 +20,16 @@ const StudentSignup = () => {
     examDate: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/student/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const learningStyles = [
     { id: 'visual', label: 'Visual', desc: 'Learn through images, diagrams, and charts' },

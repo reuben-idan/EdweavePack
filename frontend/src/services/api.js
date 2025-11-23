@@ -8,22 +8,22 @@ const api = axios.create({
 
 // Add auth token to requests
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  // Check for both teacher and student tokens
+  const token = localStorage.getItem('token') || localStorage.getItem('studentToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log('API Request:', config.method?.toUpperCase(), config.url, config.data);
   return config;
 });
 
-// Add response interceptor for debugging
+// Add response interceptor for error handling
 api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response.status, response.config.url);
-    return response;
-  },
+  (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.status, error.response?.data, error.config?.url);
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('studentToken');
+    }
     return Promise.reject(error);
   }
 );
@@ -109,9 +109,15 @@ export const analyticsAPI = {
 export const studentsAPI = {
   create: (data) => api.post('/api/learning-paths/students', data),
   getAll: () => api.get('/api/learning-paths/students'),
+  getById: (id) => api.get(`/api/learning-paths/students/${id}`),
+  update: (id, data) => api.put(`/api/learning-paths/students/${id}`, data),
+  delete: (id) => api.delete(`/api/learning-paths/students/${id}`),
   getAnalytics: (id) => api.get(`/api/learning-paths/analytics/${id}`),
   generatePath: (studentId, curriculumId) => api.post(`/api/learning-paths/personalized/${studentId}/${curriculumId}`),
   getPath: (studentId, curriculumId) => api.get(`/api/learning-paths/personalized/${studentId}/${curriculumId}`),
+  getProgress: (id) => api.get(`/api/analytics/progress-tracking/${id}`),
+  bulkImport: (data) => api.post('/api/learning-paths/students/bulk-import', data),
+  export: (format = 'csv') => api.get(`/api/learning-paths/students/export?format=${format}`, { responseType: 'blob' }),
 };
 
 export default api;

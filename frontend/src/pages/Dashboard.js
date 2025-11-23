@@ -10,6 +10,7 @@ const Dashboard = () => {
   const [curricula, setCurricula] = useState([]);
   const [performanceData, setPerformanceData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,13 +21,39 @@ const Dashboard = () => {
     try {
       setLoading(true);
       
-      // Fetch analytics
-      const analyticsResponse = await analyticsAPI.getDashboard();
-      setAnalytics(analyticsResponse.data);
+      // Check if user is authenticated
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.error('No authentication token found');
+        navigate('/login');
+        return;
+      }
       
-      // Fetch curricula
-      const curriculaResponse = await curriculumAPI.getAll();
-      setCurricula(curriculaResponse.data);
+      // Set default data immediately
+      setAnalytics({
+        total_curricula: 0,
+        total_assessments: 0,
+        total_students: 0,
+        average_class_performance: 0,
+        subject_distribution: []
+      });
+      setCurricula([]);
+      
+      // Try to fetch real data
+      try {
+        const analyticsResponse = await analyticsAPI.getDashboard();
+        setAnalytics(analyticsResponse.data);
+      } catch (error) {
+        console.error('Analytics API error:', error);
+      }
+      
+      // Try to fetch curricula
+      try {
+        const curriculaResponse = await curriculumAPI.getAll();
+        setCurricula(curriculaResponse.data || []);
+      } catch (error) {
+        console.error('Curricula API error:', error);
+      }
       
       // Fetch performance data
       try {
@@ -38,6 +65,7 @@ const Dashboard = () => {
       
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
+      setError('Failed to load dashboard data. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -66,6 +94,25 @@ const Dashboard = () => {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-red-600 mb-4">{error}</div>
+          <button
+            onClick={() => {
+              setError(null);
+              fetchDashboardData();
+            }}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Retry
+          </button>
+        </div>
       </div>
     );
   }

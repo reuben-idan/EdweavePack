@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
-import io
 from app.core.database import get_db
 from app.models.curriculum import Curriculum, LearningPath, Assessment, Question
 from app.models.user import User
@@ -12,8 +11,6 @@ from app.services.ai_service import AIService
 from app.services.content_extractor import ContentExtractor
 from app.services.pedagogical_templates import PedagogicalTemplate
 from app.services.export_service import ExportService
-import PyPDF2
-import io
 
 router = APIRouter()
 ai_service = AIService()
@@ -28,11 +25,19 @@ async def create_curriculum(
     db: Session = Depends(get_db)
 ):
     # Generate AI curriculum
-    ai_result = await ai_service.generate_curriculum(
-        curriculum.source_content,
-        curriculum.subject,
-        curriculum.grade_level
-    )
+    try:
+        ai_result = await ai_service.generate_curriculum(
+            curriculum.source_content,
+            curriculum.subject,
+            curriculum.grade_level
+        )
+    except Exception as e:
+        # Fallback if AI service fails
+        ai_result = {
+            "learning_paths": [],
+            "assessments": [],
+            "metadata": {"error": str(e)}
+        }
     
     # Create curriculum
     db_curriculum = Curriculum(
@@ -42,7 +47,7 @@ async def create_curriculum(
         grade_level=curriculum.grade_level,
         user_id=current_user.id,
         source_content=curriculum.source_content,
-        metadata=ai_result
+        curriculum_metadata=ai_result
     )
     db.add(db_curriculum)
     db.commit()
@@ -94,6 +99,22 @@ async def get_curricula(
     db: Session = Depends(get_db)
 ):
     return db.query(Curriculum).filter(Curriculum.user_id == current_user.id).all()
+
+@router.get("/{curriculum_id}", response_model=CurriculumResponse)
+async def get_curriculum(
+    curriculum_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    curriculum = db.query(Curriculum).filter(
+        Curriculum.id == curriculum_id,
+        Curriculum.user_id == current_user.id
+    ).first()
+    
+    if not curriculum:
+        raise HTTPException(status_code=404, detail="Curriculum not found")
+    
+    return curriculum
 
 @router.get("/{curriculum_id}/learning-paths", response_model=List[LearningPathResponse])
 async def get_learning_paths(

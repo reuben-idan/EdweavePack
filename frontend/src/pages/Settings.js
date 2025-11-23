@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
@@ -19,7 +19,7 @@ const Settings = () => {
   });
 
   // Update form when user data loads
-  React.useEffect(() => {
+  useEffect(() => {
     if (user) {
       setProfileData({
         fullName: user.name || user.full_name || '',
@@ -54,11 +54,18 @@ const Settings = () => {
     setLoading(true);
     
     try {
-      await authAPI.updateProfile(profileData);
+      const response = await authAPI.updateProfile(profileData);
       toast.success('Profile updated successfully!');
-      // Refresh user data
-      window.location.reload();
+      
+      // Update user context with new data
+      if (response.data.user) {
+        // Force a profile refresh
+        const profileResponse = await authAPI.getProfile();
+        // This will trigger useAuth to update the user state
+        window.location.reload();
+      }
     } catch (error) {
+      console.error('Profile update error:', error);
       const message = error.response?.data?.detail || 'Failed to update profile';
       toast.error(message);
     } finally {

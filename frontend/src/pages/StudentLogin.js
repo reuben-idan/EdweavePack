@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Eye, EyeOff, Mail, Lock, ArrowRight, BookOpen } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, BookOpen, AlertCircle, CheckCircle } from 'lucide-react';
+import { useStudentAuth } from '../hooks/useStudentAuth';
 
 const StudentLogin = () => {
   const navigate = useNavigate();
+  const { login, loading, isAuthenticated } = useStudentAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [rememberMe, setRememberMe] = useState(false);
+  
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/student/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleChange = (e) => {
     setFormData({
@@ -19,30 +29,55 @@ const StudentLogin = () => {
     });
   };
 
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!formData.email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    if (!formData.password) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
-      toast.error('Please fill in all fields');
+    if (!validateForm()) {
+      toast.error('Please fix the errors below');
       return;
     }
 
-    try {
-      setLoading(true);
-      toast.info('Signing you in...');
+    const result = await login(formData);
+    
+    if (result.success) {
+      // Save remember me preference
+      if (rememberMe) {
+        localStorage.setItem('rememberStudentEmail', formData.email);
+      } else {
+        localStorage.removeItem('rememberStudentEmail');
+      }
       
-      // Mock API call
-      console.log('Student login:', formData);
-      
-      toast.success('Welcome back! Let\'s continue learning.');
       navigate('/student/dashboard');
-      
-    } catch (error) {
-      toast.error('Invalid credentials. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
+  
+  // Load remembered email on component mount
+  useEffect(() => {
+    const rememberedEmail = localStorage.getItem('rememberStudentEmail');
+    if (rememberedEmail) {
+      setFormData(prev => ({ ...prev, email: rememberedEmail }));
+      setRememberMe(true);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen animated-gradient flex items-center justify-center py-12 px-4">
@@ -70,11 +105,24 @@ const StudentLogin = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="glass-input w-full pl-10 pr-4 py-3 text-gray-900"
-                  placeholder="Enter your email"
-                  required
+                  className={`glass-input w-full pl-10 pr-4 py-3 text-gray-900 ${
+                    errors.email ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
+                  placeholder="Enter your student email"
+                  autoComplete="email"
                 />
+                {errors.email && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <AlertCircle className="h-5 w-5 text-red-500" />
+                  </div>
+                )}
               </div>
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {errors.email}
+                </p>
+              )}
             </div>
 
             <div>
@@ -86,9 +134,11 @@ const StudentLogin = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  className="glass-input w-full pl-10 pr-12 py-3 text-gray-900"
+                  className={`glass-input w-full pl-10 pr-12 py-3 text-gray-900 ${
+                    errors.password ? 'border-red-500 focus:border-red-500' : ''
+                  }`}
                   placeholder="Enter your password"
-                  required
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
@@ -98,20 +148,48 @@ const StudentLogin = () => {
                   {showPassword ? <EyeOff className="h-5 w-5 text-gray-400" /> : <Eye className="h-5 w-5 text-gray-400" />}
                 </button>
               </div>
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600 flex items-center">
+                  <AlertCircle className="h-4 w-4 mr-1" />
+                  {errors.password}
+                </p>
+              )}
+            </div>
+            
+            {/* Remember Me & Forgot Password */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
+                />
+                <span className="ml-2 text-sm text-gray-600">Remember me</span>
+              </label>
+              <Link
+                to="/student/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-500 font-medium"
+              >
+                Forgot password?
+              </Link>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full glass-button bg-gradient-primary text-white hover-lift"
+              className="w-full glass-button bg-gradient-primary text-white hover-lift disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? (
-                <div className="spinner w-5 h-5 mx-auto"></div>
+                <div className="flex items-center justify-center">
+                  <div className="spinner w-5 h-5 mr-2"></div>
+                  <span>Signing you in...</span>
+                </div>
               ) : (
-                <>
-                  <span>Sign In</span>
+                <div className="flex items-center justify-center">
+                  <span>Sign In to Student Portal</span>
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </>
+                </div>
               )}
             </button>
           </form>

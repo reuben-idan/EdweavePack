@@ -10,8 +10,11 @@ class Student(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
+    teacher_id = Column(Integer, ForeignKey("users.id"))
     age = Column(Integer)
+    grade_level = Column(String)
     learning_style = Column(String)  # visual, auditory, reading, kinesthetic
+    interests = Column(JSON)  # Student interests
     target_exams = Column(JSON)  # ["WASSCE", "SAT"]
     exam_date = Column(DateTime)
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -43,12 +46,15 @@ class StudentLearningPath(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id"))
-    title = Column(String, nullable=False)
+    curriculum_id = Column(Integer, ForeignKey("curricula.id"))
+    title = Column(String)
     description = Column(Text)
     total_weeks = Column(Integer)
     difficulty_level = Column(String)  # beginner, intermediate, advanced
     path_data = Column(JSON)  # AI-generated path structure
+    progress_data = Column(JSON)  # Progress tracking data
     created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     
     student = relationship("Student", back_populates="learning_paths")
@@ -58,7 +64,7 @@ class WeeklyPlan(Base):
     __tablename__ = "weekly_plans"
     
     id = Column(Integer, primary_key=True, index=True)
-    learning_path_id = Column(Integer, ForeignKey("learning_paths.id"))
+    learning_path_id = Column(Integer, ForeignKey("student_learning_paths.id"))
     week_number = Column(Integer, nullable=False)
     title = Column(String, nullable=False)
     topics = Column(JSON)  # ["Linear Equations", "Quadratic Functions"]
@@ -134,3 +140,43 @@ class ProgressSnapshot(Base):
     recommendations = Column(JSON)  # AI-generated recommendations
     
     student = relationship("Student", back_populates="progress_snapshots")
+
+class AssessmentAttempt(Base):
+    __tablename__ = "assessment_attempts"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"))
+    assessment_id = Column(Integer, ForeignKey("assessments.id"))
+    answers = Column(JSON)  # Student's answers
+    scores = Column(JSON)  # Individual question scores
+    total_score = Column(Float)
+    max_score = Column(Float)
+    feedback = Column(JSON)  # AI-generated feedback
+    completed_at = Column(DateTime, default=datetime.utcnow)
+    time_taken_minutes = Column(Float)
+    
+    student = relationship("Student")
+    assessment = relationship("Assessment")
+
+class LearningAnalytics(Base):
+    __tablename__ = "learning_analytics"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    student_id = Column(Integer, ForeignKey("students.id"))
+    curriculum_id = Column(Integer, ForeignKey("curricula.id"))
+    subject = Column(String)
+    concept = Column(String)
+    mastery_level = Column(Float)  # 0-100
+    mastery_data = Column(JSON)  # Detailed mastery analysis
+    misconceptions = Column(JSON)  # Common misconceptions
+    learning_gaps = Column(JSON)  # Identified learning gaps
+    recommendations = Column(JSON)  # AI recommendations
+    attempts_count = Column(Integer)
+    success_rate = Column(Float)
+    last_practiced = Column(DateTime)
+    difficulty_preference = Column(String)
+    learning_velocity = Column(Float)  # concepts per week
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    student = relationship("Student")

@@ -21,4 +21,3 @@ class User(Base):
     # Relationships
     files = relationship("File", back_populates="user")
     curricula = relationship("Curriculum", back_populates="user")
-    students = relationship("Student", back_populates="teacher")

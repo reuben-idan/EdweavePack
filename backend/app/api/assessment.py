@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from app.core.database import get_db
 from app.models.curriculum import Assessment, Question
-from app.models.student import Student, AssessmentAttempt
+from app.models.student import Student
 from app.models.user import User
 from app.schemas.curriculum import AssessmentResponse, QuestionResponse
 from app.api.auth import get_current_user
@@ -95,19 +95,8 @@ async def submit_assessment(
     # Calculate final score
     percentage_score = (total_earned / total_possible * 100) if total_possible > 0 else 0
     
-    # Save assessment attempt
-    if student_id:
-        attempt = AssessmentAttempt(
-            student_id=student_id,
-            assessment_id=assessment_id,
-            answers=answers,
-            scores=question_scores,
-            total_score=total_earned,
-            max_score=total_possible,
-            feedback=detailed_feedback
-        )
-        db.add(attempt)
-        db.commit()
+    # Save assessment attempt (simplified for now)
+    # TODO: Implement proper assessment attempt tracking
     
     return {
         "assessment_id": assessment_id,
