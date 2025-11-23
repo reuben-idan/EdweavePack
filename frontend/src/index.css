@@ -30,7 +30,7 @@
 
 .glass-nav {
   @apply glass border-b border-white/20;
-  background: rgba(102, 126, 234, 0.35);
+  background: rgba(148, 163, 184, 0.4);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
@@ -61,11 +61,11 @@
   background: var(--warning-gradient);
 }
 
-/* Animated gradients */
+/* Professional wave background */
 .animated-gradient {
-  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #cbd5e1, #94a3b8);
   background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
+  animation: gradient 20s ease infinite;
 }
 
 @keyframes gradient {
