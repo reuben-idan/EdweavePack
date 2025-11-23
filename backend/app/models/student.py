@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Text, Boolean, Float, ForeignKey, JSON
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from datetime import datetime
-
-Base = declarative_base()
+from app.core.database import Base
 
 class Student(Base):
     __tablename__ = "students"
@@ -21,7 +19,7 @@ class Student(Base):
     
     # Relationships
     goals = relationship("StudentGoal", back_populates="student")
-    learning_paths = relationship("LearningPath", back_populates="student")
+    learning_paths = relationship("StudentLearningPath", back_populates="student")
     quiz_results = relationship("StudentQuizResult", back_populates="student")
     progress_snapshots = relationship("ProgressSnapshot", back_populates="student")
 
@@ -40,8 +38,8 @@ class StudentGoal(Base):
     
     student = relationship("Student", back_populates="goals")
 
-class LearningPath(Base):
-    __tablename__ = "learning_paths"
+class StudentLearningPath(Base):
+    __tablename__ = "student_learning_paths"
     
     id = Column(Integer, primary_key=True, index=True)
     student_id = Column(Integer, ForeignKey("students.id"))
@@ -49,7 +47,7 @@ class LearningPath(Base):
     description = Column(Text)
     total_weeks = Column(Integer)
     difficulty_level = Column(String)  # beginner, intermediate, advanced
-    metadata = Column(JSON)  # AI-generated path structure
+    path_data = Column(JSON)  # AI-generated path structure
     created_at = Column(DateTime, default=datetime.utcnow)
     is_active = Column(Boolean, default=True)
     
@@ -69,7 +67,7 @@ class WeeklyPlan(Base):
     progress_percentage = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)
     
-    learning_path = relationship("LearningPath", back_populates="weekly_plans")
+    learning_path = relationship("StudentLearningPath", back_populates="weekly_plans")
     daily_tasks = relationship("DailyTask", back_populates="weekly_plan")
 
 class DailyTask(Base):

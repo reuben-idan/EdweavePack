@@ -13,10 +13,21 @@ const Settings = () => {
   const [loading, setLoading] = useState(false);
   
   const [profileData, setProfileData] = useState({
-    fullName: user?.full_name || '',
+    fullName: user?.name || user?.full_name || '',
     email: user?.email || '',
     institution: user?.institution || ''
   });
+
+  // Update form when user data loads
+  React.useEffect(() => {
+    if (user) {
+      setProfileData({
+        fullName: user.name || user.full_name || '',
+        email: user.email || '',
+        institution: user.institution || ''
+      });
+    }
+  }, [user]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -45,8 +56,11 @@ const Settings = () => {
     try {
       await authAPI.updateProfile(profileData);
       toast.success('Profile updated successfully!');
+      // Refresh user data
+      window.location.reload();
     } catch (error) {
-      toast.error('Failed to update profile');
+      const message = error.response?.data?.detail || 'Failed to update profile';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -79,7 +93,8 @@ const Settings = () => {
         confirmPassword: ''
       });
     } catch (error) {
-      toast.error('Failed to update password');
+      const message = error.response?.data?.detail || 'Failed to update password';
+      toast.error(message);
     } finally {
       setLoading(false);
     }

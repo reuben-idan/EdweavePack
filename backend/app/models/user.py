@@ -13,6 +13,8 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     institution = Column(String, nullable=True)
     role = Column(String, default="teacher")
+    reset_token = Column(String, nullable=True)
+    reset_token_expires = Column(DateTime(timezone=True), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

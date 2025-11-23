@@ -6,8 +6,12 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from app.core.database import get_db
 from app.models.user import User
-from app.schemas.auth import UserCreate, UserResponse, Token
+from app.schemas.auth import UserCreate, UserResponse, Token, ForgotPasswordRequest, ResetPasswordRequest, UpdateProfileRequest, UpdatePasswordRequest
 import os
+import secrets
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -111,4 +115,129 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user
+    return {
+        "id": current_user.id,
+        "email": current_user.email,
+        "name": current_user.name,
+        "full_name": current_user.name,
+        "is_active": current_user.is_active,
+        "institution": current_user.institution,
+        "role": current_user.role
+    }
+
+@router.post("/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == request.email).first()
+    if not user:
+        # Don't reveal if email exists
+        return {"message": "If email exists, reset link has been sent"}
+    
+    # Generate reset token
+    reset_token = secrets.token_urlsafe(32)
+    reset_expires = datetime.utcnow() + timedelta(hours=1)
+    
+    user.reset_token = reset_token
+    user.reset_token_expires = reset_expires
+    db.commit()
+    
+    # Send email
+    try:
+        send_reset_email(user.email, user.name, reset_token)
+    except Exception as e:
+        print(f"Email sending failed: {e}")
+    
+    return {"message": "If email exists, reset link has been sent"}
+
+@router.post("/reset-password")
+async def reset_password(request: ResetPasswordRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(
+        User.reset_token == request.token,
+        User.reset_token_expires > datetime.utcnow()
+    ).first()
+    
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Update password
+    user.hashed_password = get_password_hash(request.password)
+    user.reset_token = None
+    user.reset_token_expires = None
+    db.commit()
+    
+    return {"message": "Password reset successfully"}
+
+@router.put("/profile")
+async def update_profile(request: UpdateProfileRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Check if email is already taken by another user
+    if request.email != current_user.email:
+        existing_user = db.query(User).filter(User.email == request.email, User.id != current_user.id).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already in use")
+    
+    # Update user data
+    current_user.name = request.fullName
+    current_user.email = request.email
+    current_user.institution = request.institution
+    db.commit()
+    db.refresh(current_user)
+    
+    return {"message": "Profile updated successfully"}
+
+@router.put("/password")
+async def update_password(request: UpdatePasswordRequest, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    # Verify current password
+    if not verify_password(request.current_password, current_user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Update password
+    current_user.hashed_password = get_password_hash(request.new_password)
+    db.commit()
+    
+    return {"message": "Password updated successfully"}
+
+def send_reset_email(email: str, name: str, token: str):
+    """Send password reset email"""
+    smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_username = os.getenv("SMTP_USERNAME")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    
+    if not smtp_username or not smtp_password:
+        print("SMTP credentials not configured")
+        return
+    
+    reset_url = f"http://localhost:3000/reset-password/{token}"
+    
+    msg = MIMEMultipart()
+    msg['From'] = smtp_username
+    msg['To'] = email
+    msg['Subject'] = "EdweavePack - Password Reset Request"
+    
+    body = f"""
+    Hi {name},
+    
+    You requested a password reset for your EdweavePack account.
+    
+    Click the link below to reset your password:
+    {reset_url}
+    
+    This link will expire in 1 hour.
+    
+    If you didn't request this reset, please ignore this email.
+    
+    Best regards,
+    EdweavePack Team
+    """
+    
+    msg.attach(MIMEText(body, 'plain'))
+    
+    try:
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        server.send_message(msg)
+        server.quit()
+        print(f"Reset email sent to {email}")
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+        raise
