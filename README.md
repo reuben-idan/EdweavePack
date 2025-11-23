@@ -9,12 +9,25 @@
 [![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://reactjs.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
+[![AWS](https://img.shields.io/badge/AWS-Cloud%20Ready-FF9900.svg)](https://aws.amazon.com/)
 
-Transform teaching resources into structured curricula, adaptive learning paths, and auto-graded assessments powered by Amazon Q Developer.
+Transform teaching resources into structured curricula, adaptive learning paths, and auto-graded assessments powered by **Amazon Q Developer** and **Kiro** agent orchestration.
 
-[Quick Start](#quick-start) • [Documentation](#api-documentation) • [Contributing](#contributing)
+[🚀 Quick Start](#quick-start) • [🎬 Demo Video](#demo) • [📖 Documentation](#documentation) • [🏗️ Architecture](#architecture)
 
 </div>
+
+## 🎬 Demo
+
+**Watch EdweavePack in Action** (2-3 min demo)
+
+[![EdweavePack Demo](https://img.shields.io/badge/▶️%20Watch%20Demo-YouTube-red.svg)](demo/demo-script.md)
+
+**Try it yourself:**
+- 📄 [Sample Teaching Resources](demo/sample_resources.md)
+- 🔧 [Demo Script & Setup](demo/demo-script.md)
+- 📊 [Expected AI Outputs](demo/sample_resources.md#expected-ai-generated-outputs)
+- 💾 [Sample Files](demo/sample-files/) - Python, Algebra, Biology content
 
 ## Features
 
@@ -72,9 +85,17 @@ graph TB
 **Tech Stack**
 - **Backend**: FastAPI, PostgreSQL, Redis, Celery
 - **Frontend**: React 18, Tailwind CSS, React Router
-- **AI**: Amazon Q Developer, Amazon Kiro
+- **AI**: Amazon Q Developer, Kiro Agent Orchestration
 - **Infrastructure**: AWS ECS, RDS, ElastiCache, S3
 - **DevOps**: Docker, Terraform, GitHub Actions
+
+## 📖 Documentation
+
+- 🏗️ [Architecture Overview](docs/architecture.md)
+- 🚀 [Setup Guide](docs/setup-guide.md)
+- 🌐 [Deployment Guide](docs/deployment.md)
+- 🤖 [Agent Orchestration](backend/agents/)
+- 📊 [API Documentation](http://localhost:8000/docs)
 
 ## Quick Start
 

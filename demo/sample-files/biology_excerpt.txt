@@ -1,0 +1,42 @@
+Biology Textbook Excerpt
+Chapter 3: Cell Structure and Function
+
+3.1 Introduction to Cells
+All living organisms are composed of one or more cells. The cell is the basic structural and functional unit of life. There are two main types of cells: prokaryotic and eukaryotic.
+
+3.2 Cell Theory
+The cell theory consists of three main principles:
+1. All living things are composed of one or more cells
+2. The cell is the basic unit of life
+3. All cells arise from pre-existing cells
+
+3.3 Prokaryotic vs Eukaryotic Cells
+
+Prokaryotic Cells:
+- No true nucleus
+- DNA freely floating in cytoplasm
+- Few organelles, no membrane-bound organelles
+- Generally smaller (1-10 μm)
+- Examples: Bacteria, Archaea
+
+Eukaryotic Cells:
+- Membrane-bound nucleus
+- DNA contained in nucleus
+- Many membrane-bound organelles
+- Generally larger (10-100 μm)
+- Examples: Plants, Animals, Fungi, Protists
+
+3.4 Cell Organelles and Their Functions
+
+Nucleus: Controls cell activities and contains DNA
+Mitochondria: Powerhouse of the cell, produces ATP
+Ribosomes: Protein synthesis
+Endoplasmic Reticulum: Transport system within the cell
+Golgi Apparatus: Modifies and packages proteins
+Lysosomes: Digest waste materials
+
+Learning Objectives:
+- Students will distinguish between prokaryotic and eukaryotic cells
+- Students will identify major cell organelles and their functions
+- Students will explain the cell theory and its significance
+- Students will analyze how cell structure relates to function

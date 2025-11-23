@@ -1,0 +1,70 @@
+Introduction to Python Programming
+Chapter 1: Getting Started with Python
+
+Python is a high-level, interpreted programming language that emphasizes code readability and simplicity. Created by Guido van Rossum in 1991, Python has become one of the most popular programming languages in the world.
+
+1.1 What is Python?
+Python is known for its clean syntax and powerful capabilities. It supports multiple programming paradigms including procedural, object-oriented, and functional programming. Python's philosophy emphasizes that code should be readable and that there should be one obvious way to do things.
+
+Key Features of Python:
+- Easy to learn and use
+- Interpreted language (no compilation needed)
+- Cross-platform compatibility
+- Extensive standard library
+- Large community and ecosystem
+- Free and open-source
+
+1.2 Installing Python
+Python can be downloaded from python.org. The installation includes:
+- Python interpreter
+- IDLE (Integrated Development Environment)
+- Standard library modules
+- Documentation
+
+1.3 Your First Python Program
+Let's start with the traditional "Hello, World!" program:
+
+print("Hello, World!")
+
+This simple program demonstrates:
+- The print() function displays output
+- Strings are enclosed in quotes
+- No semicolons or complex syntax required
+
+1.4 Variables and Data Types
+Variables in Python are created when you assign a value to them:
+
+name = "Alice"
+age = 25
+height = 5.6
+is_student = True
+
+Python has several built-in data types:
+- Strings (str): Text data
+- Integers (int): Whole numbers
+- Floats (float): Decimal numbers
+- Booleans (bool): True or False values
+- Lists: Ordered collections
+- Dictionaries: Key-value pairs
+
+1.5 Basic Operations
+Python supports standard mathematical operations:
+
+# Arithmetic operations
+result = 10 + 5    # Addition: 15
+result = 10 - 3    # Subtraction: 7
+result = 4 * 6     # Multiplication: 24
+result = 15 / 3    # Division: 5.0
+result = 17 // 5   # Floor division: 3
+result = 17 % 5    # Modulus: 2
+result = 2 ** 3    # Exponentiation: 8
+
+Learning Objectives:
+By the end of this chapter, students should be able to:
+1. Explain what Python is and its key characteristics
+2. Install Python on their computer
+3. Write and run simple Python programs
+4. Create variables and understand basic data types
+5. Perform arithmetic and string operations
+6. Use input() and print() functions effectively
+7. Add comments to their code

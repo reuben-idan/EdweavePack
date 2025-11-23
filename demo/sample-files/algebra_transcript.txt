@@ -1,0 +1,34 @@
+Video Transcript: Solving Linear Equations
+Duration: 8 minutes
+Source: Educational Video Content
+
+Welcome to our lesson on solving linear equations. Today we'll learn how to solve equations like 2x + 5 = 13.
+
+A linear equation is an equation where the highest power of the variable is 1. Our goal is to isolate the variable on one side of the equation.
+
+Let's solve 2x + 5 = 13:
+
+Step 1: Subtract 5 from both sides
+2x + 5 - 5 = 13 - 5
+2x = 8
+
+Step 2: Divide both sides by 2
+2x ÷ 2 = 8 ÷ 2
+x = 4
+
+Let's check our answer: 2(4) + 5 = 8 + 5 = 13 ✓
+
+The key principle is maintaining balance - whatever you do to one side, you must do to the other side.
+
+Practice Problems:
+1. Solve: 3x - 7 = 14
+2. Solve: 5x + 2 = 22
+3. Solve: -2x + 10 = 4
+
+Remember: Always check your solution by substituting back into the original equation.
+
+Learning Objectives:
+- Understand the concept of linear equations
+- Apply systematic steps to solve linear equations
+- Verify solutions by substitution
+- Solve real-world problems using linear equations

@@ -1,113 +1,155 @@
-# Edweave Pack Demo Script
+# EdweavePack Demo Script (2-3 minutes)
 
-## Demo Overview
-This demo showcases how Edweave Pack transforms traditional teaching materials into AI-powered, structured curricula with adaptive learning paths and auto-graded assessments.
+## 🎬 Video Demo Walkthrough
 
-## Demo Flow (10 minutes)
+### Opening (15 seconds)
+**[Screen: EdweavePack Landing Page]**
 
-### 1. Introduction (1 minute)
-- "Welcome to Edweave Pack - the AI-powered curriculum builder"
-- "Transform any teaching resource into structured curricula, adaptive learning paths, and auto-graded assessments"
-- "Powered by Amazon Q Developer for content generation and Amazon Kiro for curriculum steering"
+"Welcome to EdweavePack - the AI-powered educational content platform that transforms your teaching resources into structured curricula, adaptive assessments, and personalized learning paths."
 
-### 2. User Registration/Login (1 minute)
-- Show clean, professional login interface
-- Register as a new teacher: "Ms. Johnson, 6th Grade Science Teacher"
-- Highlight OAuth2 security and teacher-focused design
+### Scene 1: Content Upload (30 seconds)
+**[Screen: Upload Interface]**
 
-### 3. Dashboard Overview (1 minute)
-- Show teacher dashboard with analytics
-- Highlight key metrics: curricula created, assessments generated, subjects covered
-- Point out quick actions and recent activity
+"Let's start by uploading teaching content. I'll use our sample Python programming textbook excerpt."
 
-### 4. Create New Curriculum (3 minutes)
-**Upload Content:**
-- Click "Create New Curriculum"
-- Fill in basic info:
-  - Title: "Introduction to Photosynthesis"
-  - Subject: "Science"
-  - Grade Level: "6-8"
-- Upload sample-content.txt or paste content directly
-- Show file processing and content extraction
+**Actions:**
+1. Navigate to Upload page
+2. Drag and drop sample PDF or paste text content
+3. Select "University" education level
+4. Choose "Computer Science" subject
+5. Click "Generate Curriculum"
 
-**AI Generation:**
-- Click "Create Curriculum"
-- Show loading state with "AI is analyzing your content..."
-- Explain: "Amazon Q Developer is analyzing the content and generating structured curriculum"
+**Narration:** "EdweavePack accepts PDFs, text files, video URLs, and even textbook excerpts. Our AI agents automatically extract and analyze the content."
 
-### 5. Generated Curriculum Review (2 minutes)
-**Show Generated Content:**
-- Curriculum overview and learning objectives
-- 3-4 sequential learning paths with estimated durations
-- Auto-generated assessments with multiple question types
-- Highlight adaptive learning recommendations
+### Scene 2: AI Curriculum Generation (45 seconds)
+**[Screen: Curriculum Generation in Progress]**
 
-**Key Features to Highlight:**
-- Structured learning progression
-- Time estimates for each module
-- Variety of activities (reading, experiments, discussions)
-- Standards alignment suggestions
+"Watch as our Agent Orchestrator works with four specialized AI agents:"
 
-### 6. Assessment Demo (1.5 minutes)
-- Navigate to generated assessment
-- Show different question types:
-  - Multiple choice
-  - Short answer
-  - Essay questions
-- Demonstrate auto-grading for objective questions
-- Show scoring and feedback system
+**Show progress indicators:**
+- ✅ Curriculum Architect Agent: Generating lesson plans aligned with Bloom's taxonomy
+- ✅ Assessment Generator Agent: Creating comprehensive assessments and rubrics
+- ✅ Personalized Learning Agent: Building adaptive learning paths
+- ✅ Auto-Grader Agent: Setting up automated assessment system
 
-### 7. Analytics & Insights (0.5 minutes)
-- Return to dashboard
-- Show updated analytics
-- Highlight subject distribution
-- Point out recent curriculum creation
+**[Screen: Generated Curriculum Overview]**
 
-## Key Talking Points
+"In seconds, we have a complete 4-week curriculum with:"
+- **Point to modules:** "Progressive learning modules from Remember to Create"
+- **Point to assessments:** "Mixed assessments: MCQ, coding exercises, projects"
+- **Point to timeline:** "Structured weekly progression with clear objectives"
 
-### Technical Architecture
-- "Built on AWS with FastAPI backend and React frontend"
-- "Uses PostgreSQL for data persistence and Redis for caching"
-- "Deployed on ECS with auto-scaling capabilities"
-- "Integrated with Amazon Q Developer for intelligent content generation"
+### Scene 3: Curriculum Deep Dive (30 seconds)
+**[Screen: Module Details]**
 
-### AI-Powered Features
-- "Amazon Q Developer analyzes your content and understands educational context"
-- "Generates age-appropriate learning objectives and activities"
-- "Creates diverse assessment questions with proper difficulty progression"
-- "Amazon Kiro orchestrates the curriculum generation workflow"
+"Let's explore Module 1: Variables and Data Types"
 
-### Teacher Benefits
-- "Saves hours of curriculum planning time"
-- "Ensures consistent, standards-aligned content"
-- "Provides data-driven insights into student progress"
-- "Adapts to different learning styles and paces"
+**Show:**
+- Learning objectives with Bloom's action verbs
+- Structured lessons with activities
+- Prerequisites and materials
+- Estimated duration and difficulty
 
-### Scalability & Security
-- "OAuth2 authentication for secure teacher access"
-- "Scalable infrastructure handles multiple concurrent users"
-- "Data encryption and privacy compliance"
-- "CI/CD pipeline ensures reliable updates"
+**Narration:** "Each module includes detailed lesson plans, hands-on activities, and clear learning objectives aligned to educational standards."
 
-## Demo Backup Plans
+### Scene 4: Assessment System (25 seconds)
+**[Screen: Assessment Interface]**
 
-### If AI Generation is Slow:
-- Have pre-generated curriculum ready to show
-- Explain the process while showing cached results
-- Emphasize real-world performance optimizations
+"Our Assessment Generator creates comprehensive evaluations:"
 
-### If Upload Fails:
-- Use direct text paste method
-- Have sample content ready in clipboard
-- Show file upload works with smaller files
+**Show examples:**
+- Multiple choice questions for foundational knowledge
+- Coding exercises with auto-grading
+- Project-based assessments with detailed rubrics
+- Real-time feedback and scoring
 
-### If Database is Slow:
-- Use local development environment
-- Pre-populate with sample data
-- Focus on UI/UX demonstration
+**Narration:** "Students receive immediate feedback, while teachers get detailed analytics on class performance and individual progress."
 
-## Closing Points
-- "Edweave Pack transforms traditional teaching into AI-enhanced education"
-- "Ready for immediate deployment and teacher adoption"
-- "Extensible architecture for future AI integrations"
-- "Complete solution: backend, frontend, infrastructure, and CI/CD"
+### Scene 5: Analytics Dashboard (20 seconds)
+**[Screen: Analytics Dashboard]**
+
+"The analytics dashboard provides actionable insights:"
+
+**Highlight:**
+- Class performance overview
+- Individual student progress
+- Content effectiveness metrics
+- Personalized recommendations
+
+**Narration:** "Track student engagement, identify struggling learners, and adapt your teaching strategy with data-driven insights."
+
+### Closing (15 seconds)
+**[Screen: Platform Overview]**
+
+"EdweavePack: From content to curriculum in minutes. Powered by Amazon Q Developer and Kiro for pedagogically sound, AI-generated educational experiences."
+
+**Call to Action:** "Ready to transform your teaching? Visit EdweavePack.com to get started."
+
+---
+
+## 🎯 Demo Key Points to Emphasize
+
+### Technical Innovation
+- **Agent Orchestration**: 4 specialized AI agents working together
+- **Bloom's Taxonomy Integration**: Pedagogically sound progression
+- **Real-time Generation**: Curriculum created in under 60 seconds
+- **Auto-grading**: Immediate feedback for coding and text responses
+
+### Educational Value
+- **Standards Alignment**: Meets educational best practices
+- **Personalized Learning**: Adaptive paths for each student
+- **Comprehensive Assessment**: Multiple question types and rubrics
+- **Progress Tracking**: Detailed analytics and insights
+
+### User Experience
+- **Intuitive Interface**: Drag-and-drop simplicity
+- **Mobile Responsive**: Works on all devices
+- **Export Options**: PDF, DOCX, LMS integration
+- **Collaboration**: Real-time sharing and feedback
+
+---
+
+## 📋 Demo Preparation Checklist
+
+### Before Recording:
+- [ ] Prepare sample content files (PDF, text)
+- [ ] Set up demo user accounts (teacher, students)
+- [ ] Pre-populate some student data for analytics
+- [ ] Test all features and workflows
+- [ ] Prepare backup slides for any technical issues
+
+### During Demo:
+- [ ] Keep narration clear and concise
+- [ ] Show actual AI generation in real-time
+- [ ] Highlight unique features (agent orchestration)
+- [ ] Demonstrate end-to-end workflow
+- [ ] Include brief technical architecture mention
+
+### After Demo:
+- [ ] Provide links to live demo
+- [ ] Share sample generated curricula
+- [ ] Include setup instructions
+- [ ] Offer technical documentation
+
+---
+
+## 🔗 Demo Assets
+
+### Sample Files to Use:
+1. **Python Programming PDF** (demo/sample_resources.md)
+2. **Algebra Video Transcript** (demo/sample_resources.md)
+3. **Biology Textbook Excerpt** (demo/sample_resources.md)
+
+### Expected Demo Outcomes:
+- Complete curriculum generated in <60 seconds
+- 4 modules with 12 lessons total
+- 16 assessment questions across Bloom's levels
+- Personalized learning paths for 3 student types
+- Analytics dashboard with meaningful insights
+
+### Technical Talking Points:
+- "Powered by Amazon Q Developer for content generation"
+- "Kiro configuration ensures pedagogical soundness"
+- "Agent orchestration coordinates 4 specialized AI systems"
+- "Real-time processing with Celery task queues"
+- "Enterprise-ready with AWS cloud infrastructure"
