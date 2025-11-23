@@ -1,20 +1,17 @@
-import boto3
 import os
 from typing import Optional
-from botocore.exceptions import ClientError
 import logging
+import json
+import uuid
 
 logger = logging.getLogger(__name__)
 
 class S3Service:
     def __init__(self):
-        self.s3_client = boto3.client(
-            's3',
-            aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-            aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-            region_name=os.getenv('AWS_REGION', 'us-east-1')
-        )
+        # Mock S3 service for development
+        self.mock_mode = True
         self.bucket_name = os.getenv('S3_BUCKET_NAME', 'edweave-pack-files')
+        self.mock_storage = {}  # In-memory storage for development
     
     def upload_file(self, file_content: bytes, file_path: str, content_type: str) -> bool:
         """Upload file to S3"""

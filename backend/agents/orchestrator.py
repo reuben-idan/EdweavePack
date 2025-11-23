@@ -1,10 +1,10 @@
 import asyncio
 import json
 from typing import Dict, List, Any
-from .curriculum_architect import CurriculumArchitectAgent
-from .assessment_generator import AssessmentGeneratorAgent
-from .personalized_learning import PersonalizedLearningAgent
-from .auto_grader import AutoGraderAgent
+from agents.curriculum_architect import CurriculumArchitectAgent
+from agents.assessment_generator import AssessmentGeneratorAgent
+from agents.personalized_learning import PersonalizedLearningAgent
+from agents.auto_grader import AutoGraderAgent
 
 class AgentOrchestrator:
     """Orchestrates multiple AI agents for comprehensive educational content generation"""

@@ -1,7 +1,7 @@
 import yaml
 import json
 from typing import Dict, List, Any
-from ..services.ai_service import AIService
+from app.services.ai_service import AIService
 
 class CurriculumArchitectAgent:
     def __init__(self):

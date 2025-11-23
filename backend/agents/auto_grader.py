@@ -1,7 +1,7 @@
 import json
 import yaml
 from typing import Dict, List, Any, Tuple
-from ..services.ai_service import AIService
+from app.services.ai_service import AIService
 
 class AutoGraderAgent:
     def __init__(self):
