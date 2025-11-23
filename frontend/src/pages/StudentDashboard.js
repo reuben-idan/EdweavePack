@@ -177,21 +177,26 @@ const StudentDashboard = () => {
                 </div>
               </div>
               
-              <div className="grid grid-cols-3 gap-4">
-                <button className="glass-button bg-gradient-primary text-white hover-lift">
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <button 
+                  onClick={() => navigate('/student/learning-path')}
+                  className="glass-button bg-gradient-primary text-white hover-lift"
+                >
                   <BookOpen className="h-5 w-5 mr-2" />
-                  Continue Learning
+                  My Learning Path
                 </button>
                 <button className="glass-button bg-gradient-success text-white hover-lift">
                   <Target className="h-5 w-5 mr-2" />
                   Practice Quiz
                 </button>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
                 <button 
                   onClick={() => navigate('/student/upload')}
                   className="glass-button bg-gradient-secondary text-white hover-lift"
                 >
                   <Upload className="h-5 w-5 mr-2" />
-                  Upload Goals
+                  Upload Learning Goals
                 </button>
               </div>
             </div>

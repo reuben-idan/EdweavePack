@@ -19,6 +19,8 @@ import StudentLogin from './pages/StudentLogin';
 import StudentDashboard from './pages/StudentDashboard';
 import StudentProfile from './pages/StudentProfile';
 import StudentUpload from './pages/StudentUpload';
+import StudentLearningPath from './pages/StudentLearningPath';
+import StudentQuiz from './pages/StudentQuiz';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 
 const ProtectedRoute = ({ children }) => {
@@ -50,6 +52,8 @@ const AppRoutes = () => {
       <Route path="/student/dashboard" element={<StudentDashboard />} />
       <Route path="/student/profile" element={<StudentProfile />} />
       <Route path="/student/upload" element={<StudentUpload />} />
+      <Route path="/student/learning-path" element={<StudentLearningPath />} />
+      <Route path="/student/quiz/:quizId" element={<StudentQuiz />} />
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route
         path="/dashboard"
