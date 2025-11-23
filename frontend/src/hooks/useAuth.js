@@ -27,10 +27,10 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (credentials) => {
     const formData = new URLSearchParams();
-    formData.append('username', email);
-    formData.append('password', password);
+    formData.append('username', credentials.email);
+    formData.append('password', credentials.password);
     
     const response = await authAPI.login(formData);
     const { access_token } = response.data;

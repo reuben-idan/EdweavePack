@@ -26,7 +26,7 @@ import DailyPlanPage from './pages/DailyPlanPage';
 import ProgressPage from './pages/ProgressPage';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requiredRole = null }) => {
   const { user, loading } = useAuth();
   
   if (loading) {
@@ -40,26 +40,95 @@ const ProtectedRoute = ({ children }) => {
     );
   }
   
-  return user ? children : <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+  
+  if (requiredRole && user.role !== requiredRole) {
+    return <Navigate to={user.role === 'student' ? '/student/dashboard' : '/dashboard'} />;
+  }
+  
+  return children;
 };
 
 const AppRoutes = () => {
   const { user } = useAuth();
   
+  const getDefaultRoute = () => {
+    if (!user) return '/login';
+    return user.role === 'student' ? '/student/dashboard' : '/dashboard';
+  };
+  
   return (
     <Routes>
-      <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login />} />
-      <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register />} />
+      <Route path="/login" element={user ? <Navigate to={getDefaultRoute()} /> : <Login />} />
+      <Route path="/register" element={user ? <Navigate to={getDefaultRoute()} /> : <Register />} />
       <Route path="/student/signup" element={<StudentSignup />} />
       <Route path="/student/login" element={<StudentLogin />} />
-      <Route path="/student/dashboard" element={<StudentDashboard />} />
-      <Route path="/student/profile" element={<StudentProfile />} />
-      <Route path="/student/upload" element={<StudentUpload />} />
-      <Route path="/student/learning-path" element={<StudentLearningPath />} />
-      <Route path="/student/weekly-plan" element={<WeeklyPlanPage />} />
-      <Route path="/student/daily-plan" element={<DailyPlanPage />} />
-      <Route path="/student/progress" element={<ProgressPage />} />
-      <Route path="/student/quiz/:quizId" element={<StudentQuiz />} />
+      <Route 
+        path="/student/dashboard" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <StudentDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/profile" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <StudentProfile />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/upload" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <StudentUpload />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/learning-path" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <StudentLearningPath />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/weekly-plan" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <WeeklyPlanPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/daily-plan" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <DailyPlanPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/progress" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <ProgressPage />
+          </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/quiz/:quizId" 
+        element={
+          <ProtectedRoute requiredRole="student">
+            <StudentQuiz />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route
         path="/dashboard"

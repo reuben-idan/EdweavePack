@@ -33,9 +33,15 @@ const Login = () => {
       setLoading(true);
       toast.info('Signing you in...');
       
-      await login(formData);
+      const userData = await login(formData);
       toast.success('Welcome back to EdweavePack!');
-      navigate('/dashboard');
+      
+      // Navigate based on user role
+      if (userData.role === 'student') {
+        navigate('/student/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
       
     } catch (error) {
       console.error('Login error:', error);
