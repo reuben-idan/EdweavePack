@@ -1,0 +1,69 @@
+pedagogy:
+  bloom_levels: [remember, understand, apply, analyze, evaluate, create]
+  module_count: 4
+  weekly_structure:
+    lessons_per_week: 3
+    assessments_per_week: 1
+  activity_types: [lecture, discussion, practice, project]
+  
+curriculum_architect:
+  name: "Curriculum Architect Agent"
+  role: "Generate comprehensive lesson plans and learning objectives"
+  capabilities:
+    - bloom_taxonomy_alignment
+    - learning_objective_generation
+    - activity_sequencing
+    - prerequisite_mapping
+  
+assessment_generator:
+  name: "Assessment Generator Agent"
+  role: "Create assessments and rubrics"
+  capabilities:
+    - question_generation
+    - rubric_creation
+    - difficulty_calibration
+    - format_diversification
+  
+personalized_learning:
+  name: "Personalized Learning Path Agent"
+  role: "Generate adaptive learning paths"
+  capabilities:
+    - student_profiling
+    - path_optimization
+    - prerequisite_tracking
+    - difficulty_adjustment
+  
+auto_grader:
+  name: "Auto-Grader Analytics Agent"
+  role: "Grade submissions and update metrics"
+  capabilities:
+    - automated_grading
+    - feedback_generation
+    - performance_analytics
+    - dashboard_updates
+
+templates:
+  k2:
+    focus: "foundational_skills"
+    bloom_emphasis: [remember, understand]
+    activity_preference: [hands_on, visual, storytelling]
+  
+  k5:
+    focus: "skill_building"
+    bloom_emphasis: [remember, understand, apply]
+    activity_preference: [interactive, collaborative, creative]
+  
+  middle_school:
+    focus: "concept_development"
+    bloom_emphasis: [understand, apply, analyze]
+    activity_preference: [project_based, inquiry, discussion]
+  
+  high_school:
+    focus: "critical_thinking"
+    bloom_emphasis: [apply, analyze, evaluate, create]
+    activity_preference: [research, debate, presentation, portfolio]
+  
+  university:
+    focus: "mastery_application"
+    bloom_emphasis: [analyze, evaluate, create]
+    activity_preference: [research, thesis, internship, capstone]

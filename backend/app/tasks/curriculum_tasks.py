@@ -4,6 +4,7 @@ from app.core.database import SessionLocal
 from app.models.curriculum import Curriculum
 from app.models.files import Module
 from app.services.ai_service import AIService
+from agents.orchestrator import AgentOrchestrator
 import json
 import logging
 
@@ -24,12 +25,12 @@ def curriculum_generation(self, curriculum_id: int):
         
         current_task.update_state(state='PROGRESS', meta={'progress': 30})
         
-        # Generate curriculum using AI service
-        ai_service = AIService()
-        curriculum_data = await ai_service.generate_curriculum(
+        # Generate curriculum using Agent Orchestrator
+        orchestrator = AgentOrchestrator()
+        curriculum_data = await orchestrator.create_complete_curriculum(
             curriculum.source_content,
-            curriculum.subject,
-            curriculum.grade_level
+            curriculum.grade_level,
+            curriculum.subject
         )
         
         current_task.update_state(state='PROGRESS', meta={'progress': 60})
