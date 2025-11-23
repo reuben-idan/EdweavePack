@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import UploadPage from './pages/UploadPage';
 import CurriculumPage from './pages/CurriculumPage';
 import CreateCurriculum from './pages/CreateCurriculum';
+import { TeacherDashboard } from './pages/TeacherDashboard';
 
 const ProtectedRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -65,6 +66,16 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <Layout>
               <CreateCurriculum />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/teacher"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <TeacherDashboard />
             </Layout>
           </ProtectedRoute>
         }
