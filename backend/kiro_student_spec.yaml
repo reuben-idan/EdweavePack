@@ -1,0 +1,212 @@
+kiro_agent_specification:
+  version: "2.0"
+  name: "EdweavePack Student Learning System"
+  description: "AI-powered personalized learning path generator for students"
+
+teacher_agents:
+  curriculum_architect:
+    bloom_taxonomy_layers:
+      - remember: "Recall facts, terms, basic concepts"
+      - understand: "Explain ideas, summarize, interpret"
+      - apply: "Use information in new situations"
+      - analyze: "Draw connections, examine components"
+      - evaluate: "Justify decisions, critique arguments"
+      - create: "Produce original work, design solutions"
+    
+    module_generation:
+      structure:
+        - learning_objectives: "SMART goals aligned with Bloom's taxonomy"
+        - content_blocks: "Chunked information with examples"
+        - activities: "Interactive exercises and practice"
+        - assessments: "Formative and summative evaluations"
+      
+      difficulty_progression:
+        beginner: "Basic concepts, simple examples"
+        intermediate: "Complex applications, multi-step problems"
+        advanced: "Abstract thinking, creative solutions"
+    
+    assessment_templates:
+      quiz_structure:
+        mcqs: 5-15
+        short_answer: 2-5
+        essay: 0-2
+      
+      question_types:
+        - factual_recall
+        - conceptual_understanding
+        - application_problems
+        - analysis_tasks
+        - synthesis_challenges
+
+student_agents:
+  learning_path_framework:
+    personalization_factors:
+      - age: "Cognitive development stage"
+      - learning_style: "Visual, auditory, reading, kinesthetic"
+      - target_exams: "BECE, WASSCE, SAT, IGCSE, University"
+      - strengths: "Subject areas of competence"
+      - weaknesses: "Areas needing improvement"
+      - timeline: "Exam dates and deadlines"
+    
+    path_generation:
+      duration_weeks: "auto-calculated based on goals and timeline"
+      study_hours_per_day: "personalized based on availability and intensity"
+      difficulty_progression: "adaptive based on performance"
+      
+      weekly_structure:
+        topics_per_week: 2-4
+        estimated_hours: 8-15
+        difficulty_levels: ["beginner", "intermediate", "advanced"]
+        
+      daily_structure:
+        task_types:
+          - reading: "Textbook chapters, articles, resources"
+          - practice: "Problem sets, exercises, drills"
+          - reflection: "Summary writing, concept mapping"
+          - quiz: "Knowledge checks, assessments"
+        
+        task_distribution:
+          monday: ["reading", "practice"]
+          tuesday: ["practice", "quiz"]
+          wednesday: ["reading", "reflection"]
+          thursday: ["practice", "quiz"]
+          friday: ["reflection", "review"]
+          weekend: ["optional_practice", "review"]
+    
+    quiz_generation:
+      daily_quizzes:
+        mcqs: 5-8
+        short_answer: 1-2
+        time_limit: 10-15
+        difficulty: "adaptive"
+      
+      weekly_assessments:
+        mcqs: 10-15
+        short_answer: 3-5
+        time_limit: 30-45
+        difficulty: "progressive"
+      
+      question_generation_rules:
+        factual: 30%
+        conceptual: 40%
+        application: 30%
+      
+      auto_grading:
+        mcq: "exact_match"
+        short_answer: "keyword_matching + similarity"
+        feedback: "immediate with explanations"
+    
+    adaptation_rules:
+      performance_thresholds:
+        high_score: ">= 85%"
+        medium_score: "70-84%"
+        low_score: "< 70%"
+      
+      adaptation_actions:
+        high_score:
+          - increase_difficulty: "Move to next level"
+          - add_advanced_topics: "Introduce challenging concepts"
+          - reduce_practice_time: "Focus on new material"
+        
+        medium_score:
+          - maintain_difficulty: "Continue current level"
+          - add_practice: "Extra exercises in weak areas"
+          - provide_hints: "Guided problem solving"
+        
+        low_score:
+          - decrease_difficulty: "Simplify concepts"
+          - add_remediation: "Review prerequisite topics"
+          - increase_practice: "More repetition and examples"
+          - provide_tutoring: "Additional explanations"
+      
+      learning_style_adaptations:
+        visual:
+          - diagrams: "Concept maps, flowcharts"
+          - videos: "Educational animations"
+          - infographics: "Visual summaries"
+        
+        auditory:
+          - audio_lessons: "Recorded explanations"
+          - discussions: "Q&A sessions"
+          - verbal_instructions: "Step-by-step narration"
+        
+        reading:
+          - text_materials: "Detailed written content"
+          - note_taking: "Structured summaries"
+          - written_exercises: "Text-based problems"
+        
+        kinesthetic:
+          - interactive_simulations: "Hands-on activities"
+          - real_world_applications: "Practical examples"
+          - movement_based: "Physical demonstrations"
+    
+    progress_tracking:
+      metrics:
+        - completion_rate: "Tasks completed / Total tasks"
+        - quiz_performance: "Average scores over time"
+        - study_consistency: "Daily activity tracking"
+        - subject_mastery: "Topic-wise progress"
+        - time_efficiency: "Learning speed analysis"
+      
+      analytics:
+        - learning_velocity: "Concepts mastered per week"
+        - retention_rate: "Knowledge retention over time"
+        - difficulty_comfort: "Optimal challenge level"
+        - engagement_patterns: "Peak learning times"
+      
+      recommendations_engine:
+        focus_areas:
+          - weak_subjects: "Subjects below 70% mastery"
+          - time_management: "Study schedule optimization"
+          - exam_preparation: "Timeline-based priorities"
+        
+        study_strategies:
+          - spaced_repetition: "Review scheduling"
+          - active_recall: "Self-testing techniques"
+          - interleaving: "Mixed practice sessions"
+        
+        motivational_support:
+          - achievement_badges: "Milestone celebrations"
+          - progress_visualization: "Charts and graphs"
+          - peer_comparisons: "Anonymous benchmarking"
+
+integration_workflows:
+  student_onboarding:
+    steps:
+      1. profile_creation: "Age, learning style, goals"
+      2. goal_setting: "Subjects, timeline, preferences"
+      3. path_generation: "AI creates personalized plan"
+      4. first_assessment: "Baseline knowledge check"
+      5. path_refinement: "Adjust based on assessment"
+  
+  daily_learning_cycle:
+    steps:
+      1. task_presentation: "Show today's activities"
+      2. content_delivery: "Adaptive material presentation"
+      3. practice_session: "Interactive exercises"
+      4. knowledge_check: "Mini quiz or reflection"
+      5. progress_update: "Track completion and performance"
+  
+  weekly_review_cycle:
+    steps:
+      1. progress_analysis: "Review week's performance"
+      2. mastery_assessment: "Comprehensive quiz"
+      3. path_adjustment: "Modify next week's plan"
+      4. recommendation_generation: "AI suggests improvements"
+      5. goal_alignment: "Check progress toward objectives"
+
+ai_model_specifications:
+  learning_path_generator:
+    model: "GPT-4 + domain-specific fine-tuning"
+    context_window: "Educational standards + student profile"
+    output_format: "Structured JSON with weekly/daily breakdown"
+  
+  quiz_generator:
+    model: "GPT-4 + question bank integration"
+    difficulty_calibration: "Bloom's taxonomy alignment"
+    output_format: "JSON with questions, answers, explanations"
+  
+  progress_analyzer:
+    model: "Statistical analysis + ML predictions"
+    input_features: "Performance history, time patterns, engagement"
+    output_format: "Recommendations with confidence scores"
