@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
+import io
 from app.core.database import get_db
 from app.models.curriculum import Curriculum, LearningPath, Assessment, Question
 from app.models.user import User
@@ -8,12 +10,16 @@ from app.schemas.curriculum import CurriculumCreate, CurriculumResponse, Learnin
 from app.api.auth import get_current_user
 from app.services.ai_service import AIService
 from app.services.content_extractor import ContentExtractor
+from app.services.pedagogical_templates import PedagogicalTemplate
+from app.services.export_service import ExportService
 import PyPDF2
 import io
 
 router = APIRouter()
 ai_service = AIService()
 content_extractor = ContentExtractor()
+pedagogical_templates = PedagogicalTemplate()
+export_service = ExportService()
 
 @router.post("/", response_model=CurriculumResponse)
 async def create_curriculum(
