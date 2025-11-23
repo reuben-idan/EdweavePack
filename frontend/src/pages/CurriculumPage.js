@@ -3,12 +3,14 @@ import { useParams, useNavigate } from 'react-router-dom';
 import ModuleCard from '../components/ModuleCard';
 import AssessmentCard from '../components/AssessmentCard';
 import ExportOptions from '../components/ExportOptions';
+import { useToast } from '../components/Toast';
 import { curriculumAPI, assessmentAPI } from '../services/api';
 import { BookOpen, Target, Calendar, Users, Plus, ArrowLeft } from 'lucide-react';
 
 const CurriculumPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
   const [curriculum, setCurriculum] = useState(null);
   const [modules, setModules] = useState([]);
   const [assessments, setAssessments] = useState([]);
@@ -88,11 +90,13 @@ const CurriculumPage = () => {
 
   const handleModuleStart = async (module) => {
     console.log('Starting module:', module);
+    toast.info('Module started', `Beginning ${module.title}`);
     // Implement module start logic
   };
 
   const handleAssessmentTake = async (assessment) => {
     console.log('Taking assessment:', assessment);
+    toast.info('Starting assessment', `Navigating to ${assessment.title}`);
     // Navigate to assessment page
     navigate(`/assessment/${assessment.id}`);
   };
@@ -104,12 +108,15 @@ const CurriculumPage = () => {
 
   const handleGenerateAssessment = async () => {
     try {
+      toast.info('Generating assessment', 'This may take a few moments...');
       const response = await assessmentAPI.generate(id, 'mixed');
       console.log('Generated assessment:', response.data);
+      toast.success('Assessment generated successfully', 'New assessment has been added to your curriculum');
       // Refresh assessments
       fetchCurriculumData();
     } catch (error) {
       console.error('Failed to generate assessment:', error);
+      toast.error('Failed to generate assessment', 'Please try again later');
     }
   };
 

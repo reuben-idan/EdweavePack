@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import { ToastProvider } from './components/Toast';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
@@ -8,6 +9,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import UploadPage from './pages/UploadPage';
 import CurriculumPage from './pages/CurriculumPage';
+import CurriculumList from './pages/CurriculumList';
 import CreateCurriculum from './pages/CreateCurriculum';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 
@@ -54,6 +56,16 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/curriculum"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <CurriculumList />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/curriculum/:id"
         element={
           <ProtectedRoute>
@@ -90,13 +102,15 @@ const AppRoutes = () => {
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <Router>
-          <div className="App">
-            <AppRoutes />
-          </div>
-        </Router>
-      </AuthProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <Router>
+            <div className="App">
+              <AppRoutes />
+            </div>
+          </Router>
+        </AuthProvider>
+      </ToastProvider>
     </ErrorBoundary>
   );
 }
