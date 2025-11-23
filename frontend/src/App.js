@@ -21,6 +21,9 @@ import StudentProfile from './pages/StudentProfile';
 import StudentUpload from './pages/StudentUpload';
 import StudentLearningPath from './pages/StudentLearningPath';
 import StudentQuiz from './pages/StudentQuiz';
+import WeeklyPlanPage from './pages/WeeklyPlanPage';
+import DailyPlanPage from './pages/DailyPlanPage';
+import ProgressPage from './pages/ProgressPage';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +56,9 @@ const AppRoutes = () => {
       <Route path="/student/profile" element={<StudentProfile />} />
       <Route path="/student/upload" element={<StudentUpload />} />
       <Route path="/student/learning-path" element={<StudentLearningPath />} />
+      <Route path="/student/weekly-plan" element={<WeeklyPlanPage />} />
+      <Route path="/student/daily-plan" element={<DailyPlanPage />} />
+      <Route path="/student/progress" element={<ProgressPage />} />
       <Route path="/student/quiz/:quizId" element={<StudentQuiz />} />
       <Route path="/" element={<Navigate to="/dashboard" />} />
       <Route
