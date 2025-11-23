@@ -1,213 +1,233 @@
+<div align="center">
+
 # EdweavePack
 
-EdweavePack turns any teaching resource into structured curricula, adaptive learning paths, auto-graded assessments, and teacher analytics—powered by Amazon Q Developer and Amazon Kiro.
+**AI-Powered Educational Content Platform**
 
-## 🚀 Features
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://reactjs.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 
-- **AI-Powered Curriculum Generation**: Transform any teaching material (PDF, text, video transcripts) into structured curricula
-- **Adaptive Learning Paths**: Personalized learning sequences based on student performance
-- **Auto-Graded Assessments**: Intelligent question generation with automated grading
-- **Teacher Analytics**: Comprehensive dashboard with student progress insights
-- **Secure Authentication**: OAuth2-based teacher authentication system
-- **Scalable Architecture**: Built for K-12 and University scale deployment
+Transform teaching resources into structured curricula, adaptive learning paths, and auto-graded assessments powered by Amazon Q Developer.
 
-## 🏗️ Architecture
+[Quick Start](#quick-start) • [Documentation](#api-documentation) • [Contributing](#contributing)
 
-### Backend
-- **FastAPI** (Python 3.11+) - High-performance API framework
-- **PostgreSQL** - Primary database for structured data
-- **Redis** - Caching and session management
-- **Celery** - Asynchronous task processing
-- **Amazon Q Developer** - AI content generation
-- **Amazon Kiro** - Curriculum steering and orchestration
+</div>
 
-### Frontend
-- **React 18** - Modern UI framework
-- **Tailwind CSS** - Utility-first styling
-- **React Router** - Client-side routing
-- **Axios** - API communication
+## Features
 
-### Infrastructure
-- **AWS ECS/Fargate** - Container orchestration
-- **AWS RDS** - Managed PostgreSQL
-- **AWS ElastiCache** - Managed Redis
-- **AWS S3** - File storage
-- **AWS CloudWatch** - Monitoring and logging
-- **Terraform** - Infrastructure as Code
+<table>
+<tr>
+<td>
 
-## 🚀 Quick Start
+**AI Content Generation**
+- Transform PDFs, text, videos into curricula
+- Intelligent question generation
+- Automated grading system
+
+</td>
+<td>
+
+**Analytics & Insights**
+- Real-time student progress tracking
+- Performance analytics dashboard
+- Adaptive learning recommendations
+
+</td>
+</tr>
+<tr>
+<td>
+
+**Secure & Scalable**
+- OAuth2 JWT authentication
+- Enterprise-grade security
+- AWS cloud infrastructure
+
+</td>
+<td>
+
+**Modern Interface**
+- Glassmorphism design system
+- Responsive across devices
+- Intuitive user experience
+
+</td>
+</tr>
+</table>
+
+## Architecture
+
+```mermaid
+graph TB
+    A[React Frontend] --> B[FastAPI Backend]
+    B --> C[PostgreSQL]
+    B --> D[Redis Cache]
+    B --> E[Amazon Q Developer]
+    B --> F[AWS S3]
+    G[Docker] --> H[AWS ECS]
+```
+
+**Tech Stack**
+- **Backend**: FastAPI, PostgreSQL, Redis, Celery
+- **Frontend**: React 18, Tailwind CSS, React Router
+- **AI**: Amazon Q Developer, Amazon Kiro
+- **Infrastructure**: AWS ECS, RDS, ElastiCache, S3
+- **DevOps**: Docker, Terraform, GitHub Actions
+
+## Quick Start
 
 ### Prerequisites
-- Docker and Docker Compose
-- Node.js 18+ (for local frontend development)
-- Python 3.11+ (for local backend development)
-- AWS CLI configured (for deployment)
+
+```bash
+# Required
+Docker & Docker Compose
+Node.js 18+
+Python 3.11+
+AWS CLI (for deployment)
+```
 
 ### Local Development
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd EdweavePack
-   ```
-
-2. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
-
-3. **Start the development environment**
-   ```bash
-   make up
-   ```
-
-4. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:8000
-   - API Documentation: http://localhost:8000/docs
-
-### Demo Mode
-
-To run the demo with sample data:
-
 ```bash
+# Clone and setup
+git clone https://github.com/your-org/EdweavePack.git
+cd EdweavePack
+cp .env.example .env
+
+# Start all services
+make up
+
+# Or run demo with sample data
 make demo
 ```
 
-This will start all services and populate the database with sample curricula and assessments.
+**Access Points**
+- Frontend: http://localhost:3000
+- API: http://localhost:8000
+- Docs: http://localhost:8000/docs
 
-## 📚 API Documentation
+### Manual Setup
 
-The API is fully documented with OpenAPI/Swagger. Once the backend is running, visit:
-- Interactive docs: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-### Key Endpoints
-
-- `POST /api/auth/register` - Teacher registration
-- `POST /api/auth/token` - Authentication
-- `POST /api/curriculum/` - Create new curriculum
-- `GET /api/curriculum/` - List user's curricula
-- `POST /api/curriculum/upload` - Upload teaching materials
-- `GET /api/assessment/{id}` - Get assessment details
-- `POST /api/assessment/{id}/submit` - Submit assessment answers
-- `GET /api/analytics/dashboard` - Teacher dashboard analytics
-
-## 🧪 Testing
-
-### Backend Tests
-```bash
-make test-backend
-```
-
-### Frontend Tests
-```bash
-make test-frontend
-```
-
-### All Tests
-```bash
-make test
-```
-
-## 🚀 Deployment
-
-### Infrastructure Setup
-
-1. **Configure AWS credentials**
-   ```bash
-   aws configure
-   ```
-
-2. **Deploy infrastructure**
-   ```bash
-   cd infrastructure
-   terraform init
-   terraform plan
-   terraform apply
-   ```
-
-### Application Deployment
-
-The application uses GitHub Actions for CI/CD. Push to the `main` branch triggers:
-1. Automated testing
-2. Docker image building
-3. ECR image pushing
-4. ECS service updates
-
-## 🔧 Development
-
-### Backend Development
+<details>
+<summary>Backend Development</summary>
 
 ```bash
 cd backend
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+venv\Scripts\activate  # Windows
+source venv/bin/activate  # Unix
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
+</details>
 
-### Frontend Development
+<details>
+<summary>Frontend Development</summary>
 
 ```bash
 cd frontend
 npm install
 npm start
 ```
+</details>
 
-### Database Migrations
+## API Documentation
+
+### Core Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/auth/register` | Teacher registration |
+| `POST` | `/api/auth/token` | Authentication |
+| `POST` | `/api/curriculum/` | Create curriculum |
+| `GET` | `/api/curriculum/` | List curricula |
+| `POST` | `/api/curriculum/upload` | Upload materials |
+| `GET` | `/api/assessment/{id}` | Get assessment |
+| `POST` | `/api/assessment/{id}/submit` | Submit answers |
+| `GET` | `/api/analytics/dashboard` | Analytics data |
+
+**Interactive Documentation**: Available at `/docs` when running locally
+
+## Testing
 
 ```bash
-cd backend
-alembic revision --autogenerate -m "Description"
-alembic upgrade head
+# Run all tests
+make test
+
+# Individual test suites
+make test-backend
+make test-frontend
 ```
 
-## 📊 Monitoring
+## Deployment
 
-- **Application Logs**: CloudWatch Logs
-- **Metrics**: CloudWatch Metrics
-- **Performance**: AWS X-Ray tracing
-- **Errors**: CloudWatch Alarms
+### Infrastructure
 
-## 🔒 Security
+```bash
+# Setup AWS credentials
+aws configure
 
-- OAuth2 with JWT tokens for authentication
-- HTTPS enforcement in production
-- Database encryption at rest
-- Secrets management with AWS Secrets Manager
-- CORS protection
-- Input validation and sanitization
+# Deploy with Terraform
+cd infrastructure
+terraform init && terraform apply
+```
 
-## 🤝 Contributing
+### CI/CD Pipeline
+
+Push to `main` branch triggers:
+1. Automated testing
+2. Docker image build
+3. ECR deployment
+4. ECS service update
+
+## Security
+
+- **Authentication**: OAuth2 + JWT tokens
+- **Transport**: HTTPS enforcement
+- **Data**: Encryption at rest
+- **Secrets**: AWS Secrets Manager
+- **Validation**: Input sanitization
+- **CORS**: Configured protection
+
+## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create feature branch: `git checkout -b feature/name`
+3. Commit changes: `git commit -m 'Add feature'`
+4. Push branch: `git push origin feature/name`
+5. Submit Pull Request
 
-## 📄 License
+**Development Guidelines**
+- Follow existing code style
+- Add tests for new features
+- Update documentation
+- Ensure CI passes
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the GitHub repository
-- Check the [documentation](docs/)
-- Review the [demo script](demo/demo-script.md)
-
-## 🎯 Roadmap
+## Roadmap
 
 - [ ] Multi-language support
-- [ ] Advanced analytics with ML insights
-- [ ] Integration with popular LMS platforms
-- [ ] Mobile app for students
-- [ ] Real-time collaboration features
-- [ ] Advanced AI tutoring capabilities
+- [ ] Advanced ML analytics
+- [ ] LMS integrations
+- [ ] Mobile applications
+- [ ] Real-time collaboration
+- [ ] AI tutoring system
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/your-org/EdweavePack/issues)
+- **Documentation**: [docs/](docs/)
+- **Demo**: [demo-script.md](demo/demo-script.md)
 
 ---
 
-**Built with ❤️ for educators worldwide**
+<div align="center">
+
+**Built for educators worldwide**
+
+</div>
