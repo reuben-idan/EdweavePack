@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import { AuthProvider, useAuth } from './hooks/useAuth';
-import { ToastProvider } from './components/Toast';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
@@ -11,6 +11,9 @@ import UploadPage from './pages/UploadPage';
 import CurriculumPage from './pages/CurriculumPage';
 import CurriculumList from './pages/CurriculumList';
 import CreateCurriculum from './pages/CreateCurriculum';
+import AssessmentList from './pages/AssessmentList';
+import AssessmentTake from './pages/AssessmentTake';
+import CreateAssessment from './pages/CreateAssessment';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 
 const ProtectedRoute = ({ children }) => {
@@ -18,8 +21,11 @@ const ProtectedRoute = ({ children }) => {
   
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary-600"></div>
+      <div className="flex items-center justify-center min-h-screen animated-gradient">
+        <div className="glass-card p-8 text-center">
+          <div className="spinner mx-auto mb-4"></div>
+          <p className="text-white font-medium">Loading EdweavePack...</p>
+        </div>
       </div>
     );
   }
@@ -86,6 +92,34 @@ const AppRoutes = () => {
         }
       />
       <Route
+        path="/assessments"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <AssessmentList />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assessments/create"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <CreateAssessment />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assessment/:id"
+        element={
+          <ProtectedRoute>
+            <AssessmentTake />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/teacher"
         element={
           <ProtectedRoute>
@@ -102,15 +136,26 @@ const AppRoutes = () => {
 function App() {
   return (
     <ErrorBoundary>
-      <ToastProvider>
-        <AuthProvider>
-          <Router>
-            <div className="App">
-              <AppRoutes />
-            </div>
-          </Router>
-        </AuthProvider>
-      </ToastProvider>
+      <AuthProvider>
+        <Router>
+          <div className="App">
+            <AppRoutes />
+            <ToastContainer
+              position="top-right"
+              autoClose={4000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              toastClassName="glass-card"
+            />
+          </div>
+        </Router>
+      </AuthProvider>
     </ErrorBoundary>
   );
 }
