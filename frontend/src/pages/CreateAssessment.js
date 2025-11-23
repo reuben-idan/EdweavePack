@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { curriculumAPI, assessmentAPI } from '../services/api';
-import { useToast } from '../components/Toast';
+import { toast } from 'react-toastify';
 import { Plus, Trash2, ArrowLeft, Save } from 'lucide-react';
 
 const CreateAssessment = () => {
   const navigate = useNavigate();
-  const toast = useToast();
+
   const [curricula, setCurricula] = useState([]);
   const [loading, setLoading] = useState(false);
   const [assessment, setAssessment] = useState({
@@ -28,7 +28,7 @@ const CreateAssessment = () => {
       const response = await curriculumAPI.getAll();
       setCurricula(response.data);
     } catch (error) {
-      toast.error('Failed to load curricula', 'Please refresh the page');
+      toast.error('Failed to load curricula. Please refresh the page');
     }
   };
 
@@ -42,7 +42,7 @@ const CreateAssessment = () => {
       points: 5
     };
     setQuestions([...questions, newQuestion]);
-    toast.success('Question added', 'New question ready for editing');
+    toast.success('Question added - New question ready for editing');
   };
 
   const updateQuestion = (id, field, value) => {
@@ -61,20 +61,20 @@ const CreateAssessment = () => {
 
   const removeQuestion = (id) => {
     setQuestions(questions.filter(q => q.id !== id));
-    toast.info('Question removed', 'Question deleted from assessment');
+    toast.info('Question removed - Question deleted from assessment');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!assessment.title || !assessment.curriculum_id || questions.length === 0) {
-      toast.error('Missing information', 'Please fill all required fields and add questions');
+      toast.error('Missing information. Please fill all required fields and add questions');
       return;
     }
 
     try {
       setLoading(true);
-      toast.info('Creating assessment', 'Processing your assessment...');
+      toast.info('Creating assessment - Processing your assessment...');
       
       const assessmentData = {
         ...assessment,
@@ -84,11 +84,11 @@ const CreateAssessment = () => {
       // Mock API call
       console.log('Creating assessment:', assessmentData);
       
-      toast.success('Assessment created successfully', 'Your assessment is now available');
+      toast.success('Assessment created successfully - Your assessment is now available');
       navigate('/assessments');
       
     } catch (error) {
-      toast.error('Failed to create assessment', 'Please try again');
+      toast.error('Failed to create assessment. Please try again');
     } finally {
       setLoading(false);
     }

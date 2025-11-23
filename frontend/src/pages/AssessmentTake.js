@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { assessmentAPI } from '../services/api';
-import { useToast } from '../components/Toast';
+import { toast } from 'react-toastify';
 import { Clock, CheckCircle, AlertCircle, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const AssessmentTake = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const toast = useToast();
+
   const [assessment, setAssessment] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -89,11 +89,11 @@ const AssessmentTake = () => {
       setAssessment(mockAssessment);
       setQuestions(mockQuestions);
       setTimeLeft(mockAssessment.time_limit * 60);
-      toast.success('Assessment loaded', 'Ready to begin when you are');
+      toast.success('Assessment loaded - Ready to begin when you are');
       
     } catch (error) {
       console.error('Failed to fetch assessment:', error);
-      toast.error('Failed to load assessment', 'Please try again later');
+      toast.error('Failed to load assessment. Please try again later');
     } finally {
       setLoading(false);
     }
@@ -101,7 +101,7 @@ const AssessmentTake = () => {
 
   const handleStart = () => {
     setStarted(true);
-    toast.info('Assessment started', 'Timer is now running');
+    toast.info('Assessment started - Timer is now running');
   };
 
   const handleAnswerChange = (questionId, answer) => {
@@ -126,15 +126,15 @@ const AssessmentTake = () => {
   const handleSubmit = async () => {
     try {
       setSubmitting(true);
-      toast.info('Submitting assessment', 'Processing your answers...');
+      toast.info('Submitting assessment - Processing your answers...');
       
       await assessmentAPI.submit(id, answers);
-      toast.success('Assessment submitted', 'Your answers have been recorded');
+      toast.success('Assessment submitted - Your answers have been recorded');
       navigate('/assessments');
       
     } catch (error) {
       console.error('Failed to submit assessment:', error);
-      toast.error('Submission failed', 'Please try again');
+      toast.error('Submission failed. Please try again');
     } finally {
       setSubmitting(false);
     }
