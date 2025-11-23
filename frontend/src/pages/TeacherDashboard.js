@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { AnalyticsChart } from '../components/AnalyticsChart';
-import { CurriculumCard } from '../components/CurriculumCard';
-import { api } from '../services/api';
+import AnalyticsChart from '../components/AnalyticsChart';
+import CurriculumCard from '../components/CurriculumCard';
+import { analyticsAPI, curriculumAPI, studentsAPI } from '../services/api';
 
 export const TeacherDashboard = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -16,9 +16,9 @@ export const TeacherDashboard = () => {
   const loadDashboardData = async () => {
     try {
       const [analyticsRes, curriculaRes, studentsRes] = await Promise.all([
-        api.get('/analytics/dashboard'),
-        api.get('/curriculum/'),
-        api.get('/students/')
+        analyticsAPI.getDashboard(),
+        curriculumAPI.getCurricula(),
+        studentsAPI.getStudents()
       ]);
       
       setAnalytics(analyticsRes.data);
