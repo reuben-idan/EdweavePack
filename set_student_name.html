@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Set Student Name</title>
+</head>
+<body>
+    <h2>Set Student Name for Testing</h2>
+    <input type="text" id="nameInput" placeholder="Enter student name" value="John Doe">
+    <button onclick="setName()">Set Name & Go to Dashboard</button>
+    
+    <script>
+        function setName() {
+            const name = document.getElementById('nameInput').value || 'Student';
+            localStorage.setItem('studentName', name);
+            window.location.href = '/student/dashboard';
+        }
+    </script>
+</body>
+</html>

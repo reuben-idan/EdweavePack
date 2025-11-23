@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, BookOpen, AlertCircle, CheckCircle } from 'lucide-react';
 import { useStudentAuth } from '../hooks/useStudentAuth';
+import { setStudentName } from '../utils/studentUtils';
 
 const StudentLogin = () => {
   const navigate = useNavigate();
@@ -59,6 +60,10 @@ const StudentLogin = () => {
     const result = await login(formData);
     
     if (result.success) {
+      // Extract name from email or set default
+      const studentName = formData.email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      setStudentName(studentName);
+      
       // Save remember me preference
       if (rememberMe) {
         localStorage.setItem('rememberStudentEmail', formData.email);

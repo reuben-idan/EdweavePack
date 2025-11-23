@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { BookOpen, Target, Calendar, TrendingUp, Clock, Award, User, Settings, Upload, Play, CheckCircle, Circle, Brain, BarChart3 } from 'lucide-react';
+import { getStudentName } from '../utils/studentUtils';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
@@ -14,9 +15,12 @@ const StudentDashboard = () => {
 
   const fetchStudentData = async () => {
     try {
+      // Get student name
+      const storedName = getStudentName();
+      
       // Mock comprehensive student data
       const mockStudent = {
-        name: 'Alex Johnson',
+        name: storedName,
         email: 'alex@student.com',
         age: 16,
         learningStyle: 'visual',
@@ -98,7 +102,7 @@ const StudentDashboard = () => {
       };
       
       setStudent(mockStudent);
-      toast.success('Welcome back! Ready to continue learning?');
+      toast.success(`Welcome back, ${storedName}! Ready to continue learning?`);
     } catch (error) {
       toast.error('Failed to load dashboard data');
     } finally {
