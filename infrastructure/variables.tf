@@ -4,6 +4,12 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "project_name" {
+  description = "Project name"
+  type        = string
+  default     = "edweavepack"
+}
+
 variable "db_password" {
   description = "Database password"
   type        = string
@@ -13,5 +19,5 @@ variable "db_password" {
 variable "environment" {
   description = "Environment name"
   type        = string
-  default     = "dev"
+  default     = "production"
 }

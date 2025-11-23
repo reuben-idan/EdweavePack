@@ -1,4 +1,5 @@
 terraform {
+  required_version = ">= 1.0"
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -18,31 +19,30 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name = "edweave-vpc"
-  }
-}
-
-resource "aws_subnet" "public" {
-  count             = 2
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.${count.index + 1}.0/24"
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "edweave-public-${count.index + 1}"
+    Name = "${var.project_name}-vpc"
   }
 }
 
 resource "aws_subnet" "private" {
   count             = 2
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.${count.index + 10}.0/24"
+  cidr_block        = "10.0.${count.index + 1}.0/24"
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "edweave-private-${count.index + 1}"
+    Name = "${var.project_name}-private-${count.index + 1}"
+  }
+}
+
+resource "aws_subnet" "public" {
+  count                   = 2
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.${count.index + 10}.0/24"
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-public-${count.index + 1}"
   }
 }
 
@@ -50,7 +50,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags = {
-    Name = "edweave-igw"
+    Name = "${var.project_name}-igw"
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_route_table" "public" {
   }
 
   tags = {
-    Name = "edweave-public-rt"
+    Name = "${var.project_name}-public-rt"
   }
 }
 
@@ -75,7 +75,7 @@ resource "aws_route_table_association" "public" {
 
 # Security Groups
 resource "aws_security_group" "alb" {
-  name_prefix = "edweave-alb-"
+  name_prefix = "${var.project_name}-alb"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -101,12 +101,19 @@ resource "aws_security_group" "alb" {
 }
 
 resource "aws_security_group" "ecs" {
-  name_prefix = "edweave-ecs-"
+  name_prefix = "${var.project_name}-ecs"
   vpc_id      = aws_vpc.main.id
 
   ingress {
     from_port       = 8000
     to_port         = 8000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  ingress {
+    from_port       = 80
+    to_port         = 80
     protocol        = "tcp"
     security_groups = [aws_security_group.alb.id]
   }
@@ -119,18 +126,8 @@ resource "aws_security_group" "ecs" {
   }
 }
 
-# RDS Database
-resource "aws_db_subnet_group" "main" {
-  name       = "edweave-db-subnet-group"
-  subnet_ids = aws_subnet.private[*].id
-
-  tags = {
-    Name = "edweave-db-subnet-group"
-  }
-}
-
 resource "aws_security_group" "rds" {
-  name_prefix = "edweave-rds-"
+  name_prefix = "${var.project_name}-rds"
   vpc_id      = aws_vpc.main.id
 
   ingress {
@@ -141,8 +138,18 @@ resource "aws_security_group" "rds" {
   }
 }
 
+# RDS Database
+resource "aws_db_subnet_group" "main" {
+  name       = "${var.project_name}-db-subnet-group"
+  subnet_ids = aws_subnet.private[*].id
+
+  tags = {
+    Name = "${var.project_name}-db-subnet-group"
+  }
+}
+
 resource "aws_db_instance" "main" {
-  identifier     = "edweave-db"
+  identifier     = "${var.project_name}-db"
   engine         = "postgres"
   engine_version = "15.4"
   instance_class = "db.t3.micro"
@@ -151,8 +158,8 @@ resource "aws_db_instance" "main" {
   max_allocated_storage = 100
   storage_encrypted     = true
   
-  db_name  = "edweave"
-  username = "edweave"
+  db_name  = "edweavepack"
+  username = "postgres"
   password = var.db_password
   
   vpc_security_group_ids = [aws_security_group.rds.id]
@@ -166,48 +173,38 @@ resource "aws_db_instance" "main" {
   deletion_protection = false
 
   tags = {
-    Name = "edweave-db"
+    Name = "${var.project_name}-db"
   }
 }
 
 # ElastiCache Redis
 resource "aws_elasticache_subnet_group" "main" {
-  name       = "edweave-cache-subnet"
+  name       = "${var.project_name}-cache-subnet"
   subnet_ids = aws_subnet.private[*].id
 }
 
-resource "aws_security_group" "redis" {
-  name_prefix = "edweave-redis-"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    from_port       = 6379
-    to_port         = 6379
-    protocol        = "tcp"
-    security_groups = [aws_security_group.ecs.id]
-  }
-}
-
 resource "aws_elasticache_cluster" "main" {
-  cluster_id           = "edweave-redis"
+  cluster_id           = "${var.project_name}-redis"
   engine               = "redis"
   node_type            = "cache.t3.micro"
   num_cache_nodes      = 1
   parameter_group_name = "default.redis7"
   port                 = 6379
   subnet_group_name    = aws_elasticache_subnet_group.main.name
-  security_group_ids   = [aws_security_group.redis.id]
+  security_group_ids   = [aws_security_group.ecs.id]
+
+  tags = {
+    Name = "${var.project_name}-redis"
+  }
 }
 
-# S3 Bucket for file storage
+# S3 Bucket
 resource "aws_s3_bucket" "main" {
-  bucket = "edweave-pack-${random_string.bucket_suffix.result}"
-}
+  bucket = "${var.project_name}-storage-${random_string.bucket_suffix.result}"
 
-resource "random_string" "bucket_suffix" {
-  length  = 8
-  special = false
-  upper   = false
+  tags = {
+    Name = "${var.project_name}-storage"
+  }
 }
 
 resource "aws_s3_bucket_versioning" "main" {
@@ -227,7 +224,101 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "main" {
   }
 }
 
-# Data sources
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
+# ECS Cluster
+resource "aws_ecs_cluster" "main" {
+  name = "${var.project_name}-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
+
+  tags = {
+    Name = "${var.project_name}-cluster"
+  }
+}
+
+# ECR Repositories
+resource "aws_ecr_repository" "backend" {
+  name                 = "${var.project_name}-backend"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_repository" "frontend" {
+  name                 = "${var.project_name}-frontend"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+# Application Load Balancer
+resource "aws_lb" "main" {
+  name               = "${var.project_name}-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.alb.id]
+  subnets            = aws_subnet.public[*].id
+
+  enable_deletion_protection = false
+
+  tags = {
+    Name = "${var.project_name}-alb"
+  }
+}
+
+resource "aws_lb_target_group" "frontend" {
+  name     = "${var.project_name}-frontend-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = aws_vpc.main.id
+
+  health_check {
+    enabled             = true
+    healthy_threshold   = 2
+    interval            = 30
+    matcher             = "200"
+    path                = "/"
+    port                = "traffic-port"
+    protocol            = "HTTP"
+    timeout             = 5
+    unhealthy_threshold = 2
+  }
+}
+
+resource "aws_lb_listener" "main" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+# CloudWatch Log Groups
+resource "aws_cloudwatch_log_group" "backend" {
+  name              = "/ecs/${var.project_name}-backend"
+  retention_in_days = 7
+}
+
+resource "aws_cloudwatch_log_group" "frontend" {
+  name              = "/ecs/${var.project_name}-frontend"
+  retention_in_days = 7
+}
+
 data "aws_availability_zones" "available" {
   state = "available"
 }

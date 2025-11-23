@@ -2,14 +2,16 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY_BACKEND: edweave-backend
-  ECR_REPOSITORY_FRONTEND: edweave-frontend
+  ECR_REPOSITORY_BACKEND: edweavepack-backend
+  ECR_REPOSITORY_FRONTEND: edweavepack-frontend
+  ECS_SERVICE: edweavepack-service
+  ECS_CLUSTER: edweavepack-cluster
 
 jobs:
   test:
@@ -19,15 +21,21 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_edweave
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
     - uses: actions/checkout@v4
@@ -37,29 +45,43 @@ jobs:
       with:
         python-version: '3.11'
     
-    - name: Install backend dependencies
-      run: |
-        cd backend
-        pip install -r requirements.txt
-    
-    - name: Run backend tests
-      run: |
-        cd backend
-        python -m pytest tests/ -v
-      env:
-        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_edweave
-    
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
     
+    - name: Install backend dependencies
+      run: |
+        cd backend
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio httpx
+    
     - name: Install frontend dependencies
       run: |
         cd frontend
-        npm install
+        npm ci
     
-    - name: Run frontend tests
+    - name: Lint backend
+      run: |
+        cd backend
+        pip install flake8 black
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        black --check .
+    
+    - name: Lint frontend
+      run: |
+        cd frontend
+        npm run lint
+    
+    - name: Test backend
+      env:
+        DATABASE_URL: postgresql://postgres:test@localhost:5432/test
+        REDIS_URL: redis://localhost:6379
+      run: |
+        cd backend
+        pytest
+    
+    - name: Test frontend
       run: |
         cd frontend
         npm test -- --coverage --watchAll=false
@@ -91,6 +113,8 @@ jobs:
         cd backend
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest
     
     - name: Build and push frontend image
       env:
@@ -100,8 +124,9 @@ jobs:
         cd frontend
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
     
     - name: Deploy to ECS
       run: |
-        aws ecs update-service --cluster edweave-cluster --service edweave-backend --force-new-deployment
-        aws ecs update-service --cluster edweave-cluster --service edweave-frontend --force-new-deployment
+        aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment

@@ -1,4 +1,4 @@
-.PHONY: help build up down logs test clean
+.PHONY: help build up down test deploy clean
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -6,41 +6,47 @@ help: ## Show this help message
 	@echo 'Targets:'
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  %-15s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-build: ## Build all Docker images
+build: ## Build Docker images
 	docker-compose build
 
-up: ## Start all services
+up: ## Start development environment
 	docker-compose up -d
 
-down: ## Stop all services
+down: ## Stop development environment
 	docker-compose down
 
-logs: ## Show logs from all services
+logs: ## Show logs
 	docker-compose logs -f
 
+test: ## Run all tests
+	$(MAKE) test-backend
+	$(MAKE) test-frontend
+
 test-backend: ## Run backend tests
-	cd backend && python -m pytest tests/ -v
+	cd backend && python -m pytest
 
 test-frontend: ## Run frontend tests
-	cd frontend && npm test
+	cd frontend && npm test -- --watchAll=false
 
-test: test-backend test-frontend ## Run all tests
+lint: ## Run linting
+	cd backend && flake8 . && black --check .
+	cd frontend && npm run lint
 
-clean: ## Clean up Docker resources
+format: ## Format code
+	cd backend && black .
+	cd frontend && npm run format
+
+deploy-infra: ## Deploy infrastructure
+	cd infrastructure && terraform init && terraform apply
+
+deploy-prod: ## Deploy to production
+	docker-compose -f docker-compose.prod.yml up -d
+
+clean: ## Clean up containers and images
 	docker-compose down -v
 	docker system prune -f
 
-dev-setup: ## Set up development environment
-	@echo "Setting up Edweave Pack development environment..."
-	cd backend && pip install -r requirements.txt
-	cd frontend && npm install
-	@echo "Development environment ready!"
-
-deploy-infra: ## Deploy infrastructure with Terraform
-	cd infrastructure && terraform init && terraform plan && terraform apply
-
-demo: ## Start demo environment
-	@echo "Starting Edweave Pack demo..."
-	docker-compose up -d
-	@echo "Demo available at http://localhost:3000"
-	@echo "API documentation at http://localhost:8000/docs"
+demo: ## Run demo with sample data
+	$(MAKE) up
+	sleep 10
+	docker-compose exec backend python scripts/seed_demo_data.py
