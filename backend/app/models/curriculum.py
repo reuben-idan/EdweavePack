@@ -16,8 +16,11 @@ class Curriculum(Base):
     metadata = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
+    # Relationships
+    user = relationship("User", back_populates="curricula")
     learning_paths = relationship("LearningPath", back_populates="curriculum")
     assessments = relationship("Assessment", back_populates="curriculum")
+    modules = relationship("Module", back_populates="curriculum")
 
 class LearningPath(Base):
     __tablename__ = "learning_paths"

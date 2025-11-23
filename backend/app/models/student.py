@@ -17,6 +17,7 @@ class Student(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships
+    teacher = relationship("User", back_populates="students")
     learning_paths = relationship("PersonalizedPath", back_populates="student")
     assessment_attempts = relationship("AssessmentAttempt", back_populates="student")
 

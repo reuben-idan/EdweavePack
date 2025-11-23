@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import auth, curriculum, assessment, analytics, learning_paths, curriculum_enhanced, auth_enhanced
+from app.api import auth, curriculum, assessment, analytics, learning_paths, curriculum_enhanced, auth_enhanced, files, tasks
 from app.core.database import engine
 from app.models import Base
 
@@ -20,6 +20,8 @@ Base.metadata.create_all(bind=engine)
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(auth_enhanced.router, prefix="/api/auth/sso", tags=["sso"])
+app.include_router(files.router, prefix="/api/files", tags=["files"])
+app.include_router(tasks.router, prefix="/api/tasks", tags=["tasks"])
 app.include_router(curriculum.router, prefix="/api/curriculum", tags=["curriculum"])
 app.include_router(curriculum_enhanced.router, prefix="/api/curriculum/enhanced", tags=["curriculum-enhanced"])
 app.include_router(assessment.router, prefix="/api/assessment", tags=["assessment"])
