@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ArrowLeft, Save, User, Mail, Calendar, Target, BookOpen, Settings } from 'lucide-react';
+import { ArrowLeft, Save, User, Mail, Calendar, Target, BookOpen, Settings, Camera, Edit3, Award, Brain, Clock, Star } from 'lucide-react';
+import { getStudentName } from '../utils/studentUtils';
 
 const StudentProfile = () => {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ const StudentProfile = () => {
     try {
       // Mock profile data
       const mockProfile = {
-        name: 'Alex Johnson',
+        name: getStudentName(),
         email: 'alex@student.com',
         age: '16',
         learningStyle: 'visual',
@@ -102,8 +103,40 @@ const StudentProfile = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Profile Header */}
+        <div className="glass-card p-8 mb-8">
+          <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
+            <div className="relative">
+              <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+                {formData.name.charAt(0).toUpperCase()}
+              </div>
+              <button className="absolute bottom-2 right-2 glass-button p-2 bg-white/90 hover:bg-white">
+                <Camera className="h-4 w-4 text-gray-600" />
+              </button>
+            </div>
+            <div className="text-center md:text-left flex-1">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{formData.name}</h1>
+              <p className="text-gray-600 mb-4">{formData.email}</p>
+              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                  <Star className="h-3 w-3 inline mr-1" />
+                  Level: Intermediate
+                </span>
+                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                  <Award className="h-3 w-3 inline mr-1" />
+                  85% Average
+                </span>
+                <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
+                  <Clock className="h-3 w-3 inline mr-1" />
+                  12 Day Streak
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 space-y-8">
           {/* Personal Information */}
           <div className="glass-card p-8">
             <div className="flex items-center space-x-3 mb-6">
@@ -244,29 +277,52 @@ const StudentProfile = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex space-x-4">
-            <button
-              type="button"
-              onClick={() => navigate('/student/dashboard')}
-              className="flex-1 glass-button text-gray-700 hover:bg-white/50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 glass-button bg-gradient-primary text-white hover-lift"
-            >
-              {loading ? (
-                <div className="spinner w-5 h-5 mx-auto"></div>
-              ) : (
-                <>
-                  <Save className="h-5 w-5 mr-2" />
-                  Save Changes
-                </>
-              )}
-            </button>
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            <div className="glass-card p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Learning Stats</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Completed Lessons</span>
+                  <span className="font-semibold text-blue-600">24/48</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Average Score</span>
+                  <span className="font-semibold text-green-600">85%</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600">Study Streak</span>
+                  <span className="font-semibold text-orange-600">12 days</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full glass-button bg-gradient-primary text-white hover-lift py-4"
+              >
+                {loading ? (
+                  <div className="spinner w-5 h-5 mx-auto"></div>
+                ) : (
+                  <>
+                    <Save className="h-5 w-5 mr-2" />
+                    Save Changes
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/student/dashboard')}
+                className="w-full glass-button text-gray-700 hover:bg-white/50"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
+              </button>
+            </div>
           </div>
         </form>
       </div>
