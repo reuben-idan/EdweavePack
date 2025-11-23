@@ -3,6 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import auth, curriculum, assessment, analytics, learning_paths, curriculum_enhanced, auth_enhanced, files, tasks, agents
 from app.core.database import engine
 from app.models import Base
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Edweave Pack API", version="1.0.0")
 
@@ -15,7 +20,13 @@ app.add_middleware(
 )
 
 # Create tables
-Base.metadata.create_all(bind=engine)
+try:
+    logger.info("Creating database tables...")
+    Base.metadata.create_all(bind=engine)
+    logger.info("✅ Database tables created successfully")
+except Exception as e:
+    logger.error(f"❌ Error creating database tables: {e}")
+    raise
 
 # Include routers
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])

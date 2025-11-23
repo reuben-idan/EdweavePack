@@ -36,7 +36,7 @@ def curriculum_generation(self, curriculum_id: int):
         current_task.update_state(state='PROGRESS', meta={'progress': 60})
         
         # Update curriculum metadata
-        curriculum.metadata = curriculum_data
+        curriculum.curriculum_metadata = curriculum_data
         db.commit()
         
         # Create individual modules

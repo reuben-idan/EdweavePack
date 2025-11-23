@@ -12,12 +12,37 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log('API Request:', config.method?.toUpperCase(), config.url, config.data);
   return config;
 });
 
+// Add response interceptor for debugging
+api.interceptors.response.use(
+  (response) => {
+    console.log('API Response:', response.status, response.config.url);
+    return response;
+  },
+  (error) => {
+    console.error('API Error:', error.response?.status, error.response?.data, error.config?.url);
+    return Promise.reject(error);
+  }
+);
+
 // Auth API
 export const authAPI = {
-  register: (userData) => api.post('/api/auth/register', userData),
+  register: (userData) => {
+    console.log('API: Sending registration request:', userData);
+    return api.post('/api/auth/register', userData)
+      .then(response => {
+        console.log('API: Registration response:', response);
+        return response;
+      })
+      .catch(error => {
+        console.error('API: Registration error:', error);
+        console.error('API: Error response:', error.response);
+        throw error;
+      });
+  },
   login: (credentials) => api.post('/api/auth/token', credentials, {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   }),

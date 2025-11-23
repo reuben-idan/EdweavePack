@@ -54,28 +54,45 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 
 @router.post("/register", response_model=Token)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
-    db_user = db.query(User).filter(User.email == user.email).first()
-    if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
-    hashed_password = get_password_hash(user.password)
-    db_user = User(
-        email=user.email,
-        name=user.full_name if hasattr(user, 'full_name') else user.name,
-        hashed_password=hashed_password,
-        institution=getattr(user, 'institution', None),
-        role=getattr(user, 'role', 'teacher')
-    )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    # Auto-login after registration
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": db_user.email}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+    try:
+        # Check if user already exists
+        db_user = db.query(User).filter(User.email == user.email).first()
+        if db_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        
+        # Hash password
+        hashed_password = get_password_hash(user.password)
+        
+        # Create new user
+        db_user = User(
+            email=user.email,
+            name=user.full_name,
+            hashed_password=hashed_password,
+            institution=user.institution,
+            role=user.role,
+            is_active=True
+        )
+        
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+        
+        # Auto-login after registration
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": db_user.email}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        print(f"Registration error: {str(e)}")
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Registration failed: {str(e)}"
+        )
 
 @router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):

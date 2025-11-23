@@ -13,7 +13,7 @@ class Curriculum(Base):
     grade_level = Column(String, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     source_content = Column(Text)
-    metadata = Column(JSON)
+    curriculum_metadata = Column(JSON)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     # Relationships

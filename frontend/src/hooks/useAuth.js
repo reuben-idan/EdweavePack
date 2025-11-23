@@ -43,14 +43,22 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (userData) => {
-    const response = await authAPI.register(userData);
-    const { access_token } = response.data;
-    
-    localStorage.setItem('token', access_token);
-    const userResponse = await authAPI.getProfile();
-    setUser(userResponse.data);
-    
-    return userResponse.data;
+    try {
+      console.log('Registering user with data:', userData);
+      const response = await authAPI.register(userData);
+      console.log('Registration response:', response.data);
+      
+      const { access_token } = response.data;
+      
+      localStorage.setItem('token', access_token);
+      const userResponse = await authAPI.getProfile();
+      setUser(userResponse.data);
+      
+      return userResponse.data;
+    } catch (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
   };
 
   const logout = () => {
