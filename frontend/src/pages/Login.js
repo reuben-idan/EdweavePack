@@ -149,17 +149,27 @@ const Login = () => {
               </button>
             </div>
 
-            {/* Register Link */}
-            <div className="text-center">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{' '}
+            {/* Links */}
+            <div className="space-y-4">
+              <div className="text-center">
                 <Link
-                  to="/register"
-                  className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+                  to="/forgot-password"
+                  className="text-sm text-indigo-600 hover:text-indigo-500 font-medium transition-colors"
                 >
-                  Create one now
+                  Forgot your password?
                 </Link>
-              </p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-gray-600">
+                  Don't have an account?{' '}
+                  <Link
+                    to="/register"
+                    className="font-medium text-indigo-600 hover:text-indigo-500 transition-colors"
+                  >
+                    Create one now
+                  </Link>
+                </p>
+              </div>
             </div>
           </form>
         </div>

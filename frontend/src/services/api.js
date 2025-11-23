@@ -47,6 +47,10 @@ export const authAPI = {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
   }),
   getProfile: () => api.get('/api/auth/me'),
+  forgotPassword: (data) => api.post('/api/auth/forgot-password', data),
+  resetPassword: (data) => api.post('/api/auth/reset-password', data),
+  updateProfile: (data) => api.put('/api/auth/profile', data),
+  updatePassword: (data) => api.put('/api/auth/password', data)
 };
 
 // Files API

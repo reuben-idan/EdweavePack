@@ -24,6 +24,9 @@ import StudentQuiz from './pages/StudentQuiz';
 import WeeklyPlanPage from './pages/WeeklyPlanPage';
 import DailyPlanPage from './pages/DailyPlanPage';
 import ProgressPage from './pages/ProgressPage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Settings from './pages/Settings';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
@@ -63,6 +66,8 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/login" element={user ? <Navigate to={getDefaultRoute()} /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to={getDefaultRoute()} /> : <Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/student/signup" element={<StudentSignup />} />
       <Route path="/student/login" element={<StudentLogin />} />
       <Route 
@@ -215,6 +220,14 @@ const AppRoutes = () => {
             <Layout>
               <TeacherDashboard />
             </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings/:section?"
+        element={
+          <ProtectedRoute>
+            <Settings />
           </ProtectedRoute>
         }
       />
