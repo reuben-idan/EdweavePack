@@ -1,118 +1,51 @@
 #!/bin/bash
-
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
+echo "🚀 Starting AWS deployment..."
 
-echo -e "${GREEN}🚀 EdweavePack Deployment Script${NC}"
+# Check if AWS CLI is configured
+if ! aws sts get-caller-identity > /dev/null 2>&1; then
+    echo "❌ AWS CLI not configured. Please run 'aws configure'"
+    exit 1
+fi
 
-# Check prerequisites
-check_prerequisites() {
-    echo -e "${YELLOW}Checking prerequisites...${NC}"
-    
-    if ! command -v docker &> /dev/null; then
-        echo -e "${RED}❌ Docker is not installed${NC}"
-        exit 1
-    fi
-    
-    if ! command -v aws &> /dev/null; then
-        echo -e "${RED}❌ AWS CLI is not installed${NC}"
-        exit 1
-    fi
-    
-    if ! command -v terraform &> /dev/null; then
-        echo -e "${RED}❌ Terraform is not installed${NC}"
-        exit 1
-    fi
-    
-    echo -e "${GREEN}✅ All prerequisites met${NC}"
-}
+# Set variables
+REGION="us-east-1"
+PROJECT="edweavepack"
+
+# Create S3 bucket for Terraform state if it doesn't exist
+aws s3api head-bucket --bucket "${PROJECT}-terraform-state" --region $REGION 2>/dev/null || \
+aws s3 mb s3://${PROJECT}-terraform-state --region $REGION
 
 # Deploy infrastructure
-deploy_infrastructure() {
-    echo -e "${YELLOW}Deploying infrastructure...${NC}"
-    
-    cd infrastructure
-    
-    if [ ! -f "terraform.tfvars" ]; then
-        echo -e "${RED}❌ terraform.tfvars not found. Please create it with required variables.${NC}"
-        exit 1
-    fi
-    
-    terraform init
-    terraform plan
-    terraform apply -auto-approve
-    
-    cd ..
-    
-    echo -e "${GREEN}✅ Infrastructure deployed${NC}"
-}
+echo "📦 Deploying infrastructure..."
+cd infrastructure
+terraform init
+terraform plan -var="db_password=$(openssl rand -base64 32)"
+terraform apply -auto-approve -var="db_password=$(openssl rand -base64 32)"
+
+# Get ECR URLs
+BACKEND_ECR=$(terraform output -raw ecr_backend_url)
+FRONTEND_ECR=$(terraform output -raw ecr_frontend_url)
+ALB_DNS=$(terraform output -raw load_balancer_dns)
+
+cd ..
+
+# Login to ECR
+echo "🔐 Logging into ECR..."
+aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $BACKEND_ECR
 
 # Build and push images
-build_and_push() {
-    echo -e "${YELLOW}Building and pushing Docker images...${NC}"
-    
-    # Get ECR login
-    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com
-    
-    # Build and push backend
-    cd backend
-    docker build -t edweavepack-backend .
-    docker tag edweavepack-backend:latest $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/edweavepack-backend:latest
-    docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/edweavepack-backend:latest
-    cd ..
-    
-    # Build and push frontend
-    cd frontend
-    docker build -t edweavepack-frontend .
-    docker tag edweavepack-frontend:latest $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/edweavepack-frontend:latest
-    docker push $(aws sts get-caller-identity --query Account --output text).dkr.ecr.us-east-1.amazonaws.com/edweavepack-frontend:latest
-    cd ..
-    
-    echo -e "${GREEN}✅ Images built and pushed${NC}"
-}
+echo "🏗️ Building and pushing images..."
+docker build -t $BACKEND_ECR:latest backend/
+docker push $BACKEND_ECR:latest
+
+docker build -t $FRONTEND_ECR:latest frontend/
+docker push $FRONTEND_ECR:latest
 
 # Update ECS service
-update_service() {
-    echo -e "${YELLOW}Updating ECS service...${NC}"
-    
-    aws ecs update-service --cluster edweavepack-cluster --service edweavepack-service --force-new-deployment
-    
-    echo -e "${GREEN}✅ Service updated${NC}"
-}
+echo "🔄 Updating ECS service..."
+aws ecs update-service --cluster ${PROJECT}-cluster --service ${PROJECT}-service --force-new-deployment --region $REGION
 
-# Main deployment flow
-main() {
-    case "${1:-all}" in
-        "infra")
-            check_prerequisites
-            deploy_infrastructure
-            ;;
-        "images")
-            check_prerequisites
-            build_and_push
-            ;;
-        "service")
-            check_prerequisites
-            update_service
-            ;;
-        "all")
-            check_prerequisites
-            deploy_infrastructure
-            build_and_push
-            update_service
-            ;;
-        *)
-            echo "Usage: $0 [infra|images|service|all]"
-            exit 1
-            ;;
-    esac
-    
-    echo -e "${GREEN}🎉 Deployment completed successfully!${NC}"
-}
-
-main "$@"
+echo "✅ Deployment complete!"
+echo "🌐 Application URL: http://$ALB_DNS"
