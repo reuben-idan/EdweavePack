@@ -33,34 +33,36 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-# Global exception handler
+# Global exception handler (debug mode)
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     """Handle all unhandled exceptions"""
     logger.error(f"Global exception handler caught: {exc}")
+    logger.error(f"Exception type: {type(exc)}")
     logger.error(f"Traceback: {traceback.format_exc()}")
     
-    # Don't expose internal errors in production
+    # Return detailed error for debugging
     return JSONResponse(
         status_code=500,
         content={
-            "detail": "An internal server error occurred. Please try again later.",
-            "type": "internal_server_error"
+            "detail": f"Internal server error: {str(exc)}",
+            "type": "internal_server_error",
+            "exception_type": str(type(exc))
         }
     )
 
-# HTTP exception handler for better error responses
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    """Handle HTTP exceptions with consistent format"""
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={
-            "detail": exc.detail,
-            "type": "http_exception",
-            "status_code": exc.status_code
-        }
-    )
+# HTTP exception handler for better error responses (temporarily disabled)
+# @app.exception_handler(HTTPException)
+# async def http_exception_handler(request: Request, exc: HTTPException):
+#     """Handle HTTP exceptions with consistent format"""
+#     return JSONResponse(
+#         status_code=exc.status_code,
+#         content={
+#             "detail": exc.detail,
+#             "type": "http_exception",
+#             "status_code": exc.status_code
+#         }
+#     )
 
 # Create tables
 try:
@@ -94,8 +96,9 @@ async def health_check():
     try:
         # Test database connection
         from app.core.database import get_db
+        from sqlalchemy import text
         db = next(get_db())
-        db.execute("SELECT 1")
+        db.execute(text("SELECT 1"))
         db.close()
         
         return {

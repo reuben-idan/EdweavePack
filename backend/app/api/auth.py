@@ -25,6 +25,9 @@ def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
 def get_password_hash(password):
+    # Truncate password to 72 bytes for bcrypt compatibility
+    if len(password.encode('utf-8')) > 72:
+        password = password.encode('utf-8')[:72].decode('utf-8', errors='ignore')
     return pwd_context.hash(password)
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
@@ -59,7 +62,9 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 @router.post("/register", response_model=Token)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        # Validate input data
+        print(f"Registration attempt for: {user.email}")
+        
+        # Basic validation
         if not user.email or not user.email.strip():
             raise HTTPException(status_code=400, detail="Email is required")
         
@@ -69,29 +74,21 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         if not user.full_name or not user.full_name.strip():
             raise HTTPException(status_code=400, detail="Full name is required")
         
-        # Validate role
-        valid_roles = ["teacher", "student", "administrator", "curriculum_designer"]
-        if user.role not in valid_roles:
-            raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {', '.join(valid_roles)}")
-        
-        # Clean and normalize email
+        # Clean email
         email = user.email.strip().lower()
         
-        # Check if user already exists
-        db_user = db.query(User).filter(User.email == email).first()
-        if db_user:
+        # Check existing user
+        existing_user = db.query(User).filter(User.email == email).first()
+        if existing_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         
-        # Hash password
-        hashed_password = get_password_hash(user.password)
-        
-        # Create new user with proper defaults
+        # Create user
         db_user = User(
             email=email,
             name=user.full_name.strip(),
-            hashed_password=hashed_password,
-            institution=user.institution.strip() if user.institution else "Not specified",
-            role=user.role,
+            hashed_password=get_password_hash(user.password),
+            institution=user.institution or "Not specified",
+            role=user.role or "teacher",
             is_active=True
         )
         
@@ -99,24 +96,32 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_user)
         
-        print(f"User registered successfully: {db_user.email} as {db_user.role}")
+        print(f"User created: {db_user.email}")
         
-        # Auto-login after registration
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        # Create token
         access_token = create_access_token(
-            data={"sub": db_user.email}, expires_delta=access_token_expires
+            data={"sub": db_user.email}, 
+            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         )
         
         return {"access_token": access_token, "token_type": "bearer"}
         
-    except HTTPException:
-        raise
+    except HTTPException as he:
+        print(f"HTTP Exception: {he.detail}")
+        raise he
     except Exception as e:
-        db.rollback()
         print(f"Registration error: {str(e)}")
+        print(f"Error type: {type(e)}")
+        import traceback
+        print(f"Traceback: {traceback.format_exc()}")
+        if 'db' in locals() and db:
+            try:
+                db.rollback()
+            except:
+                pass
         raise HTTPException(
             status_code=500, 
-            detail="Registration failed due to server error. Please try again."
+            detail=f"UPDATED_CODE: Registration failed: {str(e)} (Type: {type(e).__name__})"
         )
 
 @router.post("/token", response_model=Token)
