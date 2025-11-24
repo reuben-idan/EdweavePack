@@ -109,7 +109,7 @@ const Register = () => {
           navigate('/dashboard');
       }
     } catch (error) {
-      console.error('Registration error:', error);
+      console.error('Registration error: Network or server issue');
       let errorMessage = 'Registration failed. Please try again.';
       
       if (error.isNetworkError) {
