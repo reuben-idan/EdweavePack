@@ -1,5 +1,13 @@
 import { useState, useEffect, createContext, useContext } from 'react';
 import { authAPI } from '../services/api';
+import { ENABLE_LOGGING } from '../config';
+
+// Secure logging function
+const secureLog = (message) => {
+  if (ENABLE_LOGGING) {
+    console.log(message);
+  }
+};
 
 const AuthContext = createContext();
 
@@ -94,8 +102,9 @@ export const AuthProvider = ({ children }) => {
           role: userData.role || 'teacher'
         };
         
+        secureLog('Processing registration request');
         const response = await authAPI.register(validatedData);
-        // Registration successful
+        secureLog('Registration completed successfully');
         
         const { access_token } = response.data;
         
@@ -125,18 +134,18 @@ export const AuthProvider = ({ children }) => {
         
         // Don't retry on validation errors (400) or auth errors (401, 403)
         if (error.response?.status && [400, 401, 403].includes(error.response.status)) {
-          // Registration validation error
+          secureLog('Registration validation error');
           throw error;
         }
         
         // Don't retry if no more attempts
         if (retries === 0) {
-          // Registration failed after retries
+          secureLog('Registration failed after all retries');
           throw error;
         }
         
         // Wait before retry
-        console.log(`Registration attempt failed, retrying... (${retries} attempts left)`);
+        secureLog(`Registration attempt failed, retrying... (${retries} attempts left)`);
         await new Promise(resolve => setTimeout(resolve, 1000 * (4 - retries)));
       }
     }

@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from app.api import auth, curriculum, assessment, analytics, learning_paths, curriculum_enhanced, auth_enhanced, files, tasks, agents, student_endpoints
 from app.core.database import engine
 from app.models import Base
+from app.middleware.security import get_security_middleware, get_rate_limit_middleware
 import logging
 import traceback
 from datetime import datetime
@@ -14,42 +15,69 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Edweave Pack API", version="1.0.0")
 
-# Enhanced CORS configuration for production
-allowed_origins = [
-    "http://localhost:3000",
-    "https://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://edweavepack.com",
-    "https://www.edweavepack.com",
-    "https://*.edweavepack.com"
-]
+import os
 
+# Secure CORS configuration - only HTTPS in production
+is_production = os.getenv("ENVIRONMENT", "development") == "production"
+
+if is_production:
+    allowed_origins = [
+        "https://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com",
+        "https://edweavepack.com",
+        "https://www.edweavepack.com"
+    ]
+else:
+    allowed_origins = [
+        "http://localhost:3000",
+        "https://localhost:3000",
+        "http://127.0.0.1:3000"
+    ]
+
+# Add security middleware first
+SecurityMiddleware, security_config = get_security_middleware()
+app.add_middleware(SecurityMiddleware, **security_config)
+
+# Add rate limiting middleware
+RateLimitMiddleware, rate_limit_config = get_rate_limit_middleware()
+app.add_middleware(RateLimitMiddleware, **rate_limit_config)
+
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for testing
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"]
 )
 
-# Global exception handler (debug mode)
+# Secure global exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    """Handle all unhandled exceptions"""
+    """Handle all unhandled exceptions securely"""
+    # Log detailed error server-side only
     logger.error(f"Global exception handler caught: {exc}")
     logger.error(f"Exception type: {type(exc)}")
     logger.error(f"Traceback: {traceback.format_exc()}")
     
-    # Return detailed error for debugging
-    return JSONResponse(
-        status_code=500,
-        content={
-            "detail": f"Internal server error: {str(exc)}",
-            "type": "internal_server_error",
-            "exception_type": str(type(exc))
-        }
-    )
+    # Return generic error in production, detailed in development
+    if is_production:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "detail": "Internal server error occurred",
+                "type": "internal_server_error"
+            }
+        )
+    else:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "detail": f"Internal server error: {str(exc)}",
+                "type": "internal_server_error",
+                "exception_type": str(type(exc))
+            }
+        )
 
 # HTTP exception handler for better error responses (temporarily disabled)
 # @app.exception_handler(HTTPException)

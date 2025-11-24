@@ -1,8 +1,53 @@
 import axios from 'axios';
-import { API_BASE_URL } from './config';
+import { API_BASE_URL, ENABLE_LOGGING } from '../config';
+
+// Deep sanitization function to prevent sensitive data leakage
+const deepSanitize = (obj, sensitiveFields = ['password', 'confirmPassword', 'access_token', 'refresh_token', 'secret', 'key', 'token']) => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepSanitize(item, sensitiveFields));
+  }
+  
+  const sanitized = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (sensitiveFields.some(field => key.toLowerCase().includes(field.toLowerCase()))) {
+      sanitized[key] = '[REDACTED]';
+    } else if (typeof value === 'object') {
+      sanitized[key] = deepSanitize(value, sensitiveFields);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+  return sanitized;
+};
+
+// Secure logging function with deep sanitization
+const secureLog = (message, data = null) => {
+  if (!ENABLE_LOGGING) return;
+  
+  if (data && typeof data === 'object') {
+    const sanitized = deepSanitize(data);
+    console.log(message, sanitized);
+  } else {
+    console.log(message);
+  }
+};
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 30000, // 30 second timeout
+  headers: {
+    'Content-Type': 'application/json',
+    ...(SECURITY_CONFIG.enforceHTTPS && {
+      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block'
+    })
+  }
 });
 
 // Add auth token to requests
@@ -56,8 +101,6 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   register: (userData) => {
-    // Sending registration request
-    
     // Validate required fields
     const requiredFields = ['email', 'password', 'full_name', 'role'];
     for (const field of requiredFields) {
@@ -72,13 +115,15 @@ export const authAPI = {
       userData.role = 'teacher'; // Default fallback
     }
     
+    secureLog('Sending registration request');
+    
     return api.post('/api/auth/register', userData)
       .then(response => {
-        // Registration successful
+        secureLog('Registration successful');
         return response;
       })
       .catch(error => {
-        // Registration error occurred
+        secureLog('Registration error occurred');
         
         if (!error.response) {
           const networkError = new Error('Unable to connect to server. Please check your internet connection and try again.');
@@ -104,11 +149,17 @@ export const authAPI = {
       });
   },
   login: (credentials) => {
+    secureLog('Sending login request');
+    
     return api.post('/api/auth/token', credentials, {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
+    .then(response => {
+      secureLog('Login successful');
+      return response;
+    })
     .catch(error => {
-
+      secureLog('Login error occurred');
       
       if (!error.response) {
         const networkError = new Error('Unable to connect to server. Please check your internet connection.');
@@ -133,8 +184,12 @@ export const authAPI = {
   },
   getProfile: () => {
     return api.get('/api/auth/me')
+      .then(response => {
+        secureLog('Profile fetched successfully');
+        return response;
+      })
       .catch(error => {
-
+        secureLog('Profile fetch error');
         
         if (!error.response) {
           const networkError = new Error('Unable to fetch profile. Please check your connection.');
