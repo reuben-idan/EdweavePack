@@ -28,37 +28,122 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const formData = new URLSearchParams();
-    formData.append('username', credentials.email);
-    formData.append('password', credentials.password);
+    let retries = 3;
+    let lastError;
     
-    const response = await authAPI.login(formData);
-    const { access_token } = response.data;
+    while (retries > 0) {
+      try {
+        const formData = new URLSearchParams();
+        formData.append('username', credentials.email?.trim());
+        formData.append('password', credentials.password);
+        
+        const response = await authAPI.login(formData);
+        const { access_token } = response.data;
+        
+        localStorage.setItem('token', access_token);
+        
+        // Get user profile with retry
+        let profileRetries = 2;
+        let userResponse;
+        
+        while (profileRetries > 0) {
+          try {
+            userResponse = await authAPI.getProfile();
+            break;
+          } catch (profileError) {
+            profileRetries--;
+            if (profileRetries === 0) throw profileError;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+        
+        setUser(userResponse.data);
+        return userResponse.data;
+        
+      } catch (error) {
+        lastError = error;
+        retries--;
+        
+        // Don't retry on auth errors
+        if (error.response?.status && [401, 403].includes(error.response.status)) {
+          throw error;
+        }
+        
+        if (retries === 0) throw error;
+        
+        console.log(`Login attempt failed, retrying... (${retries} attempts left)`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (4 - retries)));
+      }
+    }
     
-    localStorage.setItem('token', access_token);
-    const userResponse = await authAPI.getProfile();
-    setUser(userResponse.data);
-    
-    return userResponse.data;
+    throw lastError;
   };
 
   const register = async (userData) => {
-    try {
-      console.log('Registering user with data:', userData);
-      const response = await authAPI.register(userData);
-      console.log('Registration response:', response.data);
-      
-      const { access_token } = response.data;
-      
-      localStorage.setItem('token', access_token);
-      const userResponse = await authAPI.getProfile();
-      setUser(userResponse.data);
-      
-      return userResponse.data;
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
+    let retries = 3;
+    let lastError;
+    
+    while (retries > 0) {
+      try {
+        console.log('Registering user with data:', userData);
+        
+        // Validate user data before sending
+        const validatedData = {
+          email: userData.email?.trim(),
+          password: userData.password,
+          full_name: userData.full_name?.trim(),
+          institution: userData.institution?.trim(),
+          role: userData.role || 'teacher'
+        };
+        
+        const response = await authAPI.register(validatedData);
+        console.log('Registration successful:', response.data);
+        
+        const { access_token } = response.data;
+        
+        localStorage.setItem('token', access_token);
+        
+        // Get user profile with retry
+        let profileRetries = 2;
+        let userResponse;
+        
+        while (profileRetries > 0) {
+          try {
+            userResponse = await authAPI.getProfile();
+            break;
+          } catch (profileError) {
+            profileRetries--;
+            if (profileRetries === 0) throw profileError;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+        
+        setUser(userResponse.data);
+        return userResponse.data;
+        
+      } catch (error) {
+        lastError = error;
+        retries--;
+        
+        // Don't retry on validation errors (400) or auth errors (401, 403)
+        if (error.response?.status && [400, 401, 403].includes(error.response.status)) {
+          console.error('Registration validation error:', error.response.data);
+          throw error;
+        }
+        
+        // Don't retry if no more attempts
+        if (retries === 0) {
+          console.error('Registration failed after retries:', error);
+          throw error;
+        }
+        
+        // Wait before retry
+        console.log(`Registration attempt failed, retrying... (${retries} attempts left)`);
+        await new Promise(resolve => setTimeout(resolve, 1000 * (4 - retries)));
+      }
     }
+    
+    throw lastError;
   };
 
   const logout = () => {

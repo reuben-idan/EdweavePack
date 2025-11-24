@@ -3,16 +3,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Glassmorphic Design System */
+/* Enhanced Glassmorphic Design System with Better Contrast */
 :root {
-  --glass-bg: rgba(255, 255, 255, 0.25);
-  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-bg: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.25);
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-  --glass-backdrop: blur(8px);
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  --glass-backdrop: blur(12px);
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --secondary-gradient: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+  --success-gradient: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+  --warning-gradient: linear-gradient(135deg, #d97706 0%, #ea580c 100%);
+  
+  /* High contrast text colors */
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --text-light: #9ca3af;
+  --text-white: #ffffff;
+  --text-contrast: #000000;
 }
 
 /* Glass morphism base class */
@@ -26,22 +34,34 @@
 
 .glass-card {
   @apply glass rounded-2xl;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .glass-nav {
-  @apply glass border-b border-white/20;
-  background: rgba(148, 163, 184, 0.4);
+  @apply glass border-b border-white/30;
+  background: rgba(30, 41, 59, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 .glass-button {
-  @apply glass rounded-xl px-6 py-3 font-medium transition-all duration-300 hover:scale-105 active:scale-95;
+  @apply glass rounded-xl px-6 py-3 font-semibold transition-all duration-300 hover:scale-105 active:scale-95;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: var(--text-primary);
 }
 
 .glass-input {
-  @apply glass rounded-xl px-4 py-3 border-white/30 focus:border-white/50 focus:ring-2 focus:ring-white/20 transition-all duration-300;
-  background: rgba(255, 255, 255, 0.1);
+  @apply rounded-xl px-4 py-3 border-2 border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-300;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.glass-input::placeholder {
+  color: var(--text-muted);
+  font-weight: 400;
 }
 
 /* Gradient backgrounds */
@@ -61,11 +81,28 @@
   background: var(--warning-gradient);
 }
 
-/* Professional wave background */
+/* Enhanced professional background with better contrast */
 .animated-gradient {
-  background: linear-gradient(-45deg, #f8fafc, #e2e8f0, #cbd5e1, #94a3b8);
+  background: linear-gradient(-45deg, #f1f5f9, #e2e8f0, #cbd5e1, #94a3b8, #64748b);
   background-size: 400% 400%;
-  animation: gradient 20s ease infinite;
+  animation: gradient 25s ease infinite;
+}
+
+/* High contrast text classes */
+.text-high-contrast {
+  color: var(--text-contrast) !important;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+.text-readable {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.text-readable-secondary {
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 @keyframes gradient {

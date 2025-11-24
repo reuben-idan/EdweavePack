@@ -23,16 +23,30 @@ export const StudentAuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const token = localStorage.getItem('studentToken');
+      const token = localStorage.getItem('studentToken') || localStorage.getItem('token');
       if (token) {
-        // Verify token with backend
-        const response = await authAPI.getProfile();
+        // Verify token with backend with retry logic
+        let response;
+        let retries = 2;
+        
+        while (retries > 0) {
+          try {
+            response = await authAPI.getProfile();
+            break;
+          } catch (authError) {
+            retries--;
+            if (retries === 0) throw authError;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+        
         if (response.data) {
           setStudent(response.data);
           setIsAuthenticated(true);
         } else {
           // Invalid token
           localStorage.removeItem('studentToken');
+          localStorage.removeItem('token');
           setStudent(null);
           setIsAuthenticated(false);
         }
@@ -40,6 +54,7 @@ export const StudentAuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Auth check failed:', error);
       localStorage.removeItem('studentToken');
+      localStorage.removeItem('token');
       setStudent(null);
       setIsAuthenticated(false);
     } finally {
@@ -60,9 +75,23 @@ export const StudentAuthProvider = ({ children }) => {
       
       if (response.data && response.data.access_token) {
         localStorage.setItem('studentToken', response.data.access_token);
+        localStorage.setItem('token', response.data.access_token); // Also set as general token
         
-        // Get student profile
-        const profileResponse = await authAPI.getProfile();
+        // Get student profile with retry logic
+        let profileResponse;
+        let retries = 3;
+        
+        while (retries > 0) {
+          try {
+            profileResponse = await authAPI.getProfile();
+            break;
+          } catch (profileError) {
+            retries--;
+            if (retries === 0) throw profileError;
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+        
         if (profileResponse.data) {
           setStudent(profileResponse.data);
           setIsAuthenticated(true);
@@ -76,7 +105,14 @@ export const StudentAuthProvider = ({ children }) => {
       }
     } catch (error) {
       console.error('Login failed:', error);
-      const errorMessage = error.response?.data?.detail || 'Login failed. Please check your credentials.';
+      let errorMessage = 'Login failed. Please check your credentials.';
+      
+      if (error.message?.includes('Unable to connect')) {
+        errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      } else if (error.response?.data?.detail) {
+        errorMessage = error.response.data.detail;
+      }
+      
       toast.error(errorMessage);
       return { success: false, error: errorMessage };
     } finally {

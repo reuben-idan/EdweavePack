@@ -33,6 +33,7 @@ import ResetPassword from './pages/ResetPassword';
 import Settings from './pages/Settings';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 import StudentsPage from './pages/StudentsPage';
+import StudentLesson from './pages/StudentLesson';
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
   const { user, loading } = useAuth();
@@ -137,6 +138,14 @@ const AppRoutes = () => {
         element={
           <StudentProtectedRoute>
             <StudentQuiz />
+          </StudentProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/student/lesson/:lessonId" 
+        element={
+          <StudentProtectedRoute>
+            <StudentLesson />
           </StudentProtectedRoute>
         } 
       />

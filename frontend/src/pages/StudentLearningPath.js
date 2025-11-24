@@ -90,7 +90,14 @@ const StudentLearningPath = () => {
 
   const handleStartQuiz = (quizId) => {
     toast.info('Starting quiz...');
-    navigate(`/student/quiz/${quizId}`);
+    // For now, show a mock quiz interface
+    toast.success('Quiz functionality will be available soon!');
+    // navigate(`/student/quiz/${quizId}`);
+  };
+  
+  const handleStartTask = (taskId) => {
+    toast.info('Starting task...');
+    handleTaskComplete(taskId);
   };
 
   if (loading) {
@@ -302,7 +309,10 @@ const StudentLearningPath = () => {
                       </div>
                       
                       {!task.completed && (
-                        <button className="glass-button bg-gradient-primary text-white">
+                        <button 
+                          onClick={() => handleStartTask(task.id)}
+                          className="glass-button bg-gradient-primary text-white hover-lift"
+                        >
                           <Play className="h-4 w-4 mr-2" />
                           Start
                         </button>

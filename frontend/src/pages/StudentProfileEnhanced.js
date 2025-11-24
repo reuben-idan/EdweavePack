@@ -273,74 +273,74 @@ const StudentProfileEnhanced = () => {
               {/* Profile Tab */}
               {activeTab === 'profile' && (
                 <div className="space-y-6">
-                  <div className="glass-card p-6">
-                    <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                      <User className="h-6 w-6 mr-2 text-blue-400" />
+                  <div className="bg-white border-2 border-gray-200 rounded-xl p-8 shadow-sm">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                      <User className="h-7 w-7 mr-3 text-blue-500" />
                       Personal Information
                     </h2>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">Full Name</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                         <input
                           type="text"
                           value={profileData.name}
                           onChange={(e) => handleProfileChange('name', e.target.value)}
-                          className="glass-input w-full"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                           placeholder="Enter your full name"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">Email Address</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
                         <input
                           type="email"
                           value={profileData.email}
                           onChange={(e) => handleProfileChange('email', e.target.value)}
-                          className="glass-input w-full"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                           placeholder="Enter your email"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">Phone Number</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                         <input
                           type="tel"
                           value={profileData.phone}
                           onChange={(e) => handleProfileChange('phone', e.target.value)}
-                          className="glass-input w-full"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                           placeholder="Enter your phone number"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">Date of Birth</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Date of Birth</label>
                         <input
                           type="date"
                           value={profileData.dateOfBirth}
                           onChange={(e) => handleProfileChange('dateOfBirth', e.target.value)}
-                          className="glass-input w-full"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                         />
                       </div>
                     </div>
 
                     <div className="mt-6">
-                      <label className="block text-sm font-medium text-blue-200 mb-2">Address</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Address</label>
                       <input
                         type="text"
                         value={profileData.address}
                         onChange={(e) => handleProfileChange('address', e.target.value)}
-                        className="glass-input w-full"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                         placeholder="Enter your address"
                       />
                     </div>
 
                     <div className="mt-6">
-                      <label className="block text-sm font-medium text-blue-200 mb-2">Bio</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
                       <textarea
                         value={profileData.bio}
                         onChange={(e) => handleProfileChange('bio', e.target.value)}
-                        className="glass-input w-full h-24 resize-none"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all h-24 resize-none"
                         placeholder="Tell us about yourself..."
                       />
                     </div>
@@ -351,19 +351,21 @@ const StudentProfileEnhanced = () => {
               {/* Academic Tab */}
               {activeTab === 'academic' && (
                 <div className="space-y-6">
-                  <div className="glass-card p-6">
-                    <h2 className="text-xl font-semibold text-white mb-6 flex items-center">
-                      <BookOpen className="h-6 w-6 mr-2 text-green-400" />
+                  <div className="bg-white border-2 border-gray-200 rounded-xl p-8 shadow-sm">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                      <BookOpen className="h-7 w-7 mr-3 text-green-500" />
                       Academic Profile
                     </h2>
                     
                     {/* Learning Style */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-blue-200 mb-4">Learning Style</label>
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium text-gray-700 mb-4">Learning Style</label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {learningStyles.map(style => (
-                          <label key={style.id} className={`glass-card p-4 cursor-pointer hover-lift transition-all ${
-                            profileData.learningStyle === style.id ? 'ring-2 ring-blue-400 bg-blue-500/10' : ''
+                          <label key={style.id} className={`p-5 border-2 rounded-xl cursor-pointer transition-all ${
+                            profileData.learningStyle === style.id 
+                              ? 'border-blue-500 bg-blue-50 shadow-md' 
+                              : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:shadow-sm'
                           }`}>
                             <input
                               type="radio"
@@ -373,11 +375,11 @@ const StudentProfileEnhanced = () => {
                               onChange={(e) => handleProfileChange('learningStyle', e.target.value)}
                               className="sr-only"
                             />
-                            <div className="flex items-start space-x-3">
-                              <span className="text-2xl">{style.icon}</span>
+                            <div className="flex items-start space-x-4">
+                              <span className="text-3xl">{style.icon}</span>
                               <div>
-                                <div className="font-medium text-white">{style.label}</div>
-                                <div className="text-sm text-blue-200">{style.desc}</div>
+                                <div className="font-semibold text-gray-900 text-lg">{style.label}</div>
+                                <div className="text-sm text-gray-600 mt-1">{style.desc}</div>
                               </div>
                             </div>
                           </label>
@@ -386,18 +388,18 @@ const StudentProfileEnhanced = () => {
                     </div>
 
                     {/* Target Exams */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-blue-200 mb-4">Target Exams</label>
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium text-gray-700 mb-4">Target Exams</label>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                         {examOptions.map(exam => (
                           <button
                             key={exam}
                             type="button"
                             onClick={() => handleArrayToggle('targetExams', exam)}
-                            className={`glass-card p-3 text-sm font-medium transition-all ${
+                            className={`p-3 border-2 rounded-lg text-sm font-medium transition-all ${
                               profileData.targetExams.includes(exam)
-                                ? 'bg-blue-500/20 text-blue-400 ring-1 ring-blue-400'
-                                : 'text-white hover:bg-white/10'
+                                ? 'border-blue-500 bg-blue-50 text-blue-700'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                             }`}
                           >
                             {exam}
@@ -407,18 +409,18 @@ const StudentProfileEnhanced = () => {
                     </div>
 
                     {/* Subjects */}
-                    <div className="mb-6">
-                      <label className="block text-sm font-medium text-blue-200 mb-4">Subjects of Interest</label>
+                    <div className="mb-8">
+                      <label className="block text-sm font-medium text-gray-700 mb-4">Subjects of Interest</label>
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                         {subjectOptions.map(subject => (
                           <button
                             key={subject}
                             type="button"
                             onClick={() => handleArrayToggle('subjects', subject)}
-                            className={`glass-card p-3 text-sm font-medium transition-all ${
+                            className={`p-3 border-2 rounded-lg text-sm font-medium transition-all ${
                               profileData.subjects.includes(subject)
-                                ? 'bg-green-500/20 text-green-400 ring-1 ring-green-400'
-                                : 'text-white hover:bg-white/10'
+                                ? 'border-green-500 bg-green-50 text-green-700'
+                                : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                             }`}
                           >
                             {subject}
@@ -430,11 +432,11 @@ const StudentProfileEnhanced = () => {
                     {/* Study Preferences */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">Daily Study Hours</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Daily Study Hours</label>
                         <select
                           value={profileData.studyHours}
                           onChange={(e) => handleProfileChange('studyHours', parseInt(e.target.value))}
-                          className="glass-input w-full"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                         >
                           <option value={1}>1 hour</option>
                           <option value={2}>2 hours</option>
@@ -445,11 +447,11 @@ const StudentProfileEnhanced = () => {
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-blue-200 mb-2">Preferred Study Time</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Study Time</label>
                         <select
                           value={profileData.preferredStudyTime}
                           onChange={(e) => handleProfileChange('preferredStudyTime', e.target.value)}
-                          className="glass-input w-full"
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
                         >
                           <option value="morning">Morning (6AM - 12PM)</option>
                           <option value="afternoon">Afternoon (12PM - 6PM)</option>
@@ -461,11 +463,11 @@ const StudentProfileEnhanced = () => {
 
                     {/* Academic Goals */}
                     <div className="mt-6">
-                      <label className="block text-sm font-medium text-blue-200 mb-2">Academic Goals</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Academic Goals</label>
                       <textarea
                         value={profileData.academicGoals}
                         onChange={(e) => handleProfileChange('academicGoals', e.target.value)}
-                        className="glass-input w-full h-24 resize-none"
+                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg bg-white text-gray-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all h-24 resize-none"
                         placeholder="Describe your academic goals and what you want to achieve..."
                       />
                     </div>

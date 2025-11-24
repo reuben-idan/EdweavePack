@@ -59,20 +59,38 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 @router.post("/register", response_model=Token)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     try:
+        # Validate input data
+        if not user.email or not user.email.strip():
+            raise HTTPException(status_code=400, detail="Email is required")
+        
+        if not user.password or len(user.password) < 8:
+            raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
+        
+        if not user.full_name or not user.full_name.strip():
+            raise HTTPException(status_code=400, detail="Full name is required")
+        
+        # Validate role
+        valid_roles = ["teacher", "student", "administrator", "curriculum_designer"]
+        if user.role not in valid_roles:
+            raise HTTPException(status_code=400, detail=f"Invalid role. Must be one of: {', '.join(valid_roles)}")
+        
+        # Clean and normalize email
+        email = user.email.strip().lower()
+        
         # Check if user already exists
-        db_user = db.query(User).filter(User.email == user.email).first()
+        db_user = db.query(User).filter(User.email == email).first()
         if db_user:
             raise HTTPException(status_code=400, detail="Email already registered")
         
         # Hash password
         hashed_password = get_password_hash(user.password)
         
-        # Create new user
+        # Create new user with proper defaults
         db_user = User(
-            email=user.email,
-            name=user.full_name,
+            email=email,
+            name=user.full_name.strip(),
             hashed_password=hashed_password,
-            institution=user.institution,
+            institution=user.institution.strip() if user.institution else "Not specified",
             role=user.role,
             is_active=True
         )
@@ -81,40 +99,58 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_user)
         
+        print(f"User registered successfully: {db_user.email} as {db_user.role}")
+        
         # Auto-login after registration
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": db_user.email}, expires_delta=access_token_expires
         )
+        
         return {"access_token": access_token, "token_type": "bearer"}
         
-    except HTTPException:
-        raise
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
         print(f"Registration error: {str(e)}")
-        # Don't expose internal errors in production
         raise HTTPException(
             status_code=500, 
-            detail="Registration failed. Please try again."
+            detail="Registration failed due to server error. Please try again."
         )
 
 @router.post("/token", response_model=Token)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == form_data.username).first()
-    if not user or not verify_password(form_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
+    try:
+        user = db.query(User).filter(User.email == form_data.username).first()
+        if not user or not verify_password(form_data.password, user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect email or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        if not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Account is disabled",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user.email}, expires_delta=access_token_expires
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
-        data={"sub": user.email}, expires_delta=access_token_expires
-    )
-    return {"access_token": access_token, "token_type": "bearer"}
+        return {"access_token": access_token, "token_type": "bearer"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Login error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Login failed. Please try again."
+        )
 
 @router.get("/me", response_model=UserResponse)
 async def read_users_me(current_user: User = Depends(get_current_user)):

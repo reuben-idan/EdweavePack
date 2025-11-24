@@ -337,52 +337,52 @@ const StudentLearningPathEnhanced = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Progress Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="glass-card p-6">
+          <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-white">{learningPath.overallProgress}%</div>
-                <div className="text-sm text-blue-200">Overall Progress</div>
+                <div className="text-2xl font-bold text-gray-900">{learningPath.overallProgress}%</div>
+                <div className="text-sm text-gray-600">Overall Progress</div>
               </div>
-              <Target className="h-8 w-8 text-blue-400" />
+              <Target className="h-8 w-8 text-blue-500" />
             </div>
-            <div className="mt-4 w-full bg-white/20 rounded-full h-2">
+            <div className="mt-4 w-full bg-gray-200 rounded-full h-3">
               <div 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${learningPath.overallProgress}%` }}
               ></div>
             </div>
           </div>
           
-          <div className="glass-card p-6">
+          <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-white">{learningPath.analytics.completedLessons}/{learningPath.analytics.totalLessons}</div>
-                <div className="text-sm text-blue-200">Lessons Complete</div>
+                <div className="text-2xl font-bold text-gray-900">{learningPath.analytics.completedLessons}/{learningPath.analytics.totalLessons}</div>
+                <div className="text-sm text-gray-600">Lessons Complete</div>
               </div>
-              <BookOpen className="h-8 w-8 text-green-400" />
+              <BookOpen className="h-8 w-8 text-green-500" />
             </div>
           </div>
           
-          <div className="glass-card p-6">
+          <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-white">{learningPath.analytics.averageScore}%</div>
-                <div className="text-sm text-blue-200">Average Score</div>
+                <div className="text-2xl font-bold text-gray-900">{learningPath.analytics.averageScore}%</div>
+                <div className="text-sm text-gray-600">Average Score</div>
               </div>
-              <BarChart3 className="h-8 w-8 text-yellow-400" />
+              <BarChart3 className="h-8 w-8 text-yellow-500" />
             </div>
           </div>
           
-          <div className="glass-card p-6">
+          <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <div className="text-2xl font-bold text-white flex items-center">
+                <div className="text-2xl font-bold text-gray-900 flex items-center">
                   {learningPath.analytics.streakDays}
-                  <Flame className="h-5 w-5 text-orange-400 ml-1" />
+                  <Flame className="h-5 w-5 text-orange-500 ml-1" />
                 </div>
-                <div className="text-sm text-blue-200">Study Streak</div>
+                <div className="text-sm text-gray-600">Study Streak</div>
               </div>
-              <Calendar className="h-8 w-8 text-orange-400" />
+              <Calendar className="h-8 w-8 text-orange-500" />
             </div>
           </div>
         </div>
@@ -391,8 +391,8 @@ const StudentLearningPathEnhanced = () => {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Week Navigation Sidebar */}
           <div className="lg:col-span-1">
-            <div className="glass-card p-6 sticky top-24">
-              <h3 className="text-lg font-semibold text-white mb-4">Learning Weeks</h3>
+            <div className="bg-white border-2 border-gray-200 rounded-xl p-6 sticky top-24 shadow-sm">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Learning Weeks</h3>
               <div className="space-y-3">
                 {learningPath.weeks.map((week) => {
                   const StatusIcon = getStatusIcon(week.status);
@@ -400,26 +400,29 @@ const StudentLearningPathEnhanced = () => {
                     <button
                       key={week.weekNumber}
                       onClick={() => setActiveWeek(week.weekNumber)}
-                      className={`w-full text-left p-3 rounded-lg transition-all ${
+                      className={`w-full text-left p-4 border-2 rounded-lg transition-all ${
                         activeWeek === week.weekNumber 
-                          ? 'bg-blue-500/20 border border-blue-400' 
-                          : 'bg-white/10 hover:bg-white/20'
+                          ? 'border-blue-500 bg-blue-50 shadow-md' 
+                          : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:shadow-sm'
                       } ${!week.unlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
                       disabled={!week.unlocked}
                     >
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-medium text-white text-sm">Week {week.weekNumber}</div>
-                          <div className="text-xs text-blue-200">{week.title}</div>
+                          <div className="font-medium text-gray-900 text-sm">Week {week.weekNumber}</div>
+                          <div className="text-xs text-gray-600">{week.title}</div>
                         </div>
                         <div className="flex items-center space-x-2">
-                          <StatusIcon className="h-4 w-4 text-white" />
-                          <span className="text-xs text-white">{week.progress}%</span>
+                          <StatusIcon className={`h-4 w-4 ${
+                            week.status === 'completed' ? 'text-green-600' :
+                            week.status === 'in-progress' ? 'text-blue-600' : 'text-gray-400'
+                          }`} />
+                          <span className="text-xs text-gray-700 font-medium">{week.progress}%</span>
                         </div>
                       </div>
-                      <div className="mt-2 w-full bg-white/20 rounded-full h-1">
+                      <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
                         <div 
-                          className="bg-gradient-to-r from-blue-400 to-purple-500 h-1 rounded-full transition-all duration-300"
+                          className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-300"
                           style={{ width: `${week.progress}%` }}
                         ></div>
                       </div>
@@ -437,41 +440,41 @@ const StudentLearningPathEnhanced = () => {
               .map(week => (
                 <div key={week.weekNumber} className="space-y-6">
                   {/* Week Header */}
-                  <div className="glass-card p-6">
-                    <div className="flex items-center justify-between mb-4">
+                  <div className="bg-white border-2 border-gray-200 rounded-xl p-8 shadow-sm">
+                    <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h2 className="text-2xl font-bold text-white">Week {week.weekNumber}: {week.title}</h2>
-                        <p className="text-blue-200">Bloom's Taxonomy Focus: {week.bloomLevel}</p>
+                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Week {week.weekNumber}: {week.title}</h2>
+                        <p className="text-gray-600 text-lg">Bloom's Taxonomy Focus: {week.bloomLevel}</p>
                       </div>
                       <div className="flex items-center space-x-4">
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(week.status)}`}>
+                        <div className={`px-4 py-2 rounded-full text-sm font-medium border-2 ${getStatusColor(week.status)} border-current`}>
                           {week.status.replace('-', ' ').toUpperCase()}
                         </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-white">{week.progress}%</div>
-                          <div className="text-sm text-blue-200">Complete</div>
+                          <div className="text-3xl font-bold text-gray-900">{week.progress}%</div>
+                          <div className="text-sm text-gray-600">Complete</div>
                         </div>
                       </div>
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-white">{week.estimatedHours}h</div>
-                        <div className="text-sm text-blue-200">Estimated Time</div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                      <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="text-2xl font-bold text-gray-900">{week.estimatedHours}h</div>
+                        <div className="text-sm text-gray-600">Estimated Time</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-white">{week.actualHours || 0}h</div>
-                        <div className="text-sm text-blue-200">Time Spent</div>
+                      <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="text-2xl font-bold text-gray-900">{week.actualHours || 0}h</div>
+                        <div className="text-sm text-gray-600">Time Spent</div>
                       </div>
-                      <div className="text-center">
-                        <div className="text-lg font-semibold text-white">{week.lessons?.length || 0}</div>
-                        <div className="text-sm text-blue-200">Activities</div>
+                      <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div className="text-2xl font-bold text-gray-900">{week.lessons?.length || 0}</div>
+                        <div className="text-sm text-gray-600">Activities</div>
                       </div>
                     </div>
                     
-                    <div className="w-full bg-white/20 rounded-full h-3">
+                    <div className="w-full bg-gray-200 rounded-full h-4">
                       <div 
-                        className="bg-gradient-to-r from-blue-500 to-purple-600 h-3 rounded-full transition-all duration-500"
+                        className="bg-gradient-to-r from-blue-500 to-purple-600 h-4 rounded-full transition-all duration-500"
                         style={{ width: `${week.progress}%` }}
                       ></div>
                     </div>
@@ -484,42 +487,42 @@ const StudentLearningPathEnhanced = () => {
                       const StatusIcon = getStatusIcon(lesson.status);
                       
                       return (
-                        <div key={lesson.id} className="glass-card p-6 hover-lift">
+                        <div key={lesson.id} className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-all">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-4 flex-1">
-                              <div className={`p-3 rounded-lg ${
+                            <div className="flex items-center space-x-5 flex-1">
+                              <div className={`p-4 rounded-xl ${
                                 lesson.type === 'lesson' ? 'bg-blue-500' :
                                 lesson.type === 'practice' ? 'bg-green-500' :
                                 lesson.type === 'quiz' ? 'bg-purple-500' : 'bg-gray-500'
                               }`}>
-                                <LessonIcon className="h-6 w-6 text-white" />
+                                <LessonIcon className="h-7 w-7 text-white" />
                               </div>
                               
                               <div className="flex-1">
-                                <div className="flex items-center space-x-3 mb-2">
-                                  <h3 className="font-semibold text-white">{lesson.title}</h3>
-                                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(lesson.difficulty)}`}>
+                                <div className="flex items-center space-x-3 mb-3">
+                                  <h3 className="font-semibold text-gray-900 text-lg">{lesson.title}</h3>
+                                  <div className={`px-3 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(lesson.difficulty)} border-current`}>
                                     {lesson.difficulty}
                                   </div>
-                                  <div className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
+                                  <div className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs border border-blue-200">
                                     {lesson.bloomLevel}
                                   </div>
                                 </div>
                                 
-                                <div className="flex items-center space-x-4 text-sm text-blue-200">
+                                <div className="flex items-center space-x-6 text-sm text-gray-600">
                                   <span className="flex items-center">
-                                    <Clock className="h-4 w-4 mr-1" />
+                                    <Clock className="h-4 w-4 mr-2" />
                                     {lesson.duration} min
                                   </span>
                                   {lesson.xpEarned && (
                                     <span className="flex items-center">
-                                      <Star className="h-4 w-4 mr-1 text-yellow-400" />
+                                      <Star className="h-4 w-4 mr-2 text-yellow-500" />
                                       {lesson.xpEarned} XP
                                     </span>
                                   )}
                                   {lesson.score && (
-                                    <span className="flex items-center text-green-400">
-                                      <Trophy className="h-4 w-4 mr-1" />
+                                    <span className="flex items-center text-green-600">
+                                      <Trophy className="h-4 w-4 mr-2" />
                                       {lesson.score}%
                                     </span>
                                   )}

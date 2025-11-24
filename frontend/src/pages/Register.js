@@ -84,7 +84,7 @@ const Register = () => {
     try {
       toast.info('Creating your account...');
       
-      await register({
+      const userData = await register({
         email: formData.email,
         password: formData.password,
         full_name: formData.fullName,
@@ -92,25 +92,45 @@ const Register = () => {
         role: formData.role
       });
       
-      toast.success('Account created successfully!');
+      toast.success(`Welcome to EdweavePack, ${userData.name}!`);
       
       // Navigate based on role
-      if (formData.role === 'student') {
-        navigate('/student/dashboard');
-      } else {
-        navigate('/dashboard');
+      switch (formData.role) {
+        case 'student':
+          navigate('/student/dashboard');
+          break;
+        case 'administrator':
+          navigate('/admin/dashboard');
+          break;
+        case 'curriculum_designer':
+          navigate('/curriculum/dashboard');
+          break;
+        default:
+          navigate('/dashboard');
       }
     } catch (error) {
       console.error('Registration error:', error);
       let errorMessage = 'Registration failed. Please try again.';
       
-      if (error.response?.data?.detail) {
+      if (error.isNetworkError) {
+        errorMessage = 'Unable to connect to server. Please check your internet connection and try again.';
+        toast.error(errorMessage, { autoClose: 5000 });
+      } else if (error.isValidationError) {
+        errorMessage = error.message;
+        toast.error(errorMessage);
+      } else if (error.isServerError) {
+        errorMessage = 'Server error occurred. Please try again in a moment.';
+        toast.error(errorMessage);
+      } else if (error.response?.data?.detail) {
         errorMessage = error.response.data.detail;
+        toast.error(errorMessage);
       } else if (error.message) {
         errorMessage = error.message;
+        toast.error(errorMessage);
+      } else {
+        toast.error(errorMessage);
       }
       
-      toast.error(errorMessage);
       setErrors({
         submit: errorMessage
       });
@@ -229,6 +249,11 @@ const Register = () => {
                   <option value="administrator">Administrator</option>
                   <option value="curriculum_designer">Curriculum Designer</option>
                 </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
 

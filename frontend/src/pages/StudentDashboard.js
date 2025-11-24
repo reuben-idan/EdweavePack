@@ -119,6 +119,15 @@ const StudentDashboard = () => {
     }));
     toast.success('Task updated!');
   };
+  
+  const handleStartTask = (taskId) => {
+    toast.info('Starting task...');
+    // Simulate task completion after a short delay
+    setTimeout(() => {
+      handleTaskComplete(taskId);
+      toast.success('Great job! Task completed!');
+    }, 1000);
+  };
 
   const handleQuizAction = (quiz) => {
     if (quiz.status === 'available') {
@@ -205,8 +214,8 @@ const StudentDashboard = () => {
                 <Target className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-gray-900">{student.progress.masteryPercentage}%</div>
-                <div className="text-sm text-gray-600">Mastery Level</div>
+                <div className="text-2xl font-bold text-readable">{student.progress.masteryPercentage}%</div>
+                <div className="text-sm text-readable-secondary font-medium">Mastery Level</div>
               </div>
             </div>
           </div>
@@ -217,8 +226,8 @@ const StudentDashboard = () => {
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-gray-900">{student.progress.averageScore}%</div>
-                <div className="text-sm text-gray-600">Average Score</div>
+                <div className="text-2xl font-bold text-readable">{student.progress.averageScore}%</div>
+                <div className="text-sm text-readable-secondary font-medium">Average Score</div>
               </div>
             </div>
           </div>
@@ -229,8 +238,8 @@ const StudentDashboard = () => {
                 <Calendar className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-gray-900">{student.progress.studyStreak}</div>
-                <div className="text-sm text-gray-600">Day Streak</div>
+                <div className="text-2xl font-bold text-readable">{student.progress.studyStreak}</div>
+                <div className="text-sm text-readable-secondary font-medium">Day Streak</div>
               </div>
             </div>
           </div>
@@ -257,7 +266,7 @@ const StudentDashboard = () => {
             {/* Today's Tasks */}
             <div className="glass-card p-6">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-900">Today's Tasks</h2>
+                <h2 className="text-xl font-semibold text-readable">Today's Tasks</h2>
                 <button
                   onClick={() => navigate('/student/learning-path')}
                   className="glass-button bg-gradient-primary text-white text-sm"
@@ -293,15 +302,18 @@ const StudentDashboard = () => {
                         </div>
                         
                         <div>
-                          <div className={`font-medium ${task.completed ? 'text-gray-500 line-through' : 'text-gray-900'}`}>
+                          <div className={`font-semibold ${task.completed ? 'text-gray-500 line-through' : 'text-readable'}`}>
                             {task.title}
                           </div>
-                          <div className="text-sm text-gray-500">{task.duration} min • {task.priority} priority</div>
+                          <div className="text-sm text-readable-secondary font-medium">{task.duration} min • {task.priority} priority</div>
                         </div>
                       </div>
                       
                       {!task.completed && (
-                        <button className="glass-button bg-gradient-primary text-white text-sm">
+                        <button 
+                          onClick={() => handleStartTask(task.id)}
+                          className="glass-button bg-gradient-primary text-white text-sm hover-lift"
+                        >
                           <Play className="h-3 w-3 mr-1" />
                           Start
                         </button>
@@ -314,20 +326,20 @@ const StudentDashboard = () => {
 
             {/* Weekly Plan */}
             <div className="glass-card p-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Weekly Progress</h2>
+              <h2 className="text-xl font-semibold text-readable mb-6">Weekly Progress</h2>
               <div className="grid grid-cols-5 gap-4">
                 {student.weeklyPlan.map((day, index) => (
                   <div key={index} className="text-center">
                     <div className="glass-card p-4 hover-lift">
-                      <div className="font-medium text-gray-900 mb-2">{day.day}</div>
-                      <div className="text-2xl font-bold text-gray-900 mb-1">{day.completed}/{day.tasks}</div>
+                      <div className="font-semibold text-readable mb-2">{day.day}</div>
+                      <div className="text-2xl font-bold text-readable mb-1">{day.completed}/{day.tasks}</div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className="bg-gradient-primary h-2 rounded-full transition-all duration-500" 
                           style={{ width: `${day.progress}%` }}
                         ></div>
                       </div>
-                      <div className="text-xs text-gray-500 mt-1">{day.progress}%</div>
+                      <div className="text-xs text-readable-secondary font-medium mt-1">{day.progress}%</div>
                     </div>
                   </div>
                 ))}
@@ -338,13 +350,13 @@ const StudentDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Mastery Progress */}
               <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Subject Mastery</h3>
+                <h3 className="text-lg font-semibold text-readable mb-4">Subject Mastery</h3>
                 <div className="space-y-4">
                   {student.masteryData.map((subject, index) => (
                     <div key={index}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-gray-700">{subject.subject}</span>
-                        <span className="text-gray-500">{subject.mastery}%</span>
+                        <span className="font-semibold text-readable">{subject.subject}</span>
+                        <span className="text-readable-secondary font-medium">{subject.mastery}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-3">
                         <div 
@@ -362,7 +374,7 @@ const StudentDashboard = () => {
 
               {/* Consistency Heatmap */}
               <div className="glass-card p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Study Consistency</h3>
+                <h3 className="text-lg font-semibold text-readable mb-4">Study Consistency</h3>
                 <div className="space-y-2">
                   <div className="grid grid-cols-7 gap-1 text-xs text-gray-500 mb-2">
                     {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
@@ -403,7 +415,7 @@ const StudentDashboard = () => {
           <div className="space-y-6">
             {/* Quick Actions */}
             <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+              <h3 className="text-lg font-semibold text-readable mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button 
                   onClick={() => navigate('/student/learning-path')}
@@ -413,13 +425,22 @@ const StudentDashboard = () => {
                   My Learning Path
                 </button>
                 <button 
-                  onClick={() => navigate('/student/upload')}
+                  onClick={() => {
+                    toast.info('Upload Goals feature coming soon!');
+                    // navigate('/student/upload');
+                  }}
                   className="w-full glass-button bg-gradient-secondary text-white hover-lift"
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Upload Goals
                 </button>
-                <button className="w-full glass-button bg-gradient-success text-white hover-lift">
+                <button 
+                  onClick={() => {
+                    toast.info('Analytics feature coming soon!');
+                    // navigate('/student/analytics');
+                  }}
+                  className="w-full glass-button bg-gradient-success text-white hover-lift"
+                >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Analytics
                 </button>
@@ -428,12 +449,12 @@ const StudentDashboard = () => {
 
             {/* Quizzes */}
             <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Quizzes</h3>
+              <h3 className="text-lg font-semibold text-readable mb-4">Available Quizzes</h3>
               <div className="space-y-3">
                 {student.quizzes.map((quiz) => (
                   <div key={quiz.id} className="glass-card p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="font-medium text-gray-900">{quiz.title}</div>
+                      <div className="font-semibold text-readable">{quiz.title}</div>
                       {quiz.score && (
                         <div className="text-sm font-semibold text-green-600">{quiz.score}%</div>
                       )}
@@ -458,7 +479,7 @@ const StudentDashboard = () => {
 
             {/* AI Recommendations */}
             <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <h3 className="text-lg font-semibold text-readable mb-4 flex items-center">
                 <Brain className="h-5 w-5 mr-2 text-purple-600" />
                 AI Recommendations
               </h3>
@@ -469,7 +490,7 @@ const StudentDashboard = () => {
                     rec.priority === 'medium' ? 'border-yellow-500' : 'border-green-500'
                   }`}>
                     <div className="flex items-start justify-between mb-2">
-                      <div className="font-medium text-gray-900 text-sm">{rec.title}</div>
+                      <div className="font-semibold text-readable text-sm">{rec.title}</div>
                       <div className={`px-2 py-1 rounded-full text-xs ${
                         rec.priority === 'high' ? 'bg-red-100 text-red-800' :
                         rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
@@ -477,7 +498,7 @@ const StudentDashboard = () => {
                         {rec.priority}
                       </div>
                     </div>
-                    <p className="text-gray-600 text-sm mb-3">{rec.description}</p>
+                    <p className="text-readable-secondary text-sm mb-3 font-medium">{rec.description}</p>
                     <button
                       onClick={() => handleRecommendationAction(rec)}
                       className="w-full glass-button bg-gradient-primary text-white text-sm"

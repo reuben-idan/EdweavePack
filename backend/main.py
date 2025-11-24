@@ -1,9 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from app.api import auth, curriculum, assessment, analytics, learning_paths, curriculum_enhanced, auth_enhanced, files, tasks, agents, student_endpoints
 from app.core.database import engine
 from app.models import Base
 import logging
+import traceback
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -11,13 +14,53 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Edweave Pack API", version="1.0.0")
 
+# Enhanced CORS configuration for production
+allowed_origins = [
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://edweavepack.com",
+    "https://www.edweavepack.com",
+    "https://*.edweavepack.com"
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Handle all unhandled exceptions"""
+    logger.error(f"Global exception handler caught: {exc}")
+    logger.error(f"Traceback: {traceback.format_exc()}")
+    
+    # Don't expose internal errors in production
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "An internal server error occurred. Please try again later.",
+            "type": "internal_server_error"
+        }
+    )
+
+# HTTP exception handler for better error responses
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Handle HTTP exceptions with consistent format"""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "detail": exc.detail,
+            "type": "http_exception",
+            "status_code": exc.status_code
+        }
+    )
 
 # Create tables
 try:
@@ -47,4 +90,28 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    """Health check endpoint with database connectivity test"""
+    try:
+        # Test database connection
+        from app.core.database import get_db
+        db = next(get_db())
+        db.execute("SELECT 1")
+        db.close()
+        
+        return {
+            "status": "healthy",
+            "timestamp": datetime.now().isoformat(),
+            "database": "connected",
+            "version": "1.0.0"
+        }
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "unhealthy",
+                "timestamp": datetime.now().isoformat(),
+                "database": "disconnected",
+                "error": "Database connection failed"
+            }
+        )

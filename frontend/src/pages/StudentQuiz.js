@@ -311,9 +311,13 @@ const StudentQuiz = () => {
           </h2>
           
           {currentQ.type === 'mcq' && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {currentQ.options.map((option, index) => (
-                <label key={index} className="glass-card p-4 cursor-pointer hover-lift">
+                <label key={index} className={`block p-5 border-2 rounded-xl cursor-pointer transition-all ${
+                  answers[currentQ.id] === index 
+                    ? 'border-blue-500 bg-blue-50 shadow-md' 
+                    : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
+                }`}>
                   <input
                     type="radio"
                     name={`question-${currentQ.id}`}
@@ -322,15 +326,15 @@ const StudentQuiz = () => {
                     onChange={() => handleAnswerChange(currentQ.id, index)}
                     className="sr-only"
                   />
-                  <div className={`flex items-center space-x-3 ${
-                    answers[currentQ.id] === index ? 'text-blue-600' : 'text-gray-700'
+                  <div className={`flex items-center space-x-4 ${
+                    answers[currentQ.id] === index ? 'text-blue-700 font-medium' : 'text-gray-800'
                   }`}>
-                    <div className={`w-4 h-4 rounded-full border-2 ${
-                      answers[currentQ.id] === index ? 'border-blue-600 bg-blue-600' : 'border-gray-300'
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      answers[currentQ.id] === index ? 'border-blue-500 bg-blue-500' : 'border-gray-400'
                     }`}>
-                      {answers[currentQ.id] === index && <div className="w-2 h-2 bg-white rounded-full m-0.5"></div>}
+                      {answers[currentQ.id] === index && <div className="w-2 h-2 bg-white rounded-full"></div>}
                     </div>
-                    <span>{option}</span>
+                    <span className="text-base">{option}</span>
                   </div>
                 </label>
               ))}
@@ -342,7 +346,7 @@ const StudentQuiz = () => {
               type="text"
               value={answers[currentQ.id] || ''}
               onChange={(e) => handleAnswerChange(currentQ.id, e.target.value)}
-              className="glass-input w-full px-4 py-3 text-gray-900"
+              className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl bg-white text-gray-800 text-base focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
               placeholder="Enter your answer..."
             />
           )}

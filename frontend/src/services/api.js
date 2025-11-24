@@ -16,18 +16,40 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Add response interceptor for error handling
+// Enhanced response interceptor with retry logic
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // Handle network errors
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // Handle network errors with retry
     if (!error.response) {
       console.error('Network Error: Unable to connect to API server');
-      error.message = 'Unable to connect to server. Please check your connection.';
+      
+      // Retry logic for network errors
+      if (!originalRequest._retry && originalRequest._retryCount < 3) {
+        originalRequest._retry = true;
+        originalRequest._retryCount = (originalRequest._retryCount || 0) + 1;
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 1000 * originalRequest._retryCount));
+        return api(originalRequest);
+      }
+      
+      error.message = 'Unable to connect to server. Please check your connection and try again.';
     } else if (error.response?.status === 401) {
+      // Clear tokens on authentication failure
       localStorage.removeItem('token');
       localStorage.removeItem('studentToken');
+      
+      // Redirect to login if not already there
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login';
+      }
+    } else if (error.response?.status >= 500) {
+      error.message = 'Server error. Please try again later.';
     }
+    
     return Promise.reject(error);
   }
 );
@@ -36,23 +58,103 @@ api.interceptors.response.use(
 export const authAPI = {
   register: (userData) => {
     console.log('API: Sending registration request:', userData);
+    
+    // Validate required fields
+    const requiredFields = ['email', 'password', 'full_name', 'role'];
+    for (const field of requiredFields) {
+      if (!userData[field]) {
+        throw new Error(`${field.replace('_', ' ')} is required`);
+      }
+    }
+    
+    // Ensure role is valid
+    const validRoles = ['teacher', 'student', 'administrator', 'curriculum_designer'];
+    if (!validRoles.includes(userData.role)) {
+      userData.role = 'teacher'; // Default fallback
+    }
+    
     return api.post('/api/auth/register', userData)
       .then(response => {
-        console.log('API: Registration response:', response);
+        console.log('API: Registration successful:', response.data);
         return response;
       })
       .catch(error => {
         console.error('API: Registration error:', error);
+        
         if (!error.response) {
-          throw new Error('Unable to connect to server. Please ensure the backend is running.');
+          const networkError = new Error('Unable to connect to server. Please check your internet connection and try again.');
+          networkError.isNetworkError = true;
+          throw networkError;
         }
+        
+        // Handle specific error cases
+        if (error.response.status === 400) {
+          const detail = error.response.data?.detail || 'Registration failed due to invalid data';
+          const validationError = new Error(detail);
+          validationError.isValidationError = true;
+          throw validationError;
+        }
+        
+        if (error.response.status >= 500) {
+          const serverError = new Error('Server error occurred. Please try again in a moment.');
+          serverError.isServerError = true;
+          throw serverError;
+        }
+        
         throw error;
       });
   },
-  login: (credentials) => api.post('/api/auth/token', credentials, {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-  }),
-  getProfile: () => api.get('/api/auth/me'),
+  login: (credentials) => {
+    return api.post('/api/auth/token', credentials, {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
+    })
+    .catch(error => {
+      console.error('API: Login error:', error);
+      
+      if (!error.response) {
+        const networkError = new Error('Unable to connect to server. Please check your internet connection.');
+        networkError.isNetworkError = true;
+        throw networkError;
+      }
+      
+      if (error.response.status === 401) {
+        const authError = new Error('Invalid email or password. Please check your credentials.');
+        authError.isAuthError = true;
+        throw authError;
+      }
+      
+      if (error.response.status >= 500) {
+        const serverError = new Error('Server error occurred. Please try again.');
+        serverError.isServerError = true;
+        throw serverError;
+      }
+      
+      throw error;
+    });
+  },
+  getProfile: () => {
+    return api.get('/api/auth/me')
+      .catch(error => {
+        console.error('API: Profile fetch error:', error);
+        
+        if (!error.response) {
+          const networkError = new Error('Unable to fetch profile. Please check your connection.');
+          networkError.isNetworkError = true;
+          throw networkError;
+        }
+        
+        if (error.response.status === 401) {
+          // Token expired or invalid
+          localStorage.removeItem('token');
+          localStorage.removeItem('studentToken');
+          const authError = new Error('Session expired. Please log in again.');
+          authError.isAuthError = true;
+          throw authError;
+        }
+        
+        throw error;
+      });
+  },
   forgotPassword: (data) => api.post('/api/auth/forgot-password', data),
   resetPassword: (data) => api.post('/api/auth/reset-password', data),
   updateProfile: (data) => api.put('/api/auth/profile', data),
