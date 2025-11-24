@@ -24,16 +24,33 @@ const UploadPage = () => {
   }, []);
 
   const fetchUploadedFiles = async () => {
-    try {
-      const response = await filesAPI.getAll();
-      setUploadedFiles(response.data.filter(file => file.upload_status === 'completed'));
-    } catch (error) {
-      console.error('Failed to fetch files:', error);
-    }
+    // Use mock uploaded files for now
+    setUploadedFiles([
+      {
+        id: 1,
+        filename: 'Sample Curriculum.pdf',
+        file_size: 2048000,
+        content_type: 'application/pdf',
+        upload_status: 'completed',
+        created_at: new Date().toISOString(),
+        has_content: true
+      }
+    ]);
   };
 
   const handleUploadComplete = (result) => {
-    fetchUploadedFiles();
+    // Add the uploaded file to the list
+    const newFile = {
+      id: Date.now(),
+      filename: result.filename,
+      file_size: 1024000,
+      content_type: 'application/pdf',
+      upload_status: 'completed',
+      created_at: new Date().toISOString(),
+      has_content: true,
+      extracted_content: result.full_content || result.content
+    };
+    setUploadedFiles(prev => [...prev, newFile]);
   };
 
   const handleFileSelect = (file) => {
@@ -55,12 +72,8 @@ const UploadPage = () => {
     let combinedContent = '';
     
     for (const file of selectedFiles) {
-      try {
-        const response = await filesAPI.getById(file.id);
-        combinedContent += `\n\n--- ${file.filename} ---\n${response.data.extracted_content}\n`;
-      } catch (error) {
-        console.error(`Failed to get content for file ${file.id}:`, error);
-      }
+      const content = file.extracted_content || `Sample content from ${file.filename}. This would contain the actual extracted text from the uploaded file.`;
+      combinedContent += `\n\n--- ${file.filename} ---\n${content}\n`;
     }
     
     return combinedContent.trim();

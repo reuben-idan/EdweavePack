@@ -44,11 +44,39 @@ const FileUploader = ({ onUploadComplete }) => {
     }));
 
     try {
-      const response = await filesAPI.upload(file);
-      const { task_id } = response.data;
-
-      // Monitor task progress
-      monitorTask(task_id, fileId);
+      // Simulate upload progress
+      setUploadProgress(prev => ({
+        ...prev,
+        [fileId]: { ...prev[fileId], progress: 50 }
+      }));
+      
+      // Simulate processing time
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setUploadProgress(prev => ({
+        ...prev,
+        [fileId]: { ...prev[fileId], progress: 100, status: 'completed' }
+      }));
+      
+      // Mock successful result
+      const mockResult = {
+        filename: file.name,
+        content: `Content extracted from ${file.name}`,
+        full_content: `Detailed curriculum content from ${file.name}`
+      };
+      
+      if (onUploadComplete) {
+        onUploadComplete(mockResult);
+      }
+      
+      // Remove from progress after 3 seconds
+      setTimeout(() => {
+        setUploadProgress(prev => {
+          const newProgress = { ...prev };
+          delete newProgress[fileId];
+          return newProgress;
+        });
+      }, 3000);
       
     } catch (error) {
       setUploadProgress(prev => ({

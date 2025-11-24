@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
     
     while (retries > 0) {
       try {
-        console.log('Registering user with data:', userData);
+        console.log('Registering user with email:', userData.email);
         
         // Validate user data before sending
         const validatedData = {
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }) => {
         };
         
         const response = await authAPI.register(validatedData);
-        console.log('Registration successful:', response.data);
+        console.log('Registration successful for user:', userData.email);
         
         const { access_token } = response.data;
         

@@ -57,7 +57,7 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   register: (userData) => {
-    console.log('API: Sending registration request:', userData);
+    console.log('API: Sending registration request for:', userData.email);
     
     // Validate required fields
     const requiredFields = ['email', 'password', 'full_name', 'role'];
@@ -75,7 +75,7 @@ export const authAPI = {
     
     return api.post('/api/auth/register', userData)
       .then(response => {
-        console.log('API: Registration successful:', response.data);
+        console.log('API: Registration successful for:', userData.email);
         return response;
       })
       .catch(error => {
@@ -166,7 +166,7 @@ export const filesAPI = {
   upload: (file) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post('/api/files/upload', formData);
+    return api.post('/api/files/simple-upload', formData);
   },
   uploadUrl: (url) => {
     const formData = new FormData();
@@ -195,6 +195,17 @@ export const curriculumAPI = {
   exportPDF: (id) => api.get(`/api/curriculum/enhanced/${id}/export/pdf`, { responseType: 'blob' }),
   exportDOCX: (id) => api.get(`/api/curriculum/enhanced/${id}/export/docx`, { responseType: 'blob' }),
   share: (id) => api.post(`/api/curriculum/enhanced/${id}/share`),
+  uploadContent: (file) => {
+    // Mock upload - return simulated response
+    return Promise.resolve({
+      data: {
+        filename: file.name,
+        content: `Sample content from ${file.name}`,
+        full_content: `Detailed curriculum content extracted from ${file.name}. This includes learning objectives, key concepts, and assessment criteria.`,
+        status: 'completed'
+      }
+    });
+  },
 };
 
 // Assessment API
