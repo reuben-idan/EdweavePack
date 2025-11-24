@@ -218,6 +218,59 @@ resource "aws_cloudwatch_log_group" "ecs" {
   retention_in_days = 7
 }
 
+# ACM Certificate
+resource "aws_acm_certificate" "main" {
+  domain_name       = "edweavepack.com"
+  validation_method = "DNS"
+  
+  subject_alternative_names = [
+    "*.edweavepack.com"
+  ]
+  
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "main" {
+  certificate_arn = aws_acm_certificate.main.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
+
+# Route53 Zone
+resource "aws_route53_zone" "main" {
+  name = "edweavepack.com"
+}
+
+resource "aws_route53_record" "cert_validation" {
+  for_each = {
+    for dvo in aws_acm_certificate.main.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+  
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.main.zone_id
+}
+
+resource "aws_route53_record" "main" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = "edweavepack.com"
+  type    = "A"
+  
+  alias {
+    name                   = aws_lb.main.dns_name
+    zone_id                = aws_lb.main.zone_id
+    evaluate_target_health = true
+  }
+}
+
 # Application Load Balancer
 resource "aws_lb" "main" {
   name               = "${var.project_name}-alb"
@@ -265,10 +318,29 @@ resource "aws_lb_target_group" "backend" {
   }
 }
 
-resource "aws_lb_listener" "main" {
+# HTTP listener - redirect to HTTPS
+resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.main.arn
   port              = "80"
   protocol          = "HTTP"
+  
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# HTTPS listener
+resource "aws_lb_listener" "https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn   = aws_acm_certificate_validation.main.certificate_arn
   
   default_action {
     type             = "forward"
@@ -277,7 +349,7 @@ resource "aws_lb_listener" "main" {
 }
 
 resource "aws_lb_listener_rule" "backend" {
-  listener_arn = aws_lb_listener.main.arn
+  listener_arn = aws_lb_listener.https.arn
   priority     = 100
   
   action {
@@ -416,5 +488,5 @@ resource "aws_ecs_service" "main" {
     container_port   = 8000
   }
   
-  depends_on = [aws_lb_listener.main]
+  depends_on = [aws_lb_listener.https]
 }

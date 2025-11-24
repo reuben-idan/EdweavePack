@@ -1,51 +1,71 @@
 #!/bin/bash
+
+# EdweavePack AWS Deployment Script
+
 set -e
 
-echo "🚀 Starting AWS deployment..."
+echo "🚀 Starting EdweavePack deployment to AWS..."
 
-# Check if AWS CLI is configured
-if ! aws sts get-caller-identity > /dev/null 2>&1; then
-    echo "❌ AWS CLI not configured. Please run 'aws configure'"
+# Check if environment is provided
+if [ -z "$1" ]; then
+    echo "Usage: ./deploy.sh [environment]"
+    echo "Example: ./deploy.sh production"
     exit 1
 fi
 
-# Set variables
-REGION="us-east-1"
-PROJECT="edweavepack"
+ENVIRONMENT=$1
+ENV_FILE=".env.${ENVIRONMENT}"
 
-# Create S3 bucket for Terraform state if it doesn't exist
-aws s3api head-bucket --bucket "${PROJECT}-terraform-state" --region $REGION 2>/dev/null || \
-aws s3 mb s3://${PROJECT}-terraform-state --region $REGION
+# Check if environment file exists
+if [ ! -f "$ENV_FILE" ]; then
+    echo "❌ Environment file $ENV_FILE not found!"
+    echo "Please create $ENV_FILE with your configuration."
+    exit 1
+fi
 
-# Deploy infrastructure
-echo "📦 Deploying infrastructure..."
-cd infrastructure
-terraform init
-terraform plan -var="db_password=$(openssl rand -base64 32)"
-terraform apply -auto-approve -var="db_password=$(openssl rand -base64 32)"
+# Load environment variables
+source $ENV_FILE
 
-# Get ECR URLs
-BACKEND_ECR=$(terraform output -raw ecr_backend_url)
-FRONTEND_ECR=$(terraform output -raw ecr_frontend_url)
-ALB_DNS=$(terraform output -raw load_balancer_dns)
+echo "📦 Building Docker images for $ENVIRONMENT..."
 
-cd ..
+# Build backend image
+docker build -f backend/Dockerfile.prod -t edweave-backend:$ENVIRONMENT ./backend
 
-# Login to ECR
+# Build frontend image with API URL
+docker build -f frontend/Dockerfile.prod \
+    --build-arg REACT_APP_API_URL=$REACT_APP_API_URL \
+    -t edweave-frontend:$ENVIRONMENT ./frontend
+
+echo "🏷️ Tagging images for ECR..."
+
+# Tag images for ECR (replace with your ECR repository URIs)
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+ECR_REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+
+docker tag edweave-backend:$ENVIRONMENT $ECR_REGISTRY/edweave-backend:$ENVIRONMENT
+docker tag edweave-frontend:$ENVIRONMENT $ECR_REGISTRY/edweave-frontend:$ENVIRONMENT
+
 echo "🔐 Logging into ECR..."
-aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $BACKEND_ECR
+aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
-# Build and push images
-echo "🏗️ Building and pushing images..."
-docker build -t $BACKEND_ECR:latest backend/
-docker push $BACKEND_ECR:latest
+echo "📤 Pushing images to ECR..."
+docker push $ECR_REGISTRY/edweave-backend:$ENVIRONMENT
+docker push $ECR_REGISTRY/edweave-frontend:$ENVIRONMENT
 
-docker build -t $FRONTEND_ECR:latest frontend/
-docker push $FRONTEND_ECR:latest
+echo "🔄 Updating ECS services..."
+aws ecs update-service \
+    --cluster edweave-cluster \
+    --service edweave-backend-service \
+    --force-new-deployment \
+    --region $AWS_REGION
 
-# Update ECS service
-echo "🔄 Updating ECS service..."
-aws ecs update-service --cluster ${PROJECT}-cluster --service ${PROJECT}-service --force-new-deployment --region $REGION
+aws ecs update-service \
+    --cluster edweave-cluster \
+    --service edweave-frontend-service \
+    --force-new-deployment \
+    --region $AWS_REGION
 
-echo "✅ Deployment complete!"
-echo "🌐 Application URL: http://$ALB_DNS"
+echo "✅ Deployment completed successfully!"
+echo "🌐 Frontend: Check your load balancer URL"
+echo "🔧 Backend: Check your API load balancer URL"
+echo "📊 Monitor: Check ECS console for deployment status"

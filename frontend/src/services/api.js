@@ -20,7 +20,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Handle network errors
+    if (!error.response) {
+      console.error('Network Error: Unable to connect to API server');
+      error.message = 'Unable to connect to server. Please check your connection.';
+    } else if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('studentToken');
     }
@@ -39,7 +43,9 @@ export const authAPI = {
       })
       .catch(error => {
         console.error('API: Registration error:', error);
-        console.error('API: Error response:', error.response);
+        if (!error.response) {
+          throw new Error('Unable to connect to server. Please ensure the backend is running.');
+        }
         throw error;
       });
   },
