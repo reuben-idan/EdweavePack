@@ -1,6 +1,5 @@
 import axios from 'axios';
-
-const API_BASE_URL = 'http://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com';
+import { API_BASE_URL } from './config';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -109,7 +108,7 @@ export const authAPI = {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     })
     .catch(error => {
-      console.error('API: Login error:', error);
+
       
       if (!error.response) {
         const networkError = new Error('Unable to connect to server. Please check your internet connection.');
@@ -135,7 +134,7 @@ export const authAPI = {
   getProfile: () => {
     return api.get('/api/auth/me')
       .catch(error => {
-        console.error('API: Profile fetch error:', error);
+
         
         if (!error.response) {
           const networkError = new Error('Unable to fetch profile. Please check your connection.');

@@ -1,0 +1,1 @@
+export const API_BASE_URL = 'http://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com';
