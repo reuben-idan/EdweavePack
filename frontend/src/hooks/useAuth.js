@@ -85,8 +85,6 @@ export const AuthProvider = ({ children }) => {
     
     while (retries > 0) {
       try {
-        console.log('Registering user with email:', userData.email);
-        
         // Validate user data before sending
         const validatedData = {
           email: userData.email?.trim(),
@@ -97,7 +95,7 @@ export const AuthProvider = ({ children }) => {
         };
         
         const response = await authAPI.register(validatedData);
-        console.log('Registration successful for user:', userData.email);
+        // Registration successful
         
         const { access_token } = response.data;
         
@@ -127,13 +125,13 @@ export const AuthProvider = ({ children }) => {
         
         // Don't retry on validation errors (400) or auth errors (401, 403)
         if (error.response?.status && [400, 401, 403].includes(error.response.status)) {
-          console.error('Registration validation error:', error.response.data);
+          // Registration validation error
           throw error;
         }
         
         // Don't retry if no more attempts
         if (retries === 0) {
-          console.error('Registration failed after retries:', error);
+          // Registration failed after retries
           throw error;
         }
         

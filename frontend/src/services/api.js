@@ -57,7 +57,7 @@ api.interceptors.response.use(
 // Auth API
 export const authAPI = {
   register: (userData) => {
-    console.log('API: Sending registration request for:', userData.email);
+    // Sending registration request
     
     // Validate required fields
     const requiredFields = ['email', 'password', 'full_name', 'role'];
@@ -75,11 +75,11 @@ export const authAPI = {
     
     return api.post('/api/auth/register', userData)
       .then(response => {
-        console.log('API: Registration successful for:', userData.email);
+        // Registration successful
         return response;
       })
       .catch(error => {
-        console.error('API: Registration error:', error);
+        // Registration error occurred
         
         if (!error.response) {
           const networkError = new Error('Unable to connect to server. Please check your internet connection and try again.');
