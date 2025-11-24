@@ -128,7 +128,7 @@ resource "aws_security_group" "rds" {
 resource "aws_db_instance" "main" {
   identifier     = "${var.project_name}-db"
   engine         = "postgres"
-  engine_version = "15.8"
+  engine_version = "15.15"
   instance_class = "db.t3.micro"
   
   allocated_storage     = 20
@@ -327,7 +327,7 @@ resource "aws_ecs_task_definition" "main" {
   container_definitions = jsonencode([
     {
       name  = "backend"
-      image = "${aws_ecr_repository.backend.repository_url}:latest"
+      image = "084828575963.dkr.ecr.eu-north-1.amazonaws.com/edweavepack-backend:latest"
       
       portMappings = [
         {
@@ -358,7 +358,7 @@ resource "aws_ecs_task_definition" "main" {
     },
     {
       name  = "frontend"
-      image = "${aws_ecr_repository.frontend.repository_url}:latest"
+      image = "084828575963.dkr.ecr.eu-north-1.amazonaws.com/edweavepack-frontend:latest"
       
       portMappings = [
         {
