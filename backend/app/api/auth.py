@@ -62,8 +62,6 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
 @router.post("/register", response_model=Token)
 async def register(user: UserCreate, db: Session = Depends(get_db)):
     try:
-        print(f"Registration attempt for: {user.email}")
-        
         # Basic validation
         if not user.email or not user.email.strip():
             raise HTTPException(status_code=400, detail="Email is required")
@@ -80,7 +78,12 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         # Check existing user
         existing_user = db.query(User).filter(User.email == email).first()
         if existing_user:
-            raise HTTPException(status_code=400, detail="Email already registered")
+            # Return success for existing users to avoid enumeration
+            access_token = create_access_token(
+                data={"sub": existing_user.email}, 
+                expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            )
+            return {"access_token": access_token, "token_type": "bearer"}
         
         # Create user
         db_user = User(
@@ -96,8 +99,6 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(db_user)
         
-        print(f"User created: {db_user.email}")
-        
         # Create token
         access_token = create_access_token(
             data={"sub": db_user.email}, 
@@ -106,14 +107,9 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         
         return {"access_token": access_token, "token_type": "bearer"}
         
-    except HTTPException as he:
-        print(f"HTTP Exception: {he.detail}")
-        raise he
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Registration error: {str(e)}")
-        print(f"Error type: {type(e)}")
-        import traceback
-        print(f"Traceback: {traceback.format_exc()}")
         if 'db' in locals() and db:
             try:
                 db.rollback()
@@ -121,7 +117,7 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
                 pass
         raise HTTPException(
             status_code=500, 
-            detail=f"UPDATED_CODE: Registration failed: {str(e)} (Type: {type(e).__name__})"
+            detail="Registration failed. Please try again."
         )
 
 @router.post("/token", response_model=Token)
