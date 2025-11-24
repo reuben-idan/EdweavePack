@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from app.core.database import get_db
-from app.models.curriculum import Assessment, Question
+from app.models.curriculum import Assessment, Question, Curriculum
 from app.models.student import Student
 from app.models.user import User
 from app.schemas.curriculum import AssessmentResponse, QuestionResponse
@@ -15,12 +15,10 @@ ai_service = AIService()
 @router.get("/{assessment_id}", response_model=AssessmentResponse)
 async def get_assessment(
     assessment_id: int,
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    assessment = db.query(Assessment).join(Assessment.curriculum).filter(
-        Assessment.id == assessment_id,
-        Assessment.curriculum.has(user_id=current_user.id)
+    assessment = db.query(Assessment).filter(
+        Assessment.id == assessment_id
     ).first()
     
     if not assessment:
@@ -31,12 +29,10 @@ async def get_assessment(
 @router.get("/{assessment_id}/questions", response_model=List[QuestionResponse])
 async def get_questions(
     assessment_id: int,
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    assessment = db.query(Assessment).join(Assessment.curriculum).filter(
-        Assessment.id == assessment_id,
-        Assessment.curriculum.has(user_id=current_user.id)
+    assessment = db.query(Assessment).filter(
+        Assessment.id == assessment_id
     ).first()
     
     if not assessment:
@@ -44,11 +40,14 @@ async def get_questions(
     
     return db.query(Question).filter(Question.assessment_id == assessment_id).all()
 
+@router.post("/test-submit")
+async def test_submit():
+    return {"message": "Test endpoint working"}
+
 @router.post("/{assessment_id}/submit")
 async def submit_assessment(
     assessment_id: int,
     submission_data: Dict[str, Any],
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     answers = submission_data.get("answers", {})

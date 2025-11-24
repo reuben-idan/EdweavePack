@@ -128,7 +128,7 @@ const AssessmentTake = () => {
       setSubmitting(true);
       toast.info('Submitting assessment - Processing your answers...');
       
-      await assessmentAPI.submit(id, answers);
+      await assessmentAPI.submit(id, { answers });
       toast.success('Assessment submitted - Your answers have been recorded');
       navigate('/assessments');
       

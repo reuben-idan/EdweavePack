@@ -81,7 +81,6 @@ const StudentSignup = () => {
     }
 
     try {
-      setLoading(true);
       toast.info('Creating your student account...');
       
       // Mock API call
@@ -92,8 +91,6 @@ const StudentSignup = () => {
       
     } catch (error) {
       toast.error('Failed to create account. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
