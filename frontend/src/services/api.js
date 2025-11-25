@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { API_BASE_URL, ENABLE_LOGGING } from '../config';
+import { API_BASE_URL, ENABLE_LOGGING, SECURITY_CONFIG } from '../config';
 
 // Deep sanitization function to prevent sensitive data leakage
 const deepSanitize = (obj, sensitiveFields = ['password', 'confirmPassword', 'access_token', 'refresh_token', 'secret', 'key', 'token']) => {
@@ -38,15 +38,9 @@ const secureLog = (message, data = null) => {
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 30000, // 30 second timeout
+  timeout: 10000,
   headers: {
-    'Content-Type': 'application/json',
-    ...(SECURITY_CONFIG.enforceHTTPS && {
-      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-      'X-XSS-Protection': '1; mode=block'
-    })
+    'Content-Type': 'application/json'
   }
 });
 

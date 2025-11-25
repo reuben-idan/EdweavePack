@@ -121,7 +121,4 @@ resource "aws_route53_record" "www" {
   }
 }
 
-# Security policy for ALB
-data "aws_lb_ssl_negotiation_policy" "secure" {
-  name = "ELBSecurityPolicy-TLS-1-2-2017-01"
-}
+# Note: SSL policy is configured directly in ALB listener

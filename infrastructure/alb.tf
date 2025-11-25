@@ -23,7 +23,7 @@ resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.main.arn
   port              = "443"
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn   = aws_acm_certificate_validation.main.certificate_arn
 
   default_action {
@@ -49,19 +49,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-# Fallback HTTPS Listener for ALB DNS
-resource "aws_lb_listener" "https_fallback" {
-  load_balancer_arn = aws_lb.main.arn
-  port              = "8443"
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = aws_acm_certificate.fallback.arn
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.frontend.arn
-  }
-}
 
 # Target Group for Frontend
 resource "aws_lb_target_group" "frontend" {
@@ -70,13 +58,14 @@ resource "aws_lb_target_group" "frontend" {
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
   target_type = "ip"
+  deregistration_delay = 30
 
   health_check {
     enabled             = true
     healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 5
-    interval            = 30
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 15
     path                = "/"
     matcher             = "200"
     port                = "traffic-port"
@@ -96,13 +85,14 @@ resource "aws_lb_target_group" "backend" {
   protocol = "HTTP"
   vpc_id   = aws_vpc.main.id
   target_type = "ip"
+  deregistration_delay = 30
 
   health_check {
     enabled             = true
     healthy_threshold   = 2
-    unhealthy_threshold = 2
-    timeout             = 5
-    interval            = 30
+    unhealthy_threshold = 3
+    timeout             = 10
+    interval            = 15
     path                = "/health"
     matcher             = "200"
     port                = "traffic-port"
