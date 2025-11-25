@@ -1,23 +1,8 @@
 // Secure API configuration - enforce HTTPS in production
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
-// Dynamic API URL detection
-const getApiBaseUrl = () => {
-  if (typeof window === 'undefined') return 'http://localhost:8000';
-  
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  
-  // Production AWS environment
-  if (hostname.includes('amazonaws.com') || hostname.includes('elb.')) {
-    return `${protocol}//${hostname}`;
-  }
-  
-  // Local development
-  return 'http://localhost:8000';
-};
-
-export const API_BASE_URL = getApiBaseUrl();
+// Hardcoded production URL - no localhost fallback
+export const API_BASE_URL = 'https://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com';
 export const IS_PRODUCTION_ENV = IS_PRODUCTION;
 export const ENABLE_LOGGING = !IS_PRODUCTION;
 

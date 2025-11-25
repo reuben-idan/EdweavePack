@@ -16,22 +16,43 @@ logger = logging.getLogger(__name__)
 app = FastAPI(title="Edweave Pack API", version="1.0.0")
 
 import os
+import boto3
+from botocore.exceptions import ClientError
 
 # Secure CORS configuration - only HTTPS in production
 is_production = os.getenv("ENVIRONMENT", "development") == "production"
 
-if is_production:
-    allowed_origins = [
-        "https://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com",
-        "https://edweavepack.com",
-        "https://www.edweavepack.com"
-    ]
-else:
-    allowed_origins = [
-        "http://localhost:3000",
-        "https://localhost:3000",
-        "http://127.0.0.1:3000"
-    ]
+def get_secret(secret_name):
+    """Retrieve secret from AWS Secrets Manager"""
+    if not is_production:
+        return None
+    
+    try:
+        session = boto3.session.Session()
+        client = session.client(
+            service_name='secretsmanager',
+            region_name=os.getenv('AWS_REGION', 'eu-north-1')
+        )
+        response = client.get_secret_value(SecretId=secret_name)
+        return response['SecretString']
+    except ClientError as e:
+        logger.error(f"Failed to retrieve secret {secret_name}: {e}")
+        return None
+
+# Always allow ALB for production deployment
+allowed_origins = [
+    "http://localhost:3000",
+    "https://localhost:3000", 
+    "http://127.0.0.1:3000",
+    "https://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com",
+    "http://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com",
+    "https://edweavepack.com",
+    "https://www.edweavepack.com"
+]
+
+# Log CORS configuration
+logger.info(f"CORS allowed origins: {allowed_origins}")
+logger.info(f"Production mode: {is_production}")
 
 # Add security middleware first
 SecurityMiddleware, security_config = get_security_middleware()

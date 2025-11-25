@@ -329,16 +329,27 @@ resource "aws_ecs_task_definition" "backend" {
           value = "production"
         },
         {
-          name  = "DATABASE_URL"
-          value = "postgresql://postgres:${var.db_password}@${aws_db_instance.main.endpoint}/edweavepack"
-        },
-        {
-          name  = "REDIS_URL"
-          value = "redis://${aws_elasticache_replication_group.main.primary_endpoint_address}:6379"
-        },
-        {
           name  = "ENFORCE_HTTPS"
           value = "true"
+        },
+        {
+          name  = "AWS_REGION"
+          value = var.aws_region
+        }
+      ]
+      
+      secrets = [
+        {
+          name      = "DATABASE_URL"
+          valueFrom = aws_secretsmanager_secret.database.arn
+        },
+        {
+          name      = "SECRET_KEY"
+          valueFrom = aws_secretsmanager_secret.jwt.arn
+        },
+        {
+          name      = "REDIS_URL"
+          valueFrom = aws_secretsmanager_secret.redis.arn
         }
       ]
       
@@ -463,11 +474,6 @@ resource "aws_ecs_service" "backend" {
     container_port   = 8000
   }
 
-  deployment_configuration {
-    maximum_percent         = 200
-    minimum_healthy_percent = 50
-  }
-
   depends_on = [aws_lb_listener.https]
 
   tags = {
@@ -493,11 +499,6 @@ resource "aws_ecs_service" "frontend" {
     target_group_arn = aws_lb_target_group.frontend.arn
     container_name   = "frontend"
     container_port   = 3000
-  }
-
-  deployment_configuration {
-    maximum_percent         = 200
-    minimum_healthy_percent = 50
   }
 
   depends_on = [aws_lb_listener.https]
