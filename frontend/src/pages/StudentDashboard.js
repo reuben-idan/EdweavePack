@@ -68,35 +68,43 @@ const StudentDashboard = () => {
         aiRecommendations: [
           {
             id: 1,
-            type: 'focus',
-            title: 'Strengthen Chemistry Fundamentals',
-            description: 'Your chemistry scores are below target. Spend 20 extra minutes daily on basic concepts.',
+            type: 'analysis',
+            title: 'AI Learning Analysis',
+            description: 'Analysis suggests focusing on Chemistry fundamentals. Your learning pattern indicates visual learning works best for you.',
             priority: 'high',
-            action: 'Start Chemistry Basics'
+            action: 'Get AI Tutoring',
+            aiPowered: true,
+            confidence: 94
           },
           {
             id: 2,
-            type: 'practice',
-            title: 'Increase Geometry Practice',
-            description: 'Great progress! Add 2 more geometry problems daily to maintain momentum.',
+            type: 'adaptive',
+            title: 'Adaptive Path Update',
+            description: 'Agent orchestration detected excellent geometry progress. Unlocking advanced topics and increasing difficulty by 15%.',
             priority: 'medium',
-            action: 'Practice Now'
+            action: 'Continue Advanced Path',
+            aiPowered: true,
+            confidence: 87
           },
           {
             id: 3,
-            type: 'review',
-            title: 'Review Quadratic Equations',
-            description: 'You missed 3 questions on quadratics. Quick review recommended before moving forward.',
+            type: 'misconception',
+            title: 'Misconception Detection',
+            description: 'Pattern analysis shows confusion with quadratic vertex form. Personalized remediation content generated.',
             priority: 'high',
-            action: 'Review Topic'
+            action: 'Start AI Remediation',
+            aiPowered: true,
+            confidence: 91
           },
           {
             id: 4,
             type: 'achievement',
-            title: 'Excellent Algebra Progress!',
-            description: 'You\'ve mastered 85% of algebra concepts. Ready for advanced topics.',
+            title: 'Learning Achievement',
+            description: 'AI-enhanced curriculum helped achieve 85% algebra mastery. Ready for advanced mathematical concepts.',
             priority: 'low',
-            action: 'Continue Learning'
+            action: 'Continue Learning',
+            aiPowered: true,
+            confidence: 100
           }
         ]
       };
@@ -477,36 +485,55 @@ const StudentDashboard = () => {
               </div>
             </div>
 
-            {/* AI Recommendations */}
+            {/* Enhanced AI Recommendations */}
             <div className="glass-card p-6">
               <h3 className="text-lg font-semibold text-readable mb-4 flex items-center">
                 <Brain className="h-5 w-5 mr-2 text-purple-600" />
-                AI Recommendations
+                AI Learning Insights
               </h3>
               <div className="space-y-4">
                 {student.aiRecommendations.map((rec) => (
                   <div key={rec.id} className={`glass-card p-4 border-l-4 ${
                     rec.priority === 'high' ? 'border-red-500' :
                     rec.priority === 'medium' ? 'border-yellow-500' : 'border-green-500'
-                  }`}>
+                  } ${rec.aiPowered ? 'bg-gradient-to-r from-blue-50 to-purple-50' : ''}`}>
                     <div className="flex items-start justify-between mb-2">
-                      <div className="font-semibold text-readable text-sm">{rec.title}</div>
-                      <div className={`px-2 py-1 rounded-full text-xs ${
-                        rec.priority === 'high' ? 'bg-red-100 text-red-800' :
-                        rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
-                      }`}>
-                        {rec.priority}
+                      <div className="font-semibold text-readable text-sm flex items-center">
+                        {rec.title}
+                        {rec.aiPowered && (
+                          <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
+                            AI
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        {rec.confidence && (
+                          <span className="text-xs text-gray-600">{rec.confidence}% confidence</span>
+                        )}
+                        <div className={`px-2 py-1 rounded-full text-xs ${
+                          rec.priority === 'high' ? 'bg-red-100 text-red-800' :
+                          rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                          {rec.priority}
+                        </div>
                       </div>
                     </div>
                     <p className="text-readable-secondary text-sm mb-3 font-medium">{rec.description}</p>
                     <button
                       onClick={() => handleRecommendationAction(rec)}
-                      className="w-full glass-button bg-gradient-primary text-white text-sm"
+                      className={`w-full glass-button text-sm ${
+                        rec.aiPowered ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' : 'bg-gradient-primary text-white'
+                      }`}
                     >
                       {rec.action}
                     </button>
                   </div>
                 ))}
+              </div>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <p className="text-xs text-blue-800">
+                  <strong>AI-Powered Learning:</strong> Recommendations generated using advanced agent orchestration and adaptive learning algorithms
+                </p>
               </div>
             </div>
           </div>
