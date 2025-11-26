@@ -1,8 +1,10 @@
 <div align="center">
 
+<img src="logo.png" alt="EdweavePack Logo" width="200" height="200">
+
 # EdweavePack
 
-**AI-Powered Educational Content Platform**
+**🎓 AI-Powered Educational Content Platform**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -10,61 +12,104 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 [![AWS](https://img.shields.io/badge/AWS-Cloud%20Ready-FF9900.svg)](https://aws.amazon.com/)
+[![Deployment](https://img.shields.io/badge/Status-Live-brightgreen.svg)](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)
+[![Hackathon](https://img.shields.io/badge/AWS%20Global%20Vibe-AI%20Coding%20Hackathon%202025-orange.svg)](https://dorahacks.io/hackathon/aws-global-vibe)
 
-Transform teaching resources into structured curricula, adaptive learning paths, and auto-graded assessments powered by **Amazon Q Developer** and **Kiro** agent orchestration.
+**🏆 AWS Global Vibe: AI Coding Hackathon 2025 Submission**
 
-[🚀 Quick Start](#quick-start) • [🎬 Demo Video](#demo) • [📖 Documentation](#documentation) • [🏗️ Architecture](#architecture)
+**Transform teaching resources into intelligent curricula with AI-powered content generation, adaptive learning paths, and automated assessments. Built with Amazon Q Developer and advanced agent orchestration for the AI in Education track.**
+
+🌐 **[Live Demo](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)** • 🚀 [Quick Start](#quick-start) • 📖 [Documentation](#documentation) • 🏗️ [Architecture](#architecture)
 
 </div>
 
-## 🎬 Demo
+## 🌐 Live Application & Demo
 
-**Watch EdweavePack in Action** (2-3 min demo)
+**🏆 AWS Global Vibe Hackathon 2025 - AI in Education Track**
 
-[![EdweavePack Demo](https://img.shields.io/badge/▶️%20Watch%20Demo-YouTube-red.svg)](demo/demo-script.md)
+**EdweavePack is now live and fully operational!**
 
-**Try it yourself:**
+🔗 **Application URL**: [http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)
+
+**Test Credentials**:
+- 📧 Email: `deploy_test@example.com`
+- 🔑 Password: `TestPass123!`
+
+### 🎯 Hackathon Demo Features
+- ✅ **User Registration & Login** - Create your educator account
+- 🤖 **Amazon Q Developer Integration** - AI-powered curriculum generation
+- 📚 **Curriculum Creation** - Upload teaching materials and generate structured curricula
+- 🧠 **AI Content Generation** - Transform PDFs, text, and videos into interactive content
+- 📊 **Student Analytics** - Track learning progress and performance insights
+- 🎯 **Assessment Tools** - Auto-generated quizzes and graded assignments
+- 🔄 **Agent Orchestration** - Kiro-powered intelligent learning path generation
+
+**Sample Resources**:
 - 📄 [Sample Teaching Resources](demo/sample_resources.md)
 - 🔧 [Demo Script & Setup](demo/demo-script.md)
 - 📊 [Expected AI Outputs](demo/sample_resources.md#expected-ai-generated-outputs)
 - 💾 [Sample Files](demo/sample-files/) - Python, Algebra, Biology content
 
-## Features
+## ✨ Key Features - Amazon Q Developer Integration
 
 <table>
 <tr>
 <td>
 
-**AI Content Generation**
-- Transform PDFs, text, videos into curricula
-- Intelligent question generation
-- Automated grading system
+**🤖 Amazon Q Developer AI Integration**
+- **Code Generation**: Automated curriculum structure creation
+- **Content Analysis**: AI-powered document processing
+- **Question Generation**: Intelligent assessment creation
+- **Code Assistance**: Development workflow optimization
 
 </td>
 <td>
 
-**Analytics & Insights**
-- Real-time student progress tracking
-- Performance analytics dashboard
-- Adaptive learning recommendations
+**📚 AI Content Generation**
+- Transform PDFs, text, videos into structured curricula
+- Multi-format content support (documents, videos, URLs)
+- Automated grading and feedback system
+- Real-time content adaptation
 
 </td>
 </tr>
 <tr>
 <td>
 
-**Secure & Scalable**
-- OAuth2 JWT authentication
-- Enterprise-grade security
-- AWS cloud infrastructure
+**📊 Analytics & Insights**
+- Real-time student progress tracking
+- Performance analytics dashboard
+- Adaptive learning path recommendations
+- Misconception detection and remediation
 
 </td>
 <td>
 
-**Modern Interface**
+**🔄 Agent Orchestration (Kiro)**
+- Curriculum architect agent
+- Learning path generator
+- Personalized learning recommendations
+- Multi-agent collaboration system
+
+</td>
+</tr>
+<tr>
+<td>
+
+**🔒 Secure & Scalable AWS Infrastructure**
+- OAuth2 JWT authentication system
+- Enterprise-grade security (HTTPS, encryption)
+- AWS ECS, RDS, S3 integration
+- Auto-scaling and high availability
+
+</td>
+<td>
+
+**🎨 Modern Educational Interface**
 - Glassmorphism design system
-- Responsive across devices
-- Intuitive user experience
+- Fully responsive across all devices
+- Intuitive drag-and-drop interactions
+- Accessibility-compliant UI/UX
 
 </td>
 </tr>
@@ -82,12 +127,13 @@ graph TB
     G[Docker] --> H[AWS ECS]
 ```
 
-**Tech Stack**
+**🏆 Hackathon Tech Stack**
+- **AI Integration**: **Amazon Q Developer** (Primary), **Kiro Agent Orchestration**
 - **Backend**: FastAPI, PostgreSQL, Redis, Celery
 - **Frontend**: React 18, Tailwind CSS, React Router
-- **AI**: Amazon Q Developer, Kiro Agent Orchestration
-- **Infrastructure**: AWS ECS, RDS, ElastiCache, S3
-- **DevOps**: Docker, Terraform, GitHub Actions
+- **Infrastructure**: AWS ECS Fargate, RDS PostgreSQL, S3, ALB
+- **DevOps**: Docker, Terraform, GitHub Actions, ECR
+- **Security**: JWT Authentication, CORS, HTTPS-ready
 
 ## 📖 Documentation
 
@@ -113,7 +159,7 @@ AWS CLI (for deployment)
 
 ```bash
 # Clone and setup
-git clone https://github.com/your-org/EdweavePack.git
+git clone https://github.com/reuben-idan/EdweavePack.git
 cd EdweavePack
 cp .env.example .env
 
@@ -239,16 +285,60 @@ Push to `main` branch triggers:
 
 MIT License - see [LICENSE](LICENSE) file for details.
 
-## Support
+## 🚀 AWS Global Vibe Hackathon 2025
 
-- **Issues**: [GitHub Issues](https://github.com/your-org/EdweavePack/issues)
+**🏆 Submission Details**
+- **Track**: AI in Education
+- **Primary Technology**: Amazon Q Developer
+- **Secondary Technology**: Kiro Agent Orchestration
+- **Submission Deadline**: December 1, 2025
+- **Innovation Focus**: Transforming educational content creation with AI
+
+**🎯 Hackathon Highlights**
+- ✅ **Amazon Q Developer Integration**: Comprehensive AI-powered development workflow
+- ✅ **Live Deployment**: Fully functional application on AWS infrastructure
+- ✅ **Real-world Impact**: Addresses actual educational challenges
+- ✅ **Technical Innovation**: Advanced agent orchestration and AI content generation
+- ✅ **Scalable Architecture**: Enterprise-ready AWS cloud deployment
+
+## 🚀 Deployment Status
+
+**Production Environment**: ✅ **LIVE**
+- **Frontend**: React application deployed on AWS ECS Fargate
+- **Backend**: FastAPI service with PostgreSQL database
+- **Infrastructure**: Fully automated with Terraform
+- **Monitoring**: CloudWatch logs and health checks
+- **Security**: CORS configured, HTTPS ready, JWT authentication
+
+**Recent Updates**:
+- ✅ Fixed CORS and network connectivity issues
+- ✅ Resolved frontend-backend authentication flow
+- ✅ Deployed with proper load balancer configuration
+- ✅ Database tables created and functional
+- ✅ All API endpoints tested and operational
+
+## 📞 Support
+
+- **Live Application**: [EdweavePack Platform](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)
+- **Issues**: [GitHub Issues](https://github.com/reuben-idan/EdweavePack/issues)
 - **Documentation**: [docs/](docs/)
-- **Demo**: [demo-script.md](demo/demo-script.md)
+- **Demo Guide**: [demo-script.md](demo/demo-script.md)
+- **API Docs**: [Interactive API Documentation](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com/docs)
 
 ---
 
 <div align="center">
 
-**Built for educators worldwide**
+<img src="logo.png" alt="EdweavePack" width="64" height="64">
+
+**🏆 AWS Global Vibe: AI Coding Hackathon 2025**
+
+**Built for educators worldwide** 🌍
+
+*Empowering teachers with Amazon Q Developer and AI-driven educational technology*
+
+**[Try EdweavePack Live →](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)**
+
+**Submission Deadline: December 1, 2025** ⏰
 
 </div>
