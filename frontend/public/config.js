@@ -1,4 +1,4 @@
-// Runtime configuration override - force production
+// Runtime configuration override - local development
 window.EDWEAVE_CONFIG = {
-  API_BASE_URL: 'https://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com'
+  API_BASE_URL: 'http://localhost:8003'
 };

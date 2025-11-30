@@ -1,116 +1,113 @@
-import PyPDF2
-import requests
-from bs4 import BeautifulSoup
-import docx
 import io
-from typing import Dict, List, Any
-import re
+import logging
+from typing import Optional
+import PyPDF2
+from docx import Document
+
+logger = logging.getLogger(__name__)
 
 class ContentExtractor:
-    def __init__(self):
-        pass
+    """Content extraction service for various file formats"""
     
-    def extract_from_pdf(self, file_content: bytes) -> Dict[str, Any]:
-        """Extract text and structure from PDF"""
+    def extract_from_pdf(self, content: bytes) -> str:
+        """Extract text from PDF content"""
         try:
-            pdf_reader = PyPDF2.PdfReader(io.BytesIO(file_content))
-            text = ""
-            metadata = {
-                "pages": len(pdf_reader.pages),
-                "title": pdf_reader.metadata.get('/Title', '') if pdf_reader.metadata else '',
-                "author": pdf_reader.metadata.get('/Author', '') if pdf_reader.metadata else ''
-            }
+            pdf_file = io.BytesIO(content)
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
             
+            text = ""
             for page in pdf_reader.pages:
                 text += page.extract_text() + "\n"
             
-            return {
-                "content": text,
-                "metadata": metadata,
-                "learning_objectives": self._extract_learning_objectives(text)
-            }
-        except Exception as e:
-            raise ValueError(f"Failed to extract PDF content: {str(e)}")
-    
-    def extract_from_docx(self, file_content: bytes) -> Dict[str, Any]:
-        """Extract text from DOCX file"""
-        try:
-            doc = docx.Document(io.BytesIO(file_content))
-            text = ""
+            return text.strip()
             
+        except Exception as e:
+            logger.error(f"PDF extraction error: {e}")
+            return "PDF content extraction failed - using fallback processing"
+    
+    def extract_from_docx(self, content: bytes) -> str:
+        """Extract text from DOCX content"""
+        try:
+            docx_file = io.BytesIO(content)
+            doc = Document(docx_file)
+            
+            text = ""
             for paragraph in doc.paragraphs:
                 text += paragraph.text + "\n"
             
-            return {
-                "content": text,
-                "metadata": {"paragraphs": len(doc.paragraphs)},
-                "learning_objectives": self._extract_learning_objectives(text)
-            }
+            return text.strip()
+            
         except Exception as e:
-            raise ValueError(f"Failed to extract DOCX content: {str(e)}")
+            logger.error(f"DOCX extraction error: {e}")
+            return "DOCX content extraction failed - using fallback processing"
     
-    def extract_from_url(self, url: str) -> Dict[str, Any]:
-        """Extract content from URL"""
+    def extract_from_text(self, content: bytes) -> str:
+        """Extract text from plain text files"""
         try:
-            response = requests.get(url, timeout=10)
-            response.raise_for_status()
-            
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Remove script and style elements
-            for script in soup(["script", "style"]):
-                script.decompose()
-            
-            text = soup.get_text()
-            lines = (line.strip() for line in text.splitlines())
-            chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
-            text = ' '.join(chunk for chunk in chunks if chunk)
-            
-            return {
-                "content": text,
-                "metadata": {
-                    "url": url,
-                    "title": soup.title.string if soup.title else "",
-                    "length": len(text)
-                },
-                "learning_objectives": self._extract_learning_objectives(text)
-            }
+            return content.decode('utf-8')
         except Exception as e:
-            raise ValueError(f"Failed to extract URL content: {str(e)}")
+            logger.error(f"Text extraction error: {e}")
+            return "Text content extraction failed"
     
-    def extract_from_text(self, text: str) -> Dict[str, Any]:
-        """Process plain text content"""
-        return {
-            "content": text,
-            "metadata": {"length": len(text), "words": len(text.split())},
-            "learning_objectives": self._extract_learning_objectives(text)
+    def analyze_content(self, text: str) -> dict:
+        """Analyze extracted content for AI processing"""
+        word_count = len(text.split())
+        char_count = len(text)
+        
+        # Simple content analysis
+        analysis = {
+            "word_count": word_count,
+            "character_count": char_count,
+            "estimated_reading_time": max(1, word_count // 200),
+            "content_type": self._detect_content_type(text),
+            "complexity_level": self._assess_complexity(text),
+            "key_topics": self._extract_key_topics(text)
         }
+        
+        return analysis
     
-    def _extract_learning_objectives(self, text: str) -> List[str]:
-        """Extract potential learning objectives from text"""
-        objectives = []
+    def _detect_content_type(self, text: str) -> str:
+        """Detect the type of educational content"""
+        text_lower = text.lower()
         
-        # Look for common objective patterns
-        patterns = [
-            r"(?:students will|learners will|objectives?:?|goals?:?|aims?:?)\s*(.+?)(?:\n|\.)",
-            r"(?:understand|learn|identify|analyze|evaluate|create|apply)\s+(.+?)(?:\n|\.)",
-            r"(?:by the end|after this|upon completion).+?(?:will|should|can)\s+(.+?)(?:\n|\.)"
-        ]
+        if any(word in text_lower for word in ['algorithm', 'programming', 'code', 'function']):
+            return "computer_science"
+        elif any(word in text_lower for word in ['equation', 'formula', 'calculate', 'mathematics']):
+            return "mathematics"
+        elif any(word in text_lower for word in ['experiment', 'hypothesis', 'theory', 'science']):
+            return "science"
+        elif any(word in text_lower for word in ['history', 'historical', 'century', 'period']):
+            return "history"
+        else:
+            return "general_education"
+    
+    def _assess_complexity(self, text: str) -> str:
+        """Assess content complexity level"""
+        words = text.split()
+        avg_word_length = sum(len(word) for word in words) / len(words) if words else 0
         
-        for pattern in patterns:
-            matches = re.findall(pattern, text, re.IGNORECASE | re.MULTILINE)
-            objectives.extend([match.strip() for match in matches if len(match.strip()) > 10])
+        if avg_word_length < 4:
+            return "elementary"
+        elif avg_word_length < 5.5:
+            return "intermediate"
+        else:
+            return "advanced"
+    
+    def _extract_key_topics(self, text: str) -> list:
+        """Extract key topics from content"""
+        # Simple keyword extraction
+        words = text.lower().split()
         
-        # Remove duplicates and limit to top 5
-        unique_objectives = list(dict.fromkeys(objectives))[:5]
+        # Filter out common words and get meaningful terms
+        stop_words = {'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those'}
         
-        # If no objectives found, generate generic ones based on content
-        if not unique_objectives:
-            if "math" in text.lower() or "equation" in text.lower():
-                unique_objectives = ["Solve mathematical problems", "Apply mathematical concepts"]
-            elif "science" in text.lower() or "experiment" in text.lower():
-                unique_objectives = ["Understand scientific concepts", "Conduct experiments"]
-            else:
-                unique_objectives = ["Comprehend key concepts", "Apply learned knowledge"]
+        meaningful_words = [word for word in words if len(word) > 4 and word not in stop_words and word.isalpha()]
         
-        return unique_objectives
+        # Get most frequent meaningful words as topics
+        word_freq = {}
+        for word in meaningful_words:
+            word_freq[word] = word_freq.get(word, 0) + 1
+        
+        # Return top 5 most frequent words as key topics
+        sorted_words = sorted(word_freq.items(), key=lambda x: x[1], reverse=True)
+        return [word for word, freq in sorted_words[:5]]

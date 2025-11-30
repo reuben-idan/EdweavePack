@@ -3,7 +3,7 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List
 from app.core.database import get_db
-from app.models.curriculum import Curriculum, LearningPath, Assessment, Question
+# from app.models.curriculum import Curriculum, Assessment  # Models available
 from app.models.user import User
 from app.schemas.curriculum import CurriculumCreate, CurriculumResponse, LearningPathResponse
 from app.api.auth import get_current_user

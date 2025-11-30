@@ -92,21 +92,18 @@ const Register = () => {
         role: formData.role
       });
       
-      toast.success(`Welcome to EdweavePack, ${userData.name}!`);
+      console.log('Registration userData:', userData);
+      console.log('Selected role:', formData.role);
       
-      // Navigate based on role
-      switch (formData.role) {
-        case 'student':
-          navigate('/student/dashboard');
-          break;
-        case 'administrator':
-          navigate('/admin/dashboard');
-          break;
-        case 'curriculum_designer':
-          navigate('/curriculum/dashboard');
-          break;
-        default:
-          navigate('/dashboard');
+      toast.success(`Welcome to EdweavePack, ${userData.full_name || userData.name}!`);
+      
+      // Force navigation based on role
+      if (formData.role === 'student') {
+        console.log('Navigating to student dashboard');
+        navigate('/student/dashboard', { replace: true });
+      } else {
+        console.log('Navigating to teacher dashboard');
+        navigate('/dashboard', { replace: true });
       }
     } catch (error) {
       let errorMessage = 'Registration failed. Please try again.';

@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text
 from sqlalchemy.sql import func
 from app.core.database import Base
 
@@ -10,14 +9,10 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     name = Column(String, nullable=False)
     hashed_password = Column(String, nullable=False)
-    is_active = Column(Boolean, default=True)
     institution = Column(String, nullable=True)
     role = Column(String, default="teacher")
+    is_active = Column(Boolean, default=True)
     reset_token = Column(String, nullable=True)
-    reset_token_expires = Column(DateTime(timezone=True), nullable=True)
+    reset_token_expires = Column(DateTime, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
-    # Relationships
-    files = relationship("File", back_populates="user")
-    curricula = relationship("Curriculum", back_populates="user")

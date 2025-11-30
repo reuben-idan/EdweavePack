@@ -191,7 +191,7 @@ const AssessmentList = () => {
                 className="glass-input pl-4 pr-8 py-3 text-gray-900 min-w-[200px]"
               >
                 <option value="">All Curricula</option>
-                {curricula.map(curriculum => (
+                {(Array.isArray(curricula) ? curricula : []).map(curriculum => (
                   <option key={curriculum.id} value={curriculum.id}>{curriculum.title}</option>
                 ))}
               </select>
@@ -380,7 +380,7 @@ const AssessmentList = () => {
             AI Quick Actions
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {curricula.slice(0, 3).map(curriculum => (
+            {(Array.isArray(curricula) ? curricula : []).slice(0, 3).map(curriculum => (
               <button
                 key={curriculum.id}
                 onClick={() => handleGenerateAssessment(curriculum.id)}

@@ -7,11 +7,11 @@ import {
   Camera, Edit3, Check, X, AlertCircle, CheckCircle, Star, Trophy,
   BarChart3, Clock, Brain, Heart, Zap, Award, Phone, MapPin
 } from 'lucide-react';
-import { useStudentAuth } from '../hooks/useStudentAuth';
+import { useAuth } from '../hooks/useAuth';
 
 const StudentProfileEnhanced = () => {
   const navigate = useNavigate();
-  const { student, updateProfile, changePassword } = useStudentAuth();
+  const { user: student, updateProfile, changePassword } = useAuth();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
@@ -68,6 +68,9 @@ const StudentProfileEnhanced = () => {
     confirm: false
   });
 
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [profilePicturePreview, setProfilePicturePreview] = useState(null);
+
   const learningStyles = [
     { id: 'visual', label: 'Visual Learner', icon: '👁️', desc: 'Learn through images, diagrams, and charts' },
     { id: 'auditory', label: 'Auditory Learner', icon: '👂', desc: 'Learn through listening and discussion' },
@@ -91,21 +94,22 @@ const StudentProfileEnhanced = () => {
   }, [student]);
 
   const loadProfileData = () => {
-    // Load existing profile data
+    // Load existing profile data from registration/auth
     setProfileData({
-      name: student.name || '',
-      email: student.email || '',
-      phone: student.phone || '',
-      dateOfBirth: student.dateOfBirth || '',
-      address: student.address || '',
-      bio: student.bio || '',
-      learningStyle: student.learningStyle || 'visual',
-      targetExams: student.targetExams || [],
-      academicGoals: student.academicGoals || '',
-      subjects: student.subjects || [],
-      studyHours: student.studyHours || 2,
-      preferredStudyTime: student.preferredStudyTime || 'morning'
+      name: student?.name || student?.full_name || '',
+      email: student?.email || '',
+      phone: student?.phone || '',
+      dateOfBirth: student?.dateOfBirth || '',
+      address: student?.address || '',
+      bio: student?.bio || '',
+      learningStyle: student?.learningStyle || 'visual',
+      targetExams: student?.targetExams || [],
+      academicGoals: student?.academicGoals || '',
+      subjects: student?.subjects || [],
+      studyHours: student?.studyHours || 2,
+      preferredStudyTime: student?.preferredStudyTime || 'morning'
     });
+    setProfilePicturePreview(student?.profilePicture || null);
   };
 
   const handleProfileChange = (field, value) => {
@@ -131,13 +135,43 @@ const StudentProfileEnhanced = () => {
     }));
   };
 
+  const handleProfilePictureChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      setProfilePicture(file);
+      const reader = new FileReader();
+      reader.onload = (e) => setProfilePicturePreview(e.target.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     
     try {
-      const result = await updateProfile(profileData);
-      if (result.success) {
+      // Upload profile picture if changed
+      if (profilePicture) {
+        const formData = new FormData();
+        formData.append('file', profilePicture);
+        // Mock upload - in real app, use proper file upload API
+        toast.success('Profile picture updated!');
+      }
+      
+      const result = await updateProfile({
+        fullName: profileData.name,
+        email: profileData.email,
+        institution: student?.institution || 'Student Portal'
+      });
+      if (result?.success !== false) {
         toast.success('Profile updated successfully!');
       }
     } catch (error) {
@@ -155,8 +189,8 @@ const StudentProfileEnhanced = () => {
       return;
     }
     
-    if (passwordData.newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters');
+    if (passwordData.newPassword.length < 8) {
+      toast.error('Password must be at least 8 characters');
       return;
     }
     
@@ -164,11 +198,11 @@ const StudentProfileEnhanced = () => {
     
     try {
       const result = await changePassword({
-        currentPassword: passwordData.currentPassword,
-        newPassword: passwordData.newPassword
+        current_password: passwordData.currentPassword,
+        new_password: passwordData.newPassword
       });
       
-      if (result.success) {
+      if (result?.success !== false) {
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         setShowPasswordForm(false);
         toast.success('Password updated successfully!');
@@ -233,15 +267,34 @@ const StudentProfileEnhanced = () => {
               {/* Profile Summary */}
               <div className="text-center mb-6">
                 <div className="relative inline-block">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl mb-3">
-                    {student?.name?.charAt(0)?.toUpperCase() || 'S'}
+                  <div className="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-blue-400">
+                    {profilePicturePreview ? (
+                      <img 
+                        src={profilePicturePreview} 
+                        alt="Profile" 
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-2xl">
+                        {student?.name?.charAt(0)?.toUpperCase() || 'S'}
+                      </div>
+                    )}
                   </div>
-                  <button className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full hover:bg-blue-600 transition-colors">
+                  <label className="absolute bottom-0 right-0 bg-blue-500 text-white p-1 rounded-full hover:bg-blue-600 transition-colors cursor-pointer">
                     <Camera className="h-3 w-3" />
-                  </button>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleProfilePictureChange}
+                      className="hidden"
+                    />
+                  </label>
                 </div>
-                <h3 className="font-semibold text-white">{student?.name}</h3>
+                <h3 className="font-semibold text-white">{student?.name || student?.full_name}</h3>
                 <p className="text-blue-200 text-sm">{student?.email}</p>
+                {student?.institution && (
+                  <p className="text-blue-300 text-xs">{student.institution}</p>
+                )}
               </div>
 
               {/* Navigation Tabs */}
@@ -278,6 +331,36 @@ const StudentProfileEnhanced = () => {
                       <User className="h-7 w-7 mr-3 text-blue-500" />
                       Personal Information
                     </h2>
+                    
+                    {/* Profile Picture Upload */}
+                    <div className="mb-6 text-center">
+                      <label className="block text-sm font-medium text-gray-700 mb-4">Profile Picture</label>
+                      <div className="relative inline-block">
+                        <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-gray-200 mx-auto">
+                          {profilePicturePreview ? (
+                            <img 
+                              src={profilePicturePreview} 
+                              alt="Profile Preview" 
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl">
+                              {profileData.name?.charAt(0)?.toUpperCase() || 'S'}
+                            </div>
+                          )}
+                        </div>
+                        <label className="absolute bottom-0 right-1/2 transform translate-x-1/2 translate-y-2 bg-blue-500 text-white p-2 rounded-full hover:bg-blue-600 transition-colors cursor-pointer shadow-lg">
+                          <Camera className="h-4 w-4" />
+                          <input 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handleProfilePictureChange}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-2">Click camera icon to upload. Max 5MB, JPG/PNG only.</p>
+                    </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>

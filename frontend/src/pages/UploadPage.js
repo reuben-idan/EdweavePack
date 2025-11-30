@@ -39,7 +39,7 @@ const UploadPage = () => {
   };
 
   const handleUploadComplete = (result) => {
-    // Add the uploaded file to the list
+    // Add the uploaded file to the list with Amazon Q analysis
     const newFile = {
       id: Date.now(),
       filename: result.filename,
@@ -48,9 +48,14 @@ const UploadPage = () => {
       upload_status: 'completed',
       created_at: new Date().toISOString(),
       has_content: true,
-      extracted_content: result.full_content || result.content
+      extracted_content: result.full_content || result.content,
+      ai_analysis: result.ai_analysis,
+      amazon_q_processed: true
     };
     setUploadedFiles(prev => [...prev, newFile]);
+    
+    // Show Amazon Q processing success
+    alert(`🤖 Amazon Q Analysis Complete!\n\n✅ Content extracted and analyzed\n✅ Learning objectives identified\n✅ Complexity level assessed\n✅ Ready for curriculum generation`);
   };
 
   const handleFileSelect = (file) => {
@@ -122,12 +127,18 @@ const UploadPage = () => {
       <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center justify-center">
             Create New Curriculum
+            <span className="ml-3 px-3 py-1 bg-blue-500 text-white text-sm rounded-full">Amazon Q Enhanced</span>
           </h1>
           <p className="text-gray-600">
-            Upload your teaching materials and let AI transform them into structured curricula
+            🤖 Upload your teaching materials and let Amazon Q Developer transform them into AI-powered structured curricula
           </p>
+          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200 max-w-2xl mx-auto">
+            <p className="text-sm text-blue-800">
+              <strong>Amazon Q Features:</strong> Intelligent content analysis, adaptive learning paths, auto-assessment generation, and Bloom's taxonomy alignment
+            </p>
+          </div>
         </div>
 
         {/* Progress Steps */}

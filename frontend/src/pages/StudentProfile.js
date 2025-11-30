@@ -87,17 +87,17 @@ const StudentProfile = () => {
     <div className="min-h-screen animated-gradient">
       {/* Header */}
       <div className="glass-nav sticky top-0 z-50">
-        <div className="max-w-4xl mx-auto px-4 py-4">
+        <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate('/student/dashboard')}
-              className="glass-button p-3 hover-lift"
+              className="glass-button p-3 hover:scale-105 transition-all duration-300"
             >
-              <ArrowLeft className="h-5 w-5 text-white" />
+              <ArrowLeft className="h-5 w-5" style={{color: 'var(--text-primary)'}} />
             </button>
             <div>
-              <h1 className="text-xl font-bold text-white">Profile Settings</h1>
-              <p className="text-white/80 text-sm">Manage your learning preferences</p>
+              <h1 className="text-xl font-bold" style={{color: 'var(--text-primary)'}}>Profile Settings</h1>
+              <p className="text-sm font-medium" style={{color: 'var(--text-secondary)'}}>Manage your learning preferences</p>
             </div>
           </div>
         </div>
@@ -105,30 +105,30 @@ const StudentProfile = () => {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Profile Header */}
-        <div className="glass-card p-8 mb-8">
+        <div className="edu-card p-8 mb-8 animate-slide-up">
           <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
             <div className="relative">
-              <div className="w-32 h-32 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-4xl font-bold">
+              <div className="w-32 h-32 bg-gradient-primary rounded-3xl flex items-center justify-center text-white text-4xl font-bold shadow-edu-lg">
                 {formData.name.charAt(0).toUpperCase()}
               </div>
-              <button className="absolute bottom-2 right-2 glass-button p-2 bg-white/90 hover:bg-white">
-                <Camera className="h-4 w-4 text-gray-600" />
+              <button className="absolute bottom-2 right-2 p-3 glass-button rounded-full hover:scale-110 transition-all duration-300">
+                <Camera className="h-4 w-4 text-accent" />
               </button>
             </div>
             <div className="text-center md:text-left flex-1">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{formData.name}</h1>
-              <p className="text-gray-600 mb-4">{formData.email}</p>
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
-                  <Star className="h-3 w-3 inline mr-1" />
+              <h1 className="text-3xl font-bold mb-2" style={{color: 'var(--text-primary)'}}>{formData.name}</h1>
+              <p className="font-medium mb-4" style={{color: 'var(--text-secondary)'}}>{formData.email}</p>
+              <div className="flex flex-wrap gap-3 justify-center md:justify-start">
+                <span className="edu-button px-4 py-2 rounded-full text-sm font-semibold">
+                  <Star className="h-4 w-4 inline mr-2" />
                   Level: Intermediate
                 </span>
-                <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                  <Award className="h-3 w-3 inline mr-1" />
+                <span className="edu-button-success px-4 py-2 rounded-full text-sm font-semibold">
+                  <Award className="h-4 w-4 inline mr-2" />
                   85% Average
                 </span>
-                <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">
-                  <Clock className="h-3 w-3 inline mr-1" />
+                <span className="edu-button-secondary px-4 py-2 rounded-full text-sm font-semibold">
+                  <Clock className="h-4 w-4 inline mr-2" />
                   12 Day Streak
                 </span>
               </div>
@@ -138,47 +138,49 @@ const StudentProfile = () => {
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-8">
           {/* Personal Information */}
-          <div className="glass-card p-8">
-            <div className="flex items-center space-x-3 mb-6">
-              <User className="h-6 w-6 text-blue-600" />
-              <h2 className="text-xl font-semibold text-gray-900">Personal Information</h2>
+          <div className="edu-card p-8 animate-slide-up">
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="edu-icon edu-icon-primary">
+                <User className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold" style={{color: 'var(--text-primary)'}}>Personal Information</h2>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <label className="edu-label">Full Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-3 text-gray-900"
+                  className="edu-input"
                   placeholder="Enter your full name"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                <label className="edu-label">Email Address</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-3 text-gray-900"
+                  className="edu-input"
                   placeholder="Enter your email"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Age</label>
+                <label className="edu-label">Age</label>
                 <input
                   type="number"
                   name="age"
                   value={formData.age}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-3 text-gray-900"
+                  className="edu-input"
                   placeholder="Enter your age"
                   min="10"
                   max="100"
@@ -186,32 +188,38 @@ const StudentProfile = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Target Exam Date</label>
+                <label className="edu-label">Target Exam Date</label>
                 <input
                   type="date"
                   name="examDate"
                   value={formData.examDate}
                   onChange={handleChange}
-                  className="glass-input w-full px-4 py-3 text-gray-900"
+                  className="edu-input"
                 />
               </div>
             </div>
           </div>
 
           {/* Learning Preferences */}
-          <div className="glass-card p-8">
-            <div className="flex items-center space-x-3 mb-6">
-              <BookOpen className="h-6 w-6 text-green-600" />
-              <h2 className="text-xl font-semibold text-gray-900">Learning Preferences</h2>
+          <div className="edu-card p-8 animate-slide-up">
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="edu-icon edu-icon-success">
+                <BookOpen className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold" style={{color: 'var(--text-primary)'}}>Learning Preferences</h2>
             </div>
             
             <div className="space-y-6">
               {/* Learning Style */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">Learning Style</label>
+                <label className="edu-label text-lg mb-6">Learning Style</label>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {learningStyles.map(style => (
-                    <label key={style.id} className="glass-card p-4 cursor-pointer hover-lift">
+                    <label key={style.id} className={`glass-card p-6 cursor-pointer transition-all duration-300 ${
+                      formData.learningStyle === style.id 
+                        ? 'border-2 border-edu-primary shadow-edu-lg transform scale-105' 
+                        : 'hover:shadow-edu'
+                    }`}>
                       <input
                         type="radio"
                         name="learningStyle"
@@ -220,13 +228,17 @@ const StudentProfile = () => {
                         onChange={handleChange}
                         className="sr-only"
                       />
-                      <div className={`flex items-start space-x-3 ${formData.learningStyle === style.id ? 'text-blue-600' : 'text-gray-700'}`}>
-                        <div className={`w-4 h-4 rounded-full border-2 mt-1 ${formData.learningStyle === style.id ? 'border-blue-600 bg-blue-600' : 'border-gray-300'}`}>
-                          {formData.learningStyle === style.id && <div className="w-2 h-2 bg-white rounded-full m-0.5"></div>}
+                      <div className="flex items-start space-x-4" style={{color: formData.learningStyle === style.id ? 'var(--edu-primary)' : 'var(--text-primary)'}}>
+                        <div className={`w-6 h-6 rounded-full border-2 mt-1 flex items-center justify-center transition-all ${
+                          formData.learningStyle === style.id 
+                            ? 'border-edu-primary bg-gradient-primary' 
+                            : 'border-gray-300'
+                        }`}>
+                          {formData.learningStyle === style.id && <div className="w-3 h-3 bg-white rounded-full"></div>}
                         </div>
                         <div>
-                          <div className="font-medium">{style.label}</div>
-                          <div className="text-sm text-gray-500">{style.desc}</div>
+                          <div className="font-bold text-lg">{style.label}</div>
+                          <div className="text-sm font-medium" style={{color: 'var(--text-secondary)'}}>{style.desc}</div>
                         </div>
                       </div>
                     </label>
@@ -236,17 +248,17 @@ const StudentProfile = () => {
 
               {/* Target Exams */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">Target Exams</label>
+                <label className="edu-label text-lg mb-6">Target Exams</label>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {examOptions.map(exam => (
                     <button
                       key={exam}
                       type="button"
                       onClick={() => handleExamToggle(exam)}
-                      className={`glass-card p-3 text-sm font-medium transition-all ${
+                      className={`p-4 text-base font-bold transition-all duration-300 rounded-2xl ${
                         formData.targetExams.includes(exam)
-                          ? 'bg-gradient-primary text-white'
-                          : 'text-gray-700 hover:bg-white/50'
+                          ? 'edu-button transform scale-105'
+                          : 'glass-button hover:scale-105'
                       }`}
                     >
                       {exam}
@@ -258,20 +270,22 @@ const StudentProfile = () => {
           </div>
 
           {/* Academic Goals */}
-          <div className="glass-card p-8">
-            <div className="flex items-center space-x-3 mb-6">
-              <Target className="h-6 w-6 text-purple-600" />
-              <h2 className="text-xl font-semibold text-gray-900">Academic Goals</h2>
+          <div className="edu-card p-8 animate-slide-up">
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="edu-icon edu-icon-secondary">
+                <Target className="h-6 w-6 text-white" />
+              </div>
+              <h2 className="text-2xl font-bold" style={{color: 'var(--text-primary)'}}>Academic Goals</h2>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Describe Your Goals</label>
+              <label className="edu-label">Describe Your Goals</label>
               <textarea
                 name="academicGoals"
                 value={formData.academicGoals}
                 onChange={handleChange}
-                className="glass-input w-full px-4 py-3 text-gray-900"
-                rows={4}
+                className="edu-input resize-none"
+                rows={5}
                 placeholder="Describe your academic goals and what you want to achieve..."
               />
             </div>
@@ -281,20 +295,20 @@ const StudentProfile = () => {
 
           {/* Right Sidebar */}
           <div className="space-y-6">
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Learning Stats</h3>
+            <div className="edu-card p-6 animate-bounce-in">
+              <h3 className="text-xl font-bold mb-6" style={{color: 'var(--text-primary)'}}>Learning Stats</h3>
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Completed Lessons</span>
-                  <span className="font-semibold text-blue-600">24/48</span>
+                <div className="edu-button p-4 rounded-2xl flex items-center justify-between">
+                  <span className="font-bold text-white">Completed Lessons</span>
+                  <span className="font-bold text-white text-xl">24/48</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Average Score</span>
-                  <span className="font-semibold text-green-600">85%</span>
+                <div className="edu-button-success p-4 rounded-2xl flex items-center justify-between">
+                  <span className="font-bold text-white">Average Score</span>
+                  <span className="font-bold text-white text-xl">85%</span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Study Streak</span>
-                  <span className="font-semibold text-orange-600">12 days</span>
+                <div className="edu-button-warning p-4 rounded-2xl flex items-center justify-between">
+                  <span className="font-bold text-white">Study Streak</span>
+                  <span className="font-bold text-white text-xl">12 days</span>
                 </div>
               </div>
             </div>
@@ -303,7 +317,7 @@ const StudentProfile = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full glass-button bg-gradient-primary text-white hover-lift py-4"
+                className="w-full edu-button py-4 font-bold rounded-2xl transition-all duration-300 hover:scale-105"
               >
                 {loading ? (
                   <div className="spinner w-5 h-5 mx-auto"></div>
@@ -317,7 +331,7 @@ const StudentProfile = () => {
               <button
                 type="button"
                 onClick={() => navigate('/student/dashboard')}
-                className="w-full glass-button text-gray-700 hover:bg-white/50"
+                className="w-full glass-button py-3 font-medium rounded-2xl transition-all duration-300 hover:scale-105"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard

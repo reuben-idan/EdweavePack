@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Eye, EyeOff, Mail, Lock, ArrowRight, BookOpen, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, ArrowRight, BookOpen, AlertCircle, CheckCircle, Moon, Sun } from 'lucide-react';
 import { useStudentAuth } from '../hooks/useStudentAuth';
+import { useTheme } from '../contexts/ThemeContext';
 import { setStudentName } from '../utils/studentUtils';
 
 const StudentLogin = () => {
   const navigate = useNavigate();
   const { login, loading, isAuthenticated } = useStudentAuth();
+  const { isDark, toggleTheme } = useTheme();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -86,6 +88,15 @@ const StudentLogin = () => {
 
   return (
     <div className="min-h-screen animated-gradient flex items-center justify-center py-12 px-4">
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="fixed top-4 right-4 glass-button p-3 text-visible hover-lift z-50"
+        title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      >
+        {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      </button>
+      
       <div className="max-w-md w-full space-y-8">
         {/* Header */}
         <div className="text-center">

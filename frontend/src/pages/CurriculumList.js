@@ -18,9 +18,9 @@ const CurriculumList = () => {
   const fetchCurricula = async () => {
     try {
       setLoading(true);
-      const response = await curriculumAPI.getAll();
-      setCurricula(response.data);
-      toast.success('Curricula loaded successfully');
+      const response = await curriculumAPI.getCurricula();
+      setCurricula(response.data.curricula || []);
+      toast.success('AI-enhanced curricula loaded successfully');
     } catch (error) {
       console.error('Failed to fetch curricula:', error);
       toast.error('Failed to load curricula. Please try again.');
@@ -29,14 +29,14 @@ const CurriculumList = () => {
     }
   };
 
-  const filteredCurricula = curricula.filter(curriculum => {
+  const filteredCurricula = (Array.isArray(curricula) ? curricula : []).filter(curriculum => {
     const matchesSearch = curriculum.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          curriculum.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSubject = !filterSubject || curriculum.subject === filterSubject;
     return matchesSearch && matchesSubject;
   });
 
-  const subjects = [...new Set(curricula.map(c => c.subject))];
+  const subjects = [...new Set((Array.isArray(curricula) ? curricula : []).map(c => c.subject))];
 
   if (loading) {
     return (
@@ -55,20 +55,35 @@ const CurriculumList = () => {
       <div className="glass-card p-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gradient mb-2">Curricula</h1>
-            <p className="text-gray-600">Manage your educational content and learning paths</p>
+            <h1 className="text-3xl font-bold text-gradient mb-2 flex items-center">
+              AI-Enhanced Curricula
+              <span className="ml-3 px-3 py-1 bg-blue-500 text-white text-sm rounded-full">Amazon Q Powered</span>
+            </h1>
+            <p className="text-gray-600">🤖 Manage your AI-powered educational content with adaptive learning paths</p>
           </div>
           
-          <button
-            onClick={() => {
-              toast.info('Opening curriculum builder...');
-              navigate('/curriculum/create');
-            }}
-            className="glass-button bg-gradient-primary text-white hover-lift pulse-glow"
-          >
-            <Plus className="h-5 w-5 mr-2" />
-            Create Curriculum
-          </button>
+          <div className="flex space-x-3">
+            <button
+              onClick={() => {
+                toast.info('Opening AI upload wizard...');
+                navigate('/upload');
+              }}
+              className="glass-button bg-gradient-secondary text-white hover-lift pulse-glow"
+            >
+              <Sparkles className="h-5 w-5 mr-2" />
+              AI Upload
+            </button>
+            <button
+              onClick={() => {
+                toast.info('Opening curriculum builder...');
+                navigate('/curriculum/create');
+              }}
+              className="glass-button bg-gradient-primary text-white hover-lift pulse-glow"
+            >
+              <Plus className="h-5 w-5 mr-2" />
+              Create Manual
+            </button>
+          </div>
         </div>
         
         {/* Search and Filter */}
@@ -77,7 +92,7 @@ const CurriculumList = () => {
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search curricula..."
+              placeholder="Search AI-enhanced curricula..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="glass-input w-full pl-12 pr-4 py-3 text-gray-900 placeholder-gray-500"
@@ -108,7 +123,7 @@ const CurriculumList = () => {
               <BookOpen className="h-6 w-6 text-white" />
             </div>
             <div className="ml-4">
-              <div className="text-2xl font-bold text-gray-900">{curricula.length}</div>
+              <div className="text-2xl font-bold text-gray-900">{Array.isArray(curricula) ? curricula.length : 0}</div>
               <div className="text-sm text-gray-600">Total Curricula</div>
             </div>
           </div>
@@ -121,7 +136,7 @@ const CurriculumList = () => {
             </div>
             <div className="ml-4">
               <div className="text-2xl font-bold text-gray-900">
-                {curricula.reduce((sum, c) => sum + (c.metadata?.learning_objectives?.length || 0), 0)}
+                {(Array.isArray(curricula) ? curricula : []).reduce((sum, c) => sum + (c.metadata?.learning_objectives?.length || 0), 0)}
               </div>
               <div className="text-sm text-gray-600">Learning Objectives</div>
             </div>
@@ -135,7 +150,7 @@ const CurriculumList = () => {
             </div>
             <div className="ml-4">
               <div className="text-2xl font-bold text-gray-900">
-                {curricula.reduce((sum, c) => sum + (c.metadata?.weekly_modules?.length || 0), 0)}
+                {(Array.isArray(curricula) ? curricula : []).reduce((sum, c) => sum + (c.metadata?.weekly_modules?.length || 0), 0)}
               </div>
               <div className="text-sm text-gray-600">Total Weeks</div>
             </div>
@@ -162,25 +177,37 @@ const CurriculumList = () => {
             <BookOpen className="h-16 w-16 text-gray-400 mx-auto" />
           </div>
           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            {curricula.length === 0 ? 'No curricula yet' : 'No curricula match your search'}
+            {!Array.isArray(curricula) || curricula.length === 0 ? 'No AI curricula yet' : 'No curricula match your search'}
           </h3>
           <p className="text-gray-600 mb-6">
-            {curricula.length === 0 
-              ? 'Create your first curriculum to get started with EdweavePack.'
+            {!Array.isArray(curricula) || curricula.length === 0 
+              ? 'Create your first Amazon Q-powered curriculum to get started with AI-enhanced education.'
               : 'Try adjusting your search terms or filters.'
             }
           </p>
-          {curricula.length === 0 && (
-            <button
-              onClick={() => {
-                toast.info('Let\'s create your first curriculum!');
-                navigate('/curriculum/create');
-              }}
-              className="glass-button bg-gradient-primary text-white hover-lift"
-            >
-              <Sparkles className="h-5 w-5 mr-2" />
-              Create First Curriculum
-            </button>
+          {(!Array.isArray(curricula) || curricula.length === 0) && (
+            <div className="flex justify-center space-x-4">
+              <button
+                onClick={() => {
+                  toast.info('Starting AI curriculum generation...');
+                  navigate('/upload');
+                }}
+                className="glass-button bg-gradient-secondary text-white hover-lift"
+              >
+                <Sparkles className="h-5 w-5 mr-2" />
+                🤖 AI Generate
+              </button>
+              <button
+                onClick={() => {
+                  toast.info('Let\'s create your first curriculum!');
+                  navigate('/curriculum/create');
+                }}
+                className="glass-button bg-gradient-primary text-white hover-lift"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Create Manual
+              </button>
+            </div>
           )}
         </div>
       ) : (
@@ -196,14 +223,25 @@ const CurriculumList = () => {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-gradient transition-all">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-gradient transition-all flex items-center">
                     {curriculum.title}
+                    {curriculum.amazon_q_powered && (
+                      <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">🤖</span>
+                    )}
                   </h3>
                   <p className="text-gray-600 text-sm line-clamp-2">
                     {curriculum.description}
                   </p>
                 </div>
               </div>
+              
+              {curriculum.ai_enhanced && (
+                <div className="mb-4 p-2 bg-blue-50 rounded border border-blue-200">
+                  <p className="text-xs text-blue-800">
+                    ✅ AI Content Analysis • ✅ Adaptive Learning • ✅ Auto Assessment
+                  </p>
+                </div>
+              )}
               
               <div className="flex items-center space-x-2 mb-4">
                 <span className="px-3 py-1 bg-gradient-primary text-white rounded-full text-xs font-medium">

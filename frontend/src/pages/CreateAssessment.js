@@ -18,10 +18,31 @@ const CreateAssessment = () => {
     instructions: ''
   });
   const [questions, setQuestions] = useState([]);
+  const [aiGenerating, setAiGenerating] = useState(false);
 
   useEffect(() => {
     fetchCurricula();
   }, []);
+
+  const generateAIQuestions = async () => {
+    if (!assessment.curriculum_id) {
+      toast.error('Please select a curriculum first');
+      return;
+    }
+
+    setAiGenerating(true);
+    toast.info('Amazon Q is generating questions...');
+
+    try {
+      const response = await assessmentAPI.generate(assessment.curriculum_id, assessment.assessment_type);
+      setQuestions(response.data.questions);
+      toast.success(`🤖 Amazon Q generated ${response.data.questions.length} AI-powered questions!`);
+    } catch (error) {
+      toast.error('Failed to generate questions');
+    } finally {
+      setAiGenerating(false);
+    }
+  };
 
   const fetchCurricula = async () => {
     try {
@@ -107,8 +128,11 @@ const CreateAssessment = () => {
               <ArrowLeft className="h-5 w-5" />
             </button>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Create Assessment</h1>
-              <p className="text-gray-600">Build a new assessment for your students</p>
+              <h1 className="text-2xl font-bold text-gray-900 flex items-center">
+                Create Assessment
+                <span className="ml-3 px-2 py-1 bg-purple-500 text-white text-xs rounded-full">Amazon Q AI</span>
+              </h1>
+              <p className="text-gray-600">🤖 Build AI-enhanced assessments with auto-generation and intelligent grading</p>
             </div>
           </div>
         </div>
@@ -212,14 +236,29 @@ const CreateAssessment = () => {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-gray-900">Questions ({questions.length})</h2>
-              <button
-                type="button"
-                onClick={addQuestion}
-                className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Add Question</span>
-              </button>
+              <div className="flex space-x-2">
+                <button
+                  type="button"
+                  onClick={generateAIQuestions}
+                  disabled={aiGenerating}
+                  className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 disabled:opacity-50"
+                >
+                  {aiGenerating ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  ) : (
+                    <span>🤖</span>
+                  )}
+                  <span>{aiGenerating ? 'Generating...' : 'Amazon Q Generate'}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={addQuestion}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>Add Manual</span>
+                </button>
+              </div>
             </div>
             
             {questions.length === 0 ? (

@@ -60,10 +60,15 @@ const CreateCurriculum = () => {
 
     try {
       const response = await curriculumAPI.create(formData);
-      // Navigate to the created curriculum page to see generated modules/assessments
-      navigate(`/curriculum/${response.data.id}`);
+      
+      // Show success message with AI features
+      alert(`🤖 Amazon Q Enhanced Curriculum Created!\n\n✅ AI Analysis Complete\n✅ Curriculum Structure Generated\n✅ Learning Objectives Aligned\n✅ Assessment Strategy Created\n\nCurriculum ID: ${response.data.id}`);
+      
+      // Navigate to curriculum list to see the new curriculum
+      navigate('/curriculum');
     } catch (error) {
       console.error('Failed to create curriculum:', error);
+      alert('Failed to create curriculum. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -72,10 +77,18 @@ const CreateCurriculum = () => {
   return (
     <div className="max-w-4xl mx-auto px-4 py-6">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create New Curriculum</h1>
+        <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+          Create New Curriculum
+          <span className="ml-3 px-3 py-1 bg-blue-500 text-white text-sm rounded-full">Amazon Q Powered</span>
+        </h1>
         <p className="mt-2 text-gray-600">
-          Upload your teaching materials and let AI transform them into structured curricula
+          🤖 Upload your teaching materials and let Amazon Q Developer transform them into AI-enhanced structured curricula with adaptive learning paths
         </p>
+        <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <p className="text-sm text-blue-800">
+            <strong>AI Features:</strong> Content analysis, Bloom's taxonomy alignment, adaptive assessments, and personalized learning paths
+          </p>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">

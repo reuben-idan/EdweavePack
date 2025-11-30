@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ToastContainer } from 'react-toastify';
 import { AuthProvider, useAuth } from './hooks/useAuth';
 import { StudentAuthProvider, useStudentAuth } from './hooks/useStudentAuth';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Layout from './components/Layout';
 import ErrorBoundary from './components/ErrorBoundary';
 import Login from './pages/Login';
@@ -13,6 +14,7 @@ import CurriculumPage from './pages/CurriculumPage';
 import CurriculumList from './pages/CurriculumList';
 import CreateCurriculum from './pages/CreateCurriculum';
 import AssessmentList from './pages/AssessmentList';
+import AssessmentListEnhanced from './pages/AssessmentListEnhanced';
 import AssessmentTake from './pages/AssessmentTake';
 import CreateAssessment from './pages/CreateAssessment';
 import StudentSignup from './pages/StudentSignup';
@@ -34,6 +36,8 @@ import Settings from './pages/Settings';
 import { TeacherDashboard } from './pages/TeacherDashboard';
 import StudentsPage from './pages/StudentsPage';
 import StudentLesson from './pages/StudentLesson';
+import StudentUploadGoals from './pages/StudentUploadGoals';
+import StudentAnalytics from './pages/StudentAnalytics';
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
   const { user, loading } = useAuth();
@@ -53,6 +57,21 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     return <Navigate to="/login" />;
   }
   
+  // Debug user role
+  console.log('ProtectedRoute - User role:', user.role, 'Path:', window.location.pathname);
+  
+  // Redirect students to student portal if they try to access teacher routes
+  if (user.role === 'student' && !window.location.pathname.startsWith('/student')) {
+    console.log('Redirecting student to student portal');
+    return <Navigate to="/student/dashboard" replace />;
+  }
+  
+  // Redirect teachers to teacher portal if they try to access student routes
+  if (user.role !== 'student' && window.location.pathname.startsWith('/student')) {
+    console.log('Redirecting teacher to teacher portal');
+    return <Navigate to="/dashboard" replace />;
+  }
+  
   return children;
 };
 
@@ -66,13 +85,15 @@ const AppRoutes = () => {
   
   const getDefaultRoute = () => {
     if (!user) return '/login';
-    return user.role === 'student' ? '/student/dashboard' : '/dashboard';
+    if (user.role === 'student') return '/student/dashboard';
+    return '/dashboard';
   };
   
   return (
     <Routes>
       <Route path="/login" element={user ? <Navigate to={getDefaultRoute()} /> : <Login />} />
       <Route path="/register" element={user ? <Navigate to={getDefaultRoute()} /> : <Register />} />
+      <Route path="/" element={user ? <Navigate to={getDefaultRoute()} /> : <Navigate to="/login" />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/student/signup" element={<StudentSignup />} />
@@ -141,6 +162,22 @@ const AppRoutes = () => {
           </StudentProtectedRoute>
         } 
       />
+      <Route
+        path="/student/upload-goals"
+        element={
+          <StudentProtectedRoute>
+            <StudentUploadGoals />
+          </StudentProtectedRoute>
+        }
+      />
+      <Route
+        path="/student/analytics"
+        element={
+          <StudentProtectedRoute>
+            <StudentAnalytics />
+          </StudentProtectedRoute>
+        }
+      />
       <Route 
         path="/student/lesson/:lessonId" 
         element={
@@ -149,7 +186,7 @@ const AppRoutes = () => {
           </StudentProtectedRoute>
         } 
       />
-      <Route path="/" element={<Navigate to="/dashboard" />} />
+
       <Route
         path="/dashboard"
         element={
@@ -205,8 +242,26 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <Layout>
-              <AssessmentList />
+              <AssessmentListEnhanced />
             </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assessment/create"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <CreateAssessment />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assessment/:id/take"
+        element={
+          <ProtectedRoute>
+            <AssessmentTake />
           </ProtectedRoute>
         }
       />
@@ -225,6 +280,31 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <AssessmentTake />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assessments/:id/results"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <div className="p-8">
+                <h1 className="text-2xl font-bold mb-4">Assessment Results</h1>
+                <div className="glass-card p-6">
+                  <p>Assessment completed successfully!</p>
+                </div>
+              </div>
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/assessments/:id/edit"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <CreateAssessment />
+            </Layout>
           </ProtectedRoute>
         }
       />
@@ -263,28 +343,30 @@ const AppRoutes = () => {
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
-        <StudentAuthProvider>
-          <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
-            <div className="App">
-              <AppRoutes />
-              <ToastContainer
-                position="top-right"
-                autoClose={4000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-                toastClassName="glass-card"
-              />
-            </div>
-          </Router>
-        </StudentAuthProvider>
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <StudentAuthProvider>
+            <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
+              <div className="App">
+                <AppRoutes />
+                <ToastContainer
+                  position="top-right"
+                  autoClose={4000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="light"
+                  toastClassName="glass-card"
+                />
+              </div>
+            </Router>
+          </StudentAuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }

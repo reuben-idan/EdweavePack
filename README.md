@@ -12,28 +12,22 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
 [![AWS](https://img.shields.io/badge/AWS-Cloud%20Ready-FF9900.svg)](https://aws.amazon.com/)
-[![Deployment](https://img.shields.io/badge/Status-Live-brightgreen.svg)](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)
+[![Deployment](https://img.shields.io/badge/Status-Ready%20for%20Deployment-blue.svg)](#deployment)
 [![Hackathon](https://img.shields.io/badge/AWS%20Global%20Vibe-AI%20Coding%20Hackathon%202025-orange.svg)](https://dorahacks.io/hackathon/aws-global-vibe)
 
 **🏆 AWS Global Vibe: AI Coding Hackathon 2025 Submission**
 
 **Transform teaching resources into intelligent curricula with AI-powered content generation, adaptive learning paths, and automated assessments. Built with Amazon Q Developer and advanced agent orchestration for the AI in Education track.**
 
-🌐 **[Live Demo](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)** • 🚀 [Quick Start](#quick-start) • 📖 [Documentation](#documentation) • 🏗️ [Architecture](#architecture)
+🚀 [Quick Start](#quick-start) • 📖 [Documentation](#documentation) • 🏗️ [Architecture](#architecture) • ☁️ [AWS Deployment](#deployment)
 
 </div>
 
-## 🌐 Live Application & Demo
+## 🏆 AWS Global Vibe Hackathon 2025 - AI in Education Track
 
-**🏆 AWS Global Vibe Hackathon 2025 - AI in Education Track**
+**EdweavePack is ready for fresh AWS deployment!**
 
-**EdweavePack is now live and fully operational!**
-
-🔗 **Application URL**: [http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)
-
-**Test Credentials**:
-- 📧 Email: `deploy_test@example.com`
-- 🔑 Password: `TestPass123!`
+This repository has been cleaned and prepared for a new AWS deployment. All previous deployment artifacts have been removed to ensure a clean deployment process.
 
 ### 🎯 Hackathon Demo Features
 - ✅ **User Registration & Login** - Create your educator account
@@ -301,29 +295,27 @@ MIT License - see [LICENSE](LICENSE) file for details.
 - ✅ **Technical Innovation**: Advanced agent orchestration and AI content generation
 - ✅ **Scalable Architecture**: Enterprise-ready AWS cloud deployment
 
-## 🚀 Deployment Status
+## 🚀 Deployment
 
-**Production Environment**: ✅ **LIVE**
-- **Frontend**: React application deployed on AWS ECS Fargate
-- **Backend**: FastAPI service with PostgreSQL database
-- **Infrastructure**: Fully automated with Terraform
-- **Monitoring**: CloudWatch logs and health checks
-- **Security**: CORS configured, HTTPS ready, JWT authentication
+**Repository Status**: ✅ **READY FOR DEPLOYMENT**
+- **Codebase**: Clean and deployment-ready
+- **Dependencies**: All requirements specified
+- **Configuration**: Environment variables configured
+- **Docker**: Production-ready containers
+- **Documentation**: Complete setup guides available
 
-**Recent Updates**:
-- ✅ Fixed CORS and network connectivity issues
-- ✅ Resolved frontend-backend authentication flow
-- ✅ Deployed with proper load balancer configuration
-- ✅ Database tables created and functional
-- ✅ All API endpoints tested and operational
+**Ready for AWS Deployment**:
+- Clean repository without old deployment artifacts
+- Production-ready Docker containers
+- Comprehensive infrastructure as code
+- Scalable microservices architecture
 
 ## 📞 Support
 
-- **Live Application**: [EdweavePack Platform](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)
 - **Issues**: [GitHub Issues](https://github.com/reuben-idan/EdweavePack/issues)
 - **Documentation**: [docs/](docs/)
 - **Demo Guide**: [demo-script.md](demo/demo-script.md)
-- **API Docs**: [Interactive API Documentation](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com/docs)
+- **Local API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs) (when running locally)
 
 ---
 
@@ -337,7 +329,7 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 *Empowering teachers with Amazon Q Developer and AI-driven educational technology*
 
-**[Try EdweavePack Live →](http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com)**
+**Ready for AWS Deployment →**
 
 **Submission Deadline: December 1, 2025** ⏰
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from app.core.database import get_db
-from app.models.curriculum import Assessment, Question, Curriculum
+# from app.models.curriculum import Assessment, Curriculum  # Models available
 from app.models.student import Student
 from app.models.user import User
 from app.schemas.curriculum import AssessmentResponse, QuestionResponse

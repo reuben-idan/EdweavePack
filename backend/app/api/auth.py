@@ -6,12 +6,49 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from app.core.database import get_db
 from app.models.user import User
-from app.schemas.auth import UserCreate, UserResponse, Token, ForgotPasswordRequest, ResetPasswordRequest, UpdateProfileRequest, UpdatePasswordRequest
+from pydantic import BaseModel, EmailStr
 import os
 import secrets
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+# Pydantic models for request/response
+class UserCreate(BaseModel):
+    email: str
+    password: str
+    full_name: str
+    institution: str = None
+    role: str = "teacher"
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    name: str
+    full_name: str
+    is_active: bool
+    institution: str = None
+    role: str = None
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str
+
+class UpdateProfileRequest(BaseModel):
+    fullName: str
+    email: str
+    institution: str = None
+
+class UpdatePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

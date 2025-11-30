@@ -158,11 +158,36 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateProfile = async (profileData) => {
+    try {
+      const response = await authAPI.updateProfile(profileData);
+      if (response.data?.user) {
+        setUser(response.data.user);
+      }
+      return { success: true };
+    } catch (error) {
+      console.error('Profile update failed:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  const changePassword = async (passwordData) => {
+    try {
+      await authAPI.updatePassword(passwordData);
+      return { success: true };
+    } catch (error) {
+      console.error('Password change failed:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
   const value = {
     user,
     login,
     register,
     logout,
+    updateProfile,
+    changePassword,
     loading
   };
 

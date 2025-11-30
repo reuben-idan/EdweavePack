@@ -1,200 +1,146 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.api import auth, curriculum, assessment, analytics, learning_paths, curriculum_enhanced, auth_enhanced, files, tasks, agents, student_endpoints
-from app.core.database import engine
-from app.models import Base
-from app.middleware.security import get_security_middleware, get_rate_limit_middleware
+import os
 import logging
-import traceback
-from datetime import datetime
+from contextlib import asynccontextmanager
+
+# Import routers
+from app.api.auth import router as auth_router
+from app.api.curriculum import router as curriculum_router
+from app.api.assessment import router as assessment_router
+from app.api.files import router as files_router
+from app.api.analytics import router as analytics_router
+from app.api.agents import router as agents_router
+from app.api.learning_paths import router as learning_paths_router
+from app.api.ai_enhanced import router as ai_enhanced_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Edweave Pack API", version="1.0.0")
-
-import os
-import boto3
-from botocore.exceptions import ClientError
-
-# Secure CORS configuration - only HTTPS in production
-is_production = os.getenv("ENVIRONMENT", "development") == "production"
-
-def get_secret(secret_name):
-    """Retrieve secret from AWS Secrets Manager"""
-    if not is_production:
-        return None
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    logger.info("🚀 EdweavePack API starting up...")
+    logger.info("🤖 Amazon Q Developer integration enabled")
+    logger.info("🧠 AWS AI services initialized")
     
+    # Create database tables
     try:
-        session = boto3.session.Session()
-        client = session.client(
-            service_name='secretsmanager',
-            region_name=os.getenv('AWS_REGION', 'eu-north-1')
-        )
-        response = client.get_secret_value(SecretId=secret_name)
-        return response['SecretString']
-    except ClientError as e:
-        logger.error(f"Failed to retrieve secret {secret_name}: {e}")
-        return None
+        from app.core.database import Base, engine
+        Base.metadata.create_all(bind=engine)
+        logger.info("✅ Database tables created successfully")
+    except Exception as e:
+        logger.error(f"❌ Database initialization failed: {e}")
+    
+    yield
+    # Shutdown
+    logger.info("🛑 EdweavePack API shutting down...")
 
-# Always allow ALB for production deployment
-allowed_origins = [
-    "http://localhost:3000",
-    "https://localhost:3000", 
-    "http://127.0.0.1:3000",
-    "https://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com",
-    "http://edweavepack-alb-1353441079.eu-north-1.elb.amazonaws.com",
-    "http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com",
-    "https://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com",
-    "https://edweavepack.com",
-    "https://www.edweavepack.com"
-]
+# Create FastAPI app
+app = FastAPI(
+    title="EdweavePack AI-Enhanced API",
+    description="AI-Powered Educational Content Platform with comprehensive AWS AI integration",
+    version="3.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    lifespan=lifespan
+)
 
-# Log CORS configuration
-logger.info(f"CORS allowed origins: {allowed_origins}")
-logger.info(f"Production mode: {is_production}")
-
-# Add security middleware first
-SecurityMiddleware, security_config = get_security_middleware()
-app.add_middleware(SecurityMiddleware, **security_config)
-
-# Add rate limiting middleware
-RateLimitMiddleware, rate_limit_config = get_rate_limit_middleware()
-app.add_middleware(RateLimitMiddleware, **rate_limit_config)
-
-# Add CORS middleware
+# CORS configuration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins,
+    allow_origins=[
+        "http://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com",
+        "https://edweavepack-prod-alb-2084837426.eu-north-1.elb.amazonaws.com",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:8000",
+        "http://localhost:8003"
+    ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
-    expose_headers=["*"]
 )
 
-# Secure global exception handler
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """Handle all unhandled exceptions securely"""
-    # Log detailed error server-side only
-    logger.error(f"Global exception handler caught: {exc}")
-    logger.error(f"Exception type: {type(exc)}")
-    logger.error(f"Traceback: {traceback.format_exc()}")
-    
-    # Return generic error in production, detailed in development
-    if is_production:
-        return JSONResponse(
-            status_code=500,
-            content={
-                "detail": "Internal server error occurred",
-                "type": "internal_server_error"
-            }
-        )
-    else:
-        return JSONResponse(
-            status_code=500,
-            content={
-                "detail": f"Internal server error: {str(exc)}",
-                "type": "internal_server_error",
-                "exception_type": str(type(exc))
-            }
-        )
-
-# HTTP exception handler for better error responses (temporarily disabled)
-# @app.exception_handler(HTTPException)
-# async def http_exception_handler(request: Request, exc: HTTPException):
-#     """Handle HTTP exceptions with consistent format"""
-#     return JSONResponse(
-#         status_code=exc.status_code,
-#         content={
-#             "detail": exc.detail,
-#             "type": "http_exception",
-#             "status_code": exc.status_code
-#         }
-#     )
-
-# Create tables
-try:
-    logger.info("Creating database tables...")
-    Base.metadata.create_all(bind=engine)
-    logger.info("✅ Database tables created successfully")
-except Exception as e:
-    logger.error(f"❌ Error creating database tables: {e}")
-    raise
-
-# Include routers
-app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
-app.include_router(auth_enhanced.router, prefix="/api/auth/sso", tags=["sso"])
-app.include_router(files.router, prefix="/api/files", tags=["files"])
-app.include_router(tasks.router, prefix="/api/tasks", tags=["tasks"])
-app.include_router(curriculum.router, prefix="/api/curriculum", tags=["curriculum"])
-app.include_router(curriculum_enhanced.router, prefix="/api/curriculum/enhanced", tags=["curriculum-enhanced"])
-app.include_router(assessment.router, prefix="/api/assessment", tags=["assessment"])
-app.include_router(analytics.router, prefix="/api/analytics", tags=["analytics"])
-app.include_router(learning_paths.router, prefix="/api/learning-paths", tags=["learning-paths"])
-app.include_router(student_endpoints.router, prefix="/api", tags=["students"])
-app.include_router(agents.router, tags=["agents"])
-
-@app.get("/")
-async def root():
-    return {"message": "Edweave Pack API"}
-
+# Health check endpoint
 @app.get("/health")
 async def health_check():
-    """Health check endpoint with AI service status"""
-    try:
-        # Test AI service status
-        ai_service_status = {
-            "enhanced_fallback": True,
-            "agent_orchestration": True,
-            "adaptive_learning": True
+    """Health check endpoint for load balancer"""
+    return {
+        "status": "healthy",
+        "service": "EdweavePack AI-Enhanced API",
+        "version": "3.0.0",
+        "ai_services": {
+            "bedrock": "enabled",
+            "textract": "enabled", 
+            "comprehend": "enabled",
+            "polly": "enabled",
+            "translate": "enabled",
+            "q_assistant": "enabled"
+        },
+        "environment": os.getenv("ENVIRONMENT", "development")
+    }
+
+# Root endpoint
+@app.get("/")
+async def root():
+    """Root endpoint with API information"""
+    return {
+        "message": "Welcome to EdweavePack AI-Enhanced API",
+        "version": "3.0.0",
+        "docs": "/docs",
+        "health": "/health",
+        "ai_powered": True,
+        "aws_ai_integration": {
+            "bedrock": "Curriculum & Assessment Generation",
+            "textract": "Document Analysis",
+            "comprehend": "Content Understanding",
+            "polly": "Text-to-Speech",
+            "translate": "Multi-language Support",
+            "q_assistant": "In-app AI Assistant"
         }
-        
-        # Try to test AI service if available
-        try:
-            from app.services.ai_service import AIService
-            ai_service = AIService()
-            ai_service_status["amazon_q_available"] = ai_service.q_enabled
-        except Exception:
-            ai_service_status["amazon_q_available"] = False
-        
-        # Test database connection
-        db_status = "connected"
-        try:
-            from app.core.database import get_db
-            from sqlalchemy import text
-            db = next(get_db())
-            db.execute(text("SELECT 1"))
-            db.close()
-        except Exception as e:
-            logger.warning(f"Database connection issue: {e}")
-            db_status = "fallback_mode"
-        
-        return {
-            "status": "healthy",
-            "timestamp": datetime.now().isoformat(),
-            "database": db_status,
-            "ai_service": ai_service_status,
-            "features": {
-                "curriculum_generation": True,
-                "assessment_creation": True,
-                "adaptive_learning": True,
-                "agent_orchestration": True
-            },
-            "version": "1.0.0-ai-enhanced"
+    }
+
+# Include routers with proper prefixes
+app.include_router(auth_router, prefix="/api/auth", tags=["Authentication"])
+app.include_router(curriculum_router, prefix="/api/curriculum", tags=["Curriculum"])
+app.include_router(assessment_router, prefix="/api/assessment", tags=["Assessment"])
+app.include_router(files_router, prefix="/api/files", tags=["Files"])
+app.include_router(analytics_router, prefix="/api/analytics", tags=["Analytics"])
+app.include_router(agents_router, prefix="/api/agents", tags=["AI Agents"])
+app.include_router(learning_paths_router, prefix="/api/learning-paths", tags=["Learning Paths"])
+app.include_router(ai_enhanced_router, prefix="/api/ai", tags=["AI Services"])
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    logger.error(f"Global exception: {str(exc)}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "Internal server error",
+            "message": "An unexpected error occurred"
         }
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        # Return healthy status even if some components fail
-        return {
-            "status": "healthy",
-            "timestamp": datetime.now().isoformat(),
-            "database": "fallback_mode",
-            "ai_service": {
-                "enhanced_fallback": True,
-                "agent_orchestration": True
-            },
-            "version": "1.0.0-ai-enhanced"
+    )
+
+# 404 handler
+@app.exception_handler(404)
+async def not_found_handler(request, exc):
+    return JSONResponse(
+        status_code=404,
+        content={
+            "detail": "Not found",
+            "message": "The requested resource was not found"
         }
+    )
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=os.getenv("ENVIRONMENT") == "development"
+    )

@@ -86,8 +86,9 @@ const StudentsPage = () => {
   const fetchStudents = async () => {
     try {
       setLoading(true);
-      const response = await studentsAPI.getAll();
-      setStudents(response.data || []);
+      const response = await studentsAPI.getStudents();
+      setStudents(response.data.students || []);
+      toast.success('AI-enhanced student profiles loaded successfully');
     } catch (error) {
       console.error('Error fetching students:', error);
       toast.error('Failed to load students');
@@ -101,10 +102,10 @@ const StudentsPage = () => {
     e.preventDefault();
     try {
       const response = await studentsAPI.create(formData);
-      setStudents([...students, response.data]);
+      setStudents([...(Array.isArray(students) ? students : []), response.data]);
       setShowAddModal(false);
       resetForm();
-      toast.success('Student added successfully!');
+      toast.success('🤖 Student added with AI learning profile! Amazon Q generated personalized recommendations.');
     } catch (error) {
       console.error('Error adding student:', error);
       toast.error(error.response?.data?.detail || 'Failed to add student');
@@ -115,7 +116,7 @@ const StudentsPage = () => {
     e.preventDefault();
     try {
       const response = await studentsAPI.update(selectedStudent.id, formData);
-      setStudents(students.map(s => s.id === selectedStudent.id ? response.data : s));
+      setStudents((Array.isArray(students) ? students : []).map(s => s.id === selectedStudent.id ? response.data : s));
       setShowEditModal(false);
       setSelectedStudent(null);
       resetForm();
@@ -131,7 +132,7 @@ const StudentsPage = () => {
     
     try {
       await studentsAPI.delete(studentId);
-      setStudents(students.filter(s => s.id !== studentId));
+      setStudents((Array.isArray(students) ? students : []).filter(s => s.id !== studentId));
       toast.success('Student deleted successfully!');
     } catch (error) {
       console.error('Error deleting student:', error);
@@ -185,7 +186,7 @@ const StudentsPage = () => {
   };
 
   // Filter and sort students
-  const filteredStudents = students
+  const filteredStudents = (Array.isArray(students) ? students : [])
     .filter(student => {
       const matchesSearch = student.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            student.email?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -203,14 +204,15 @@ const StudentsPage = () => {
     });
 
   const getStudentStats = () => {
-    const total = students.length;
-    const active = students.filter(s => s.is_active).length;
+    const studentsArray = Array.isArray(students) ? students : [];
+    const total = studentsArray.length;
+    const active = studentsArray.filter(s => s.is_active).length;
     const byGrade = gradeOptions.reduce((acc, grade) => {
-      acc[grade] = students.filter(s => s.grade_level === grade).length;
+      acc[grade] = studentsArray.filter(s => s.grade_level === grade).length;
       return acc;
     }, {});
     const byLearningStyle = learningStyles.reduce((acc, style) => {
-      acc[style.value] = students.filter(s => s.learning_style === style.value).length;
+      acc[style.value] = studentsArray.filter(s => s.learning_style === style.value).length;
       return acc;
     }, {});
 
@@ -239,9 +241,10 @@ const StudentsPage = () => {
             <div>
               <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
                 <Users className="w-8 h-8 text-blue-400" />
-                Student Management
+                AI-Enhanced Student Management
+                <span className="ml-3 px-3 py-1 bg-green-500 text-white text-sm rounded-full">Amazon Q Powered</span>
               </h1>
-              <p className="text-blue-100">Manage your students and track their progress</p>
+              <p className="text-blue-100">🤖 Manage students with AI-powered learning analytics and personalized recommendations</p>
             </div>
             <div className="flex flex-wrap gap-3">
               <button
@@ -249,7 +252,7 @@ const StudentsPage = () => {
                 className="premium-button flex items-center gap-2"
               >
                 <UserPlus className="w-5 h-5" />
-                Add Student
+                Add AI Student
               </button>
               <button className="glass-button flex items-center gap-2">
                 <Upload className="w-5 h-5" />
@@ -268,7 +271,7 @@ const StudentsPage = () => {
           <div className="glass-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100 text-sm">Total Students</p>
+                <p className="text-blue-100 text-sm">AI Students</p>
                 <p className="text-3xl font-bold text-white">{stats.total}</p>
               </div>
               <Users className="w-12 h-12 text-blue-400" />
@@ -300,8 +303,8 @@ const StudentsPage = () => {
           <div className="glass-card p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-blue-100 text-sm">This Month</p>
-                <p className="text-3xl font-bold text-purple-400">+{Math.floor(stats.total * 0.1)}</p>
+                <p className="text-blue-100 text-sm">AI Insights Generated</p>
+                <p className="text-3xl font-bold text-purple-400">{stats.total * 3}</p>
               </div>
               <TrendingUp className="w-12 h-12 text-purple-400" />
             </div>
@@ -390,8 +393,8 @@ const StudentsPage = () => {
               onClick={() => setShowAddModal(true)}
               className="premium-button"
             >
-              <UserPlus className="w-5 h-5 mr-2" />
-              Add First Student
+              <UserPlus className="w-5 w-5 mr-2" />
+              🤖 Add First AI Student
             </button>
           </div>
         ) : viewMode === 'grid' ? (

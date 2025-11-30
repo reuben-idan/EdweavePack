@@ -22,8 +22,8 @@ export const TeacherDashboard = () => {
       ]);
       
       setAnalytics(analyticsRes.data);
-      setCurricula(curriculaRes.data);
-      setStudents(studentsRes.data);
+      setCurricula(curriculaRes.data.curricula || []);
+      setStudents(studentsRes.data.students || []);
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {

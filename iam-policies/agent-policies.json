@@ -1,0 +1,92 @@
+{
+  "IngestAgentPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "S3ReadAccess",
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:GetObjectVersion"
+        ],
+        "Resource": "arn:aws:s3:::edweavepack-content/*"
+      },
+      {
+        "Sid": "TextractAccess",
+        "Effect": "Allow",
+        "Action": [
+          "textract:DetectDocumentText",
+          "textract:AnalyzeDocument"
+        ],
+        "Resource": "*",
+        "Condition": {
+          "StringEquals": {
+            "aws:RequestedRegion": "us-east-1"
+          }
+        }
+      },
+      {
+        "Sid": "CloudWatchLogs",
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/edweavepack-ingest-agent*"
+      }
+    ]
+  },
+  "CurriculumArchitectPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "BedrockAccess",
+        "Effect": "Allow",
+        "Action": [
+          "bedrock:InvokeModel"
+        ],
+        "Resource": [
+          "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2",
+          "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-text-express-v1"
+        ]
+      },
+      {
+        "Sid": "CloudWatchLogs",
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream", 
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/edweavepack-curriculum-agent*"
+      }
+    ]
+  },
+  "AssessmentGeneratorPolicy": {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "BedrockAccess",
+        "Effect": "Allow",
+        "Action": [
+          "bedrock:InvokeModel"
+        ],
+        "Resource": [
+          "arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-v2",
+          "arn:aws:bedrock:us-east-1::foundation-model/amazon.titan-text-express-v1"
+        ]
+      },
+      {
+        "Sid": "CloudWatchLogs",
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:us-east-1:*:log-group:/aws/lambda/edweavepack-assessment-agent*"
+      }
+    ]
+  }
+}

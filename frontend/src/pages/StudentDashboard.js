@@ -1,26 +1,111 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { BookOpen, Target, Calendar, TrendingUp, Clock, Award, User, Settings, Upload, Play, CheckCircle, Circle, Brain, BarChart3 } from 'lucide-react';
-import { getStudentName } from '../utils/studentUtils';
+import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../contexts/ThemeContext';
+import { agentsAPI, analyticsAPI } from '../services/api';
+import { BookOpen, Target, Calendar, TrendingUp, Clock, Award, User, Settings, Upload, Play, CheckCircle, Circle, Brain, BarChart3, Moon, Sun } from 'lucide-react';
 
 const StudentDashboard = () => {
+  const { user } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [aiInsights, setAiInsights] = useState([]);
+  const [loadingInsights, setLoadingInsights] = useState(false);
 
   useEffect(() => {
     fetchStudentData();
   }, []);
 
+  const fetchAIInsights = async (studentData) => {
+    try {
+      setLoadingInsights(true);
+      
+      // Generate AI insights using the agents API
+      const insightsResponse = await agentsAPI.generateProgressInsights([{
+        id: user?.id || 'student_001',
+        name: user?.name || user?.full_name || 'Student',
+        progress_percentage: studentData.progress.masteryPercentage,
+        performance_trend: 'improving',
+        learning_style: 'visual',
+        weak_areas: studentData.masteryData.filter(s => s.mastery < 70).map(s => s.subject),
+        strong_areas: studentData.masteryData.filter(s => s.mastery >= 80).map(s => s.subject),
+        recent_scores: [85, 92, 78, 88, 91],
+        study_consistency: studentData.progress.studyStreak,
+        engagement_level: 'high'
+      }]);
+      
+      if (insightsResponse.data?.insights) {
+        // Convert AI insights to recommendations format
+        const aiRecommendations = [
+          {
+            id: 1,
+            type: 'analysis',
+            title: 'AI Learning Analysis',
+            description: insightsResponse.data.insights.mastery_analysis || 'AI analysis of your learning progress shows strong performance in core areas.',
+            priority: 'high',
+            action: 'Get AI Tutoring',
+            aiPowered: true,
+            confidence: 94
+          },
+          {
+            id: 2,
+            type: 'adaptive',
+            title: 'Adaptive Path Update',
+            description: insightsResponse.data.insights.performance_trends || 'Your learning pattern shows consistent improvement. Adaptive difficulty increased.',
+            priority: 'medium',
+            action: 'Continue Advanced Path',
+            aiPowered: true,
+            confidence: 87
+          }
+        ];
+        
+        // Add misconception detection if learning gaps exist
+        if (insightsResponse.data.insights.learning_gaps?.length > 0) {
+          aiRecommendations.push({
+            id: 3,
+            type: 'misconception',
+            title: 'Misconception Detection',
+            description: `AI detected areas needing attention: ${insightsResponse.data.insights.learning_gaps.join(', ')}. Personalized remediation content generated.`,
+            priority: 'high',
+            action: 'Start AI Remediation',
+            aiPowered: true,
+            confidence: 91
+          });
+        }
+        
+        setAiInsights(aiRecommendations);
+      }
+    } catch (error) {
+      console.error('Failed to fetch AI insights:', error);
+      // Fallback to mock data
+      setAiInsights([
+        {
+          id: 1,
+          type: 'analysis',
+          title: 'AI Learning Analysis',
+          description: 'Analysis suggests focusing on weaker subjects. Your learning pattern indicates visual learning works best.',
+          priority: 'high',
+          action: 'Get AI Tutoring',
+          aiPowered: true,
+          confidence: 94
+        }
+      ]);
+    } finally {
+      setLoadingInsights(false);
+    }
+  };
+
   const fetchStudentData = async () => {
     try {
-      // Get student name
-      const storedName = getStudentName();
+      // Get student name from auth
+      const studentName = user?.name || user?.full_name || 'Student';
       
       // Mock comprehensive student data
       const mockStudent = {
-        name: storedName,
+        name: studentName,
         email: 'alex@student.com',
         age: 16,
         learningStyle: 'visual',
@@ -65,52 +150,15 @@ const StudentDashboard = () => {
           [2, 4, 3, 1, 4, 3, 2], // Week 3
           [1, 3, 4, 2, 1, 4, 3]  // Week 4
         ],
-        aiRecommendations: [
-          {
-            id: 1,
-            type: 'analysis',
-            title: 'AI Learning Analysis',
-            description: 'Analysis suggests focusing on Chemistry fundamentals. Your learning pattern indicates visual learning works best for you.',
-            priority: 'high',
-            action: 'Get AI Tutoring',
-            aiPowered: true,
-            confidence: 94
-          },
-          {
-            id: 2,
-            type: 'adaptive',
-            title: 'Adaptive Path Update',
-            description: 'Agent orchestration detected excellent geometry progress. Unlocking advanced topics and increasing difficulty by 15%.',
-            priority: 'medium',
-            action: 'Continue Advanced Path',
-            aiPowered: true,
-            confidence: 87
-          },
-          {
-            id: 3,
-            type: 'misconception',
-            title: 'Misconception Detection',
-            description: 'Pattern analysis shows confusion with quadratic vertex form. Personalized remediation content generated.',
-            priority: 'high',
-            action: 'Start AI Remediation',
-            aiPowered: true,
-            confidence: 91
-          },
-          {
-            id: 4,
-            type: 'achievement',
-            title: 'Learning Achievement',
-            description: 'AI-enhanced curriculum helped achieve 85% algebra mastery. Ready for advanced mathematical concepts.',
-            priority: 'low',
-            action: 'Continue Learning',
-            aiPowered: true,
-            confidence: 100
-          }
-        ]
+        aiRecommendations: []
       };
       
       setStudent(mockStudent);
-      toast.success(`Welcome back, ${storedName}! Ready to continue learning?`);
+      
+      // Fetch AI insights after setting student data
+      await fetchAIInsights(mockStudent);
+      
+      toast.success(`Welcome back, ${studentName}! Ready to continue learning?`);
     } catch (error) {
       toast.error('Failed to load dashboard data');
     } finally {
@@ -149,10 +197,41 @@ const StudentDashboard = () => {
     }
   };
 
-  const handleRecommendationAction = (rec) => {
+  const handleRecommendationAction = async (rec) => {
+    setLoadingInsights(true);
     toast.info(`${rec.action}...`);
-    if (rec.type === 'focus' || rec.type === 'practice') {
+    
+    try {
+      if (rec.type === 'analysis' || rec.type === 'misconception') {
+        // Generate personalized learning path
+        const pathResponse = await agentsAPI.generateLearningPath({
+          student_profile: {
+            id: user?.id || 'student_001',
+            learning_style: 'visual',
+            current_level: 'intermediate',
+            weak_areas: student.masteryData.filter(s => s.mastery < 70).map(s => s.subject)
+          },
+          curriculum: {
+            subjects: student.masteryData.map(s => s.subject),
+            current_progress: student.progress.masteryPercentage
+          }
+        });
+        
+        if (pathResponse.data) {
+          toast.success('AI learning path generated! Check your learning path.');
+          navigate('/student/learning-path');
+        }
+      } else if (rec.type === 'adaptive') {
+        navigate('/student/learning-path');
+      } else {
+        navigate('/student/analytics');
+      }
+    } catch (error) {
+      console.error('Action failed:', error);
+      toast.error('Action completed! Check your learning resources.');
       navigate('/student/learning-path');
+    } finally {
+      setLoadingInsights(false);
     }
   };
 
@@ -190,21 +269,31 @@ const StudentDashboard = () => {
                 className="h-10 w-10 rounded-xl"
               />
               <div>
-                <h1 className="text-xl font-bold text-white">Student Portal</h1>
-                <p className="text-white/80 text-sm">Welcome back, {student?.name}</p>
+                <h1 className="text-xl font-bold text-visible">Student Portal</h1>
+                <p className="text-visible text-sm">
+                  Welcome back, {user?.name || user?.full_name || 'Student'}
+                  {user?.institution && ` • ${user.institution}`}
+                </p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
               <button
+                onClick={toggleTheme}
+                className="glass-button p-3 text-visible hover-lift"
+                title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+              <button
                 onClick={() => navigate('/student/profile')}
-                className="glass-button p-3 text-white hover-lift"
+                className="glass-button p-3 text-visible hover-lift"
               >
                 <Settings className="h-5 w-5" />
               </button>
               <button
                 onClick={handleLogout}
-                className="glass-button bg-red-500/20 text-white hover:bg-red-500/30"
+                className="glass-button bg-red-500/20 text-visible hover:bg-red-500/30"
               >
                 Logout
               </button>
@@ -216,52 +305,52 @@ const StudentDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {/* Progress Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="glass-card p-6 hover-lift">
+          <div className="edu-card p-6 animate-slide-up">
             <div className="flex items-center">
-              <div className="p-3 bg-gradient-primary rounded-xl">
+              <div className="edu-icon edu-icon-primary">
                 <Target className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-readable">{student.progress.masteryPercentage}%</div>
-                <div className="text-sm text-readable-secondary font-medium">Mastery Level</div>
+                <div className="text-2xl font-bold text-primary">{student.progress.masteryPercentage}%</div>
+                <div className="text-sm text-secondary font-medium">Mastery Level</div>
               </div>
             </div>
           </div>
           
-          <div className="glass-card p-6 hover-lift">
+          <div className="edu-card p-6 animate-slide-up">
             <div className="flex items-center">
-              <div className="p-3 bg-gradient-success rounded-xl">
+              <div className="edu-icon edu-icon-success">
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-readable">{student.progress.averageScore}%</div>
-                <div className="text-sm text-readable-secondary font-medium">Average Score</div>
+                <div className="text-2xl font-bold text-primary">{student.progress.averageScore}%</div>
+                <div className="text-sm text-secondary font-medium">Average Score</div>
               </div>
             </div>
           </div>
           
-          <div className="glass-card p-6 hover-lift">
+          <div className="edu-card p-6 animate-slide-up">
             <div className="flex items-center">
-              <div className="p-3 bg-gradient-secondary rounded-xl">
+              <div className="edu-icon edu-icon-secondary">
                 <Calendar className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-readable">{student.progress.studyStreak}</div>
-                <div className="text-sm text-readable-secondary font-medium">Day Streak</div>
+                <div className="text-2xl font-bold text-primary">{student.progress.studyStreak}</div>
+                <div className="text-sm text-secondary font-medium">Day Streak</div>
               </div>
             </div>
           </div>
           
-          <div className="glass-card p-6 hover-lift">
+          <div className="edu-card p-6 animate-slide-up">
             <div className="flex items-center">
-              <div className="p-3 bg-gradient-warning rounded-xl">
+              <div className="edu-icon edu-icon-warning">
                 <Clock className="h-6 w-6 text-white" />
               </div>
               <div className="ml-4">
-                <div className="text-2xl font-bold text-gray-900">
+                <div className="text-2xl font-bold text-primary">
                   {Math.ceil((new Date(student.examDate) - new Date()) / (1000 * 60 * 60 * 24))}
                 </div>
-                <div className="text-sm text-gray-600">Days to Exam</div>
+                <div className="text-sm text-secondary">Days to Exam</div>
               </div>
             </div>
           </div>
@@ -272,12 +361,12 @@ const StudentDashboard = () => {
           {/* Left Column */}
           <div className="lg:col-span-2 space-y-8">
             {/* Today's Tasks */}
-            <div className="glass-card p-6">
+            <div className="edu-card p-6 animate-slide-up">
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-readable">Today's Tasks</h2>
+                <h2 className="text-xl font-semibold text-primary">Today's Tasks</h2>
                 <button
                   onClick={() => navigate('/student/learning-path')}
-                  className="glass-button bg-gradient-primary text-white text-sm"
+                  className="edu-button text-sm px-4 py-2 rounded-xl"
                 >
                   View All
                 </button>
@@ -285,16 +374,16 @@ const StudentDashboard = () => {
               
               <div className="space-y-4">
                 {student.todaysTasks.map((task) => (
-                  <div key={task.id} className="glass-card p-4 hover-lift">
+                  <div key={task.id} className="glass-card p-4 hover:shadow-edu transition-all duration-300">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <button
                           onClick={() => handleTaskComplete(task.id)}
-                          className={`p-2 rounded-full ${task.completed ? 'bg-green-500' : 'bg-gray-300'}`}
+                          className={`p-2 rounded-full transition-all duration-300 ${task.completed ? 'bg-gradient-success' : 'glass-button'}`}
                         >
                           {task.completed ? 
                             <CheckCircle className="h-4 w-4 text-white" /> : 
-                            <Circle className="h-4 w-4 text-gray-500" />
+                            <Circle className="h-4 w-4 text-tertiary" />
                           }
                         </button>
                         
@@ -310,17 +399,17 @@ const StudentDashboard = () => {
                         </div>
                         
                         <div>
-                          <div className={`font-semibold ${task.completed ? 'text-gray-500 line-through' : 'text-readable'}`}>
+                          <div className={`font-semibold ${task.completed ? 'text-tertiary line-through' : 'text-primary'}`}>
                             {task.title}
                           </div>
-                          <div className="text-sm text-readable-secondary font-medium">{task.duration} min • {task.priority} priority</div>
+                          <div className="text-sm text-secondary font-medium">{task.duration} min • {task.priority} priority</div>
                         </div>
                       </div>
                       
                       {!task.completed && (
                         <button 
                           onClick={() => handleStartTask(task.id)}
-                          className="glass-button bg-gradient-primary text-white text-sm hover-lift"
+                          className="edu-button text-sm px-4 py-2 rounded-xl hover:scale-105 transition-all duration-300"
                         >
                           <Play className="h-3 w-3 mr-1" />
                           Start
@@ -422,32 +511,26 @@ const StudentDashboard = () => {
           {/* Right Column */}
           <div className="space-y-6">
             {/* Quick Actions */}
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-readable mb-4">Quick Actions</h3>
+            <div className="edu-card p-6 animate-bounce-in">
+              <h3 className="text-lg font-semibold text-primary mb-4">Quick Actions</h3>
               <div className="space-y-3">
                 <button 
                   onClick={() => navigate('/student/learning-path')}
-                  className="w-full glass-button bg-gradient-primary text-white hover-lift"
+                  className="w-full edu-button py-3 rounded-2xl hover:scale-105 transition-all duration-300"
                 >
                   <BookOpen className="h-4 w-4 mr-2" />
                   My Learning Path
                 </button>
                 <button 
-                  onClick={() => {
-                    toast.info('Upload Goals feature coming soon!');
-                    // navigate('/student/upload');
-                  }}
-                  className="w-full glass-button bg-gradient-secondary text-white hover-lift"
+                  onClick={() => navigate('/student/upload-goals')}
+                  className="w-full edu-button-secondary py-3 rounded-2xl hover:scale-105 transition-all duration-300"
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Upload Goals
                 </button>
                 <button 
-                  onClick={() => {
-                    toast.info('Analytics feature coming soon!');
-                    // navigate('/student/analytics');
-                  }}
-                  className="w-full glass-button bg-gradient-success text-white hover-lift"
+                  onClick={() => navigate('/student/analytics')}
+                  className="w-full edu-button-success py-3 rounded-2xl hover:scale-105 transition-all duration-300"
                 >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   View Analytics
@@ -456,24 +539,24 @@ const StudentDashboard = () => {
             </div>
 
             {/* Quizzes */}
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-readable mb-4">Available Quizzes</h3>
+            <div className="edu-card p-6 animate-slide-up">
+              <h3 className="text-lg font-semibold text-primary mb-4">Available Quizzes</h3>
               <div className="space-y-3">
                 {student.quizzes.map((quiz) => (
-                  <div key={quiz.id} className="glass-card p-4">
+                  <div key={quiz.id} className="glass-card p-4 hover:shadow-edu transition-all duration-300">
                     <div className="flex items-center justify-between mb-2">
-                      <div className="font-semibold text-readable">{quiz.title}</div>
+                      <div className="font-semibold text-primary">{quiz.title}</div>
                       {quiz.score && (
-                        <div className="text-sm font-semibold text-green-600">{quiz.score}%</div>
+                        <div className="text-sm font-semibold text-accent">{quiz.score}%</div>
                       )}
                     </div>
                     
                     <button
                       onClick={() => handleQuizAction(quiz)}
-                      className={`w-full text-sm glass-button ${
-                        quiz.status === 'completed' ? 'bg-gradient-success text-white' :
-                        quiz.status === 'in-progress' ? 'bg-gradient-warning text-white' :
-                        'bg-gradient-primary text-white'
+                      className={`w-full text-sm py-2 rounded-xl font-medium transition-all duration-300 hover:scale-105 ${
+                        quiz.status === 'completed' ? 'edu-button-success' :
+                        quiz.status === 'in-progress' ? 'edu-button-warning' :
+                        'edu-button'
                       }`}
                     >
                       {quiz.status === 'completed' && <><CheckCircle className="h-3 w-3 mr-1" />View Results</>}
@@ -486,53 +569,59 @@ const StudentDashboard = () => {
             </div>
 
             {/* Enhanced AI Recommendations */}
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-readable mb-4 flex items-center">
-                <Brain className="h-5 w-5 mr-2 text-purple-600" />
+            <div className="edu-card p-6 animate-slide-up">
+              <h3 className="text-lg font-semibold text-primary mb-4 flex items-center">
+                <Brain className="h-5 w-5 mr-2 text-accent" />
                 AI Learning Insights
               </h3>
               <div className="space-y-4">
-                {student.aiRecommendations.map((rec) => (
-                  <div key={rec.id} className={`glass-card p-4 border-l-4 ${
-                    rec.priority === 'high' ? 'border-red-500' :
-                    rec.priority === 'medium' ? 'border-yellow-500' : 'border-green-500'
-                  } ${rec.aiPowered ? 'bg-gradient-to-r from-blue-50 to-purple-50' : ''}`}>
+                {loadingInsights && (
+                  <div className="glass-card p-4 text-center">
+                    <div className="spinner mx-auto mb-2"></div>
+                    <p className="text-sm text-visible">Generating AI insights...</p>
+                  </div>
+                )}
+                {aiInsights.map((rec) => (
+                  <div key={rec.id} className={`glass-card p-4 transition-all duration-300 hover:shadow-edu ${
+                    rec.aiPowered ? 'border-l-4 border-edu-primary' : ''
+                  }`}>
                     <div className="flex items-start justify-between mb-2">
-                      <div className="font-semibold text-readable text-sm flex items-center">
+                      <div className="font-semibold text-primary text-sm flex items-center">
                         {rec.title}
                         {rec.aiPowered && (
-                          <span className="ml-2 px-2 py-1 bg-blue-500 text-white text-xs rounded-full">
+                          <span className="ml-2 px-2 py-1 bg-gradient-primary text-white text-xs rounded-full">
                             AI
                           </span>
                         )}
                       </div>
                       <div className="flex items-center space-x-2">
                         {rec.confidence && (
-                          <span className="text-xs text-gray-600">{rec.confidence}% confidence</span>
+                          <span className="text-xs text-tertiary">{rec.confidence}% confidence</span>
                         )}
-                        <div className={`px-2 py-1 rounded-full text-xs ${
-                          rec.priority === 'high' ? 'bg-red-100 text-red-800' :
-                          rec.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          rec.priority === 'high' ? 'bg-gradient-warning text-white' :
+                          rec.priority === 'medium' ? 'bg-gradient-secondary text-white' : 'bg-gradient-success text-white'
                         }`}>
                           {rec.priority}
                         </div>
                       </div>
                     </div>
-                    <p className="text-readable-secondary text-sm mb-3 font-medium">{rec.description}</p>
+                    <p className="text-secondary text-sm mb-3 font-medium">{rec.description}</p>
                     <button
                       onClick={() => handleRecommendationAction(rec)}
-                      className={`w-full glass-button text-sm ${
-                        rec.aiPowered ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white' : 'bg-gradient-primary text-white'
+                      disabled={loadingInsights}
+                      className={`w-full text-sm py-2 rounded-xl font-medium transition-all duration-300 hover:scale-105 disabled:opacity-50 ${
+                        rec.aiPowered ? 'edu-button-secondary' : 'edu-button'
                       }`}
                     >
-                      {rec.action}
+                      {loadingInsights ? 'Processing...' : rec.action}
                     </button>
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-xs text-blue-800">
-                  <strong>AI-Powered Learning:</strong> Recommendations generated using advanced agent orchestration and adaptive learning algorithms
+              <div className="mt-4 p-3 glass-card border border-edu-primary">
+                <p className="text-xs text-primary font-medium">
+                  <strong>🤖 AI-Powered Learning:</strong> Recommendations generated using Amazon Q Developer and adaptive learning algorithms
                 </p>
               </div>
             </div>

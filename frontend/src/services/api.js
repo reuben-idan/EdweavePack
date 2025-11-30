@@ -245,6 +245,7 @@ export const curriculumAPI = {
     };
     return api.post('/api/curriculum/', enhancedData);
   },
+  getCurricula: () => api.get('/api/curriculum/'),
   getAll: () => api.get('/api/curriculum/'),
   getById: (id) => api.get(`/api/curriculum/${id}`),
   getTest: (id) => api.get(`/api/curriculum/test/${id}`),
@@ -287,9 +288,11 @@ export const curriculumAPI = {
 // Assessment API
 export const assessmentAPI = {
   get: (id) => api.get(`/api/assessment/${id}`),
+  getAll: () => api.get('/api/assessments/'),
   getQuestions: (id) => api.get(`/api/assessment/${id}/questions`),
   submit: (id, answers) => api.post(`/api/assessment/${id}/submit`, { answers }),
   generate: (curriculumId, type) => api.post('/api/assessment/generate', { curriculum_id: curriculumId, assessment_type: type }),
+  create: (data) => api.post('/api/assessment/create', data),
 };
 
 // Analytics API
@@ -318,6 +321,7 @@ export const agentsAPI = {
 export const studentsAPI = {
   create: (data) => api.post('/api/learning-paths/students', data),
   getAll: () => api.get('/api/learning-paths/students'),
+  getStudents: () => api.get('/api/learning-paths/students'),
   getById: (id) => api.get(`/api/learning-paths/students/${id}`),
   update: (id, data) => api.put(`/api/learning-paths/students/${id}`, data),
   delete: (id) => api.delete(`/api/learning-paths/students/${id}`),

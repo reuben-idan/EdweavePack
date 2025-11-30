@@ -1,11 +1,13 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { useTheme } from '../contexts/ThemeContext';
 import { toast } from 'react-toastify';
-import { BookOpen, LogOut, BarChart3, FileText, Upload, Home, User, Users } from 'lucide-react';
+import { BookOpen, LogOut, BarChart3, FileText, Upload, Home, User, Users, Moon, Sun } from 'lucide-react';
 
 const Layout = ({ children }) => {
   const { user, logout } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -26,7 +28,7 @@ const Layout = ({ children }) => {
   ];
 
   return (
-    <div className="min-h-screen animated-gradient">
+    <div className="min-h-screen animated-gradient bg-edu-gradient">
       {/* Navigation */}
       <nav className="glass-nav sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,8 +52,8 @@ const Layout = ({ children }) => {
                     to={path}
                     className={`flex items-center space-x-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 ${
                       isActive(path)
-                        ? 'bg-white/20 text-white shadow-lg'
-                        : 'text-white/80 hover:text-white hover:bg-white/10'
+                        ? 'bg-edu-primary/20 text-visible shadow-lg'
+                        : 'text-visible hover:bg-edu-primary/10'
                     }`}
                   >
                     <Icon className="h-4 w-4" />
@@ -63,16 +65,31 @@ const Layout = ({ children }) => {
             
             {/* User Menu */}
             <div className="flex items-center space-x-4">
+              <button
+                onClick={toggleTheme}
+                className="glass-button p-2 text-visible hover:bg-edu-primary/10"
+                title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+              >
+                {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+              </button>
+              
               <div className="flex items-center space-x-3 glass-card px-4 py-2">
-                <User className="h-5 w-5 text-white/80" />
-                <span className="text-sm text-white font-medium">
-                  {user?.name || user?.email || 'User'}
-                </span>
+                <User className="h-5 w-5 text-visible" />
+                <div className="flex flex-col">
+                  <span className="text-sm text-visible font-medium">
+                    {user?.name || user?.full_name || 'User'}
+                  </span>
+                  {user?.institution && (
+                    <span className="text-xs text-visible opacity-75">
+                      {user.institution}
+                    </span>
+                  )}
+                </div>
               </div>
               
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 glass-button text-white/80 hover:text-white hover:bg-red-500/20"
+                className="flex items-center space-x-2 glass-button text-visible hover:bg-red-500/20"
               >
                 <LogOut className="h-4 w-4" />
                 <span>Logout</span>

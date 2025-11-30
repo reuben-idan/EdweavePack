@@ -2,94 +2,167 @@ name: Deploy to AWS
 
 on:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+    branches: [ main ]
 
 env:
-  AWS_REGION: us-east-1
-  ECR_REPOSITORY_BACKEND: edweavepack-backend
-  ECR_REPOSITORY_FRONTEND: edweavepack-frontend
-  ECS_SERVICE: edweavepack-service
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  ECR_BACKEND_REPO: ${{ secrets.ECR_BACKEND_REPO }}
+  ECR_FRONTEND_REPO: ${{ secrets.ECR_FRONTEND_REPO }}
   ECS_CLUSTER: edweavepack-cluster
+  ECS_SERVICE: edweavepack-service
+  TASK_DEFINITION: edweavepack-task-def
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-      
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      
-      - name: Install frontend dependencies
-        run: |
-          cd frontend
-          npm install
-      
-      - name: Install backend dependencies
-        run: |
-          cd backend
-          pip install -r requirements.txt
-      
-      - name: Run frontend tests
-        run: |
-          cd frontend
-          npm test -- --coverage --watchAll=false
-      
-      - name: Run backend tests
-        run: |
-          cd backend
-          python -m pytest
-
   deploy:
-    needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
     
     steps:
-      - uses: actions/checkout@v4
-      
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-      
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-      
-      - name: Build and push backend image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG backend/
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest
-      
-      - name: Build and push frontend image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG frontend/
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG
-          docker tag $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
-      
-      - name: Deploy to ECS
-        run: |
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE --force-new-deployment
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    
+    - name: Build and push backend image
+      id: build-backend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd backend
+        docker build -t $ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        echo "digest=$(docker inspect --format='{{index .RepoDigests 0}}' $ECR_REGISTRY/$ECR_BACKEND_REPO:$IMAGE_TAG)" >> $GITHUB_OUTPUT
+    
+    - name: Build and push frontend image
+      id: build-frontend
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        cd frontend
+        docker build -t $ECR_REGISTRY/$ECR_FRONTEND_REPO:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_FRONTEND_REPO:$IMAGE_TAG
+        echo "image=$ECR_REGISTRY/$ECR_FRONTEND_REPO:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        echo "digest=$(docker inspect --format='{{index .RepoDigests 0}}' $ECR_REGISTRY/$ECR_FRONTEND_REPO:$IMAGE_TAG)" >> $GITHUB_OUTPUT
+    
+    - name: Download current task definition
+      run: |
+        aws ecs describe-task-definition \
+          --task-definition $TASK_DEFINITION \
+          --query taskDefinition > task-definition.json
+    
+    - name: Update task definition with new images
+      id: task-def
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: task-definition.json
+        container-name: backend
+        image: ${{ steps.build-backend.outputs.image }}
+    
+    - name: Update task definition with frontend image
+      id: task-def-frontend
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def.outputs.task-definition }}
+        container-name: frontend
+        image: ${{ steps.build-frontend.outputs.image }}
+    
+    - name: Deploy to Amazon ECS
+      id: deploy-ecs
+      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+      with:
+        task-definition: ${{ steps.task-def-frontend.outputs.task-definition }}
+        service: ${{ env.ECS_SERVICE }}
+        cluster: ${{ env.ECS_CLUSTER }}
+        wait-for-service-stability: true
+    
+    - name: Get ALB endpoint
+      id: get-alb
+      run: |
+        ALB_DNS=$(aws elbv2 describe-load-balancers \
+          --names edweavepack-alb \
+          --query 'LoadBalancers[0].DNSName' \
+          --output text)
+        echo "alb_endpoint=http://$ALB_DNS" >> $GITHUB_OUTPUT
+    
+    - name: Install Python dependencies for validation
+      run: |
+        pip install requests boto3
+    
+    - name: Run comprehensive post-deployment validation
+      id: validation
+      env:
+        ALB_ENDPOINT: ${{ steps.get-alb.outputs.alb_endpoint }}
+        AWS_REGION: ${{ env.AWS_REGION }}
+      run: |
+        echo "Running comprehensive post-deployment validation..."
+        
+        # Wait for deployment to stabilize
+        sleep 30
+        
+        # Run validation script
+        python post-deploy-validation.py
+        
+        # Check exit code
+        if [ $? -eq 0 ]; then
+          echo "✅ Post-deployment validation passed"
+          echo "success=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Post-deployment validation failed"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+    
+    - name: Rollback on failure
+      if: failure() && steps.deploy-ecs.conclusion == 'success'
+      run: |
+        echo "🔄 Rolling back deployment..."
+        
+        # Get previous task definition
+        PREVIOUS_TASK_DEF=$(aws ecs list-task-definitions \
+          --family-prefix $TASK_DEFINITION \
+          --status ACTIVE \
+          --sort DESC \
+          --query 'taskDefinitionArns[1]' \
+          --output text)
+        
+        if [ "$PREVIOUS_TASK_DEF" != "None" ] && [ "$PREVIOUS_TASK_DEF" != "" ]; then
+          echo "Rolling back to: $PREVIOUS_TASK_DEF"
+          
+          aws ecs update-service \
+            --cluster $ECS_CLUSTER \
+            --service $ECS_SERVICE \
+            --task-definition $PREVIOUS_TASK_DEF
+          
+          # Wait for rollback to complete
+          aws ecs wait services-stable \
+            --cluster $ECS_CLUSTER \
+            --services $ECS_SERVICE
+          
+          echo "✅ Rollback completed"
+        else
+          echo "❌ No previous task definition found for rollback"
+        fi
+    
+    - name: Notify deployment status
+      if: always()
+      run: |
+        if [ "${{ steps.validation.outputs.success }}" = "true" ]; then
+          echo "🎉 Deployment successful!"
+          echo "Backend: ${{ steps.get-alb.outputs.alb_endpoint }}/health"
+          echo "Frontend: ${{ steps.get-alb.outputs.alb_endpoint }}/"
+          echo "Dashboard: https://${{ env.AWS_REGION }}.console.aws.amazon.com/cloudwatch/home?region=${{ env.AWS_REGION }}#dashboards:name=EdweavePack-Monitoring"
+          echo "Commit: ${{ github.sha }}"
+        else
+          echo "💥 Deployment failed and rolled back"
+        fi
