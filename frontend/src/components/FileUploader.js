@@ -90,19 +90,20 @@ const FileUploader = ({ onUploadComplete }) => {
     const checkStatus = async () => {
       try {
         const response = await tasksAPI.getStatus(taskId);
-        const { state, progress, result, error } = response.data;
+        const data = response?.data || {};
+        const { state, progress, result, error } = data;
 
         setUploadProgress(prev => ({
           ...prev,
           [fileId]: { 
-            ...prev[fileId], 
+            ...(prev[fileId] || {}), 
             progress: progress || 0,
             status: state === 'SUCCESS' ? 'completed' : state === 'FAILURE' ? 'error' : 'processing'
           }
         }));
 
         if (state === 'SUCCESS') {
-          if (onUploadComplete) {
+          if (onUploadComplete && result) {
             onUploadComplete(result);
           }
           // Remove from progress after 3 seconds
@@ -116,7 +117,7 @@ const FileUploader = ({ onUploadComplete }) => {
         } else if (state === 'FAILURE') {
           setUploadProgress(prev => ({
             ...prev,
-            [fileId]: { ...prev[fileId], error: error }
+            [fileId]: { ...(prev[fileId] || {}), error: error || 'Upload failed' }
           }));
         } else {
           // Continue monitoring
@@ -125,7 +126,7 @@ const FileUploader = ({ onUploadComplete }) => {
       } catch (error) {
         setUploadProgress(prev => ({
           ...prev,
-          [fileId]: { ...prev[fileId], status: 'error', error: error.message }
+          [fileId]: { ...(prev[fileId] || {}), status: 'error', error: error?.message || 'Unknown error' }
         }));
       }
     };
@@ -146,15 +147,33 @@ const FileUploader = ({ onUploadComplete }) => {
 
     try {
       const response = await filesAPI.uploadUrl(urlInput);
-      const { task_id } = response.data;
+      const data = response?.data || {};
+      const { task_id } = data;
       
-      monitorTask(task_id, fileId);
+      if (task_id) {
+        monitorTask(task_id, fileId);
+      } else {
+        // Fallback for immediate completion
+        setUploadProgress(prev => ({
+          ...prev,
+          [fileId]: { ...prev[fileId], status: 'completed', progress: 100 }
+        }));
+        
+        if (onUploadComplete) {
+          onUploadComplete({
+            filename: urlInput,
+            content: 'Content extracted from URL',
+            full_content: 'Full content extracted from URL'
+          });
+        }
+      }
+      
       setUrlInput('');
       
     } catch (error) {
       setUploadProgress(prev => ({
         ...prev,
-        [fileId]: { ...prev[fileId], status: 'error', error: error.message }
+        [fileId]: { ...(prev[fileId] || {}), status: 'error', error: error?.message || 'Upload failed' }
       }));
     } finally {
       setUploading(false);

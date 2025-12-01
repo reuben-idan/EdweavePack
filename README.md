@@ -1,336 +1,87 @@
 <div align="center">
 
-<img src="logo.png" alt="EdweavePack Logo" width="200" height="200">
+<img src="frontend/public/images/Edweave Pack Logo.png" alt="EdweavePack Logo" width="120" height="120">
 
 # EdweavePack
 
-**🎓 AI-Powered Educational Content Platform**
+**AI-Powered Educational Content Platform**
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
-[![React](https://img.shields.io/badge/React-18+-61DAFB.svg)](https://reactjs.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-009688.svg)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED.svg)](https://www.docker.com/)
-[![AWS](https://img.shields.io/badge/AWS-Cloud%20Ready-FF9900.svg)](https://aws.amazon.com/)
-[![Deployment](https://img.shields.io/badge/Status-Ready%20for%20Deployment-blue.svg)](#deployment)
-[![Hackathon](https://img.shields.io/badge/AWS%20Global%20Vibe-AI%20Coding%20Hackathon%202025-orange.svg)](https://dorahacks.io/hackathon/aws-global-vibe)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Available-brightgreen)](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com)
+[![AWS](https://img.shields.io/badge/AWS-Deployed-orange)](https://aws.amazon.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![Hackathon](https://img.shields.io/badge/AWS_Global_Vibe-2025-gold)](https://dorahacks.io/hackathon/aws-global-vibe)
+[![Status](https://img.shields.io/badge/Status-Production-success)](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com)
+[![API](https://img.shields.io/badge/API-Operational-green)](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com/docs)
 
-**🏆 AWS Global Vibe: AI Coding Hackathon 2025 Submission**
+**Transform teaching materials into intelligent curricula with Amazon Q Developer**
 
-**Transform teaching resources into intelligent curricula with AI-powered content generation, adaptive learning paths, and automated assessments. Built with Amazon Q Developer and advanced agent orchestration for the AI in Education track.**
-
-🚀 [Quick Start](#quick-start) • 📖 [Documentation](#documentation) • 🏗️ [Architecture](#architecture) • ☁️ [AWS Deployment](#deployment)
+[Try Live Demo](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com) • [API Documentation](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com/docs)
 
 </div>
 
-## 🏆 AWS Global Vibe Hackathon 2025 - AI in Education Track
+## Features
 
-**EdweavePack is ready for fresh AWS deployment!**
-
-This repository has been cleaned and prepared for a new AWS deployment. All previous deployment artifacts have been removed to ensure a clean deployment process.
-
-### 🎯 Hackathon Demo Features
-- ✅ **User Registration & Login** - Create your educator account
-- 🤖 **Amazon Q Developer Integration** - AI-powered curriculum generation
-- 📚 **Curriculum Creation** - Upload teaching materials and generate structured curricula
-- 🧠 **AI Content Generation** - Transform PDFs, text, and videos into interactive content
-- 📊 **Student Analytics** - Track learning progress and performance insights
-- 🎯 **Assessment Tools** - Auto-generated quizzes and graded assignments
-- 🔄 **Agent Orchestration** - Kiro-powered intelligent learning path generation
-
-**Sample Resources**:
-- 📄 [Sample Teaching Resources](demo/sample_resources.md)
-- 🔧 [Demo Script & Setup](demo/demo-script.md)
-- 📊 [Expected AI Outputs](demo/sample_resources.md#expected-ai-generated-outputs)
-- 💾 [Sample Files](demo/sample-files/) - Python, Algebra, Biology content
-
-## ✨ Key Features - Amazon Q Developer Integration
-
-<table>
-<tr>
-<td>
-
-**🤖 Amazon Q Developer AI Integration**
-- **Code Generation**: Automated curriculum structure creation
-- **Content Analysis**: AI-powered document processing
-- **Question Generation**: Intelligent assessment creation
-- **Code Assistance**: Development workflow optimization
-
-</td>
-<td>
-
-**📚 AI Content Generation**
-- Transform PDFs, text, videos into structured curricula
-- Multi-format content support (documents, videos, URLs)
-- Automated grading and feedback system
-- Real-time content adaptation
-
-</td>
-</tr>
-<tr>
-<td>
-
-**📊 Analytics & Insights**
-- Real-time student progress tracking
-- Performance analytics dashboard
-- Adaptive learning path recommendations
-- Misconception detection and remediation
-
-</td>
-<td>
-
-**🔄 Agent Orchestration (Kiro)**
-- Curriculum architect agent
-- Learning path generator
-- Personalized learning recommendations
-- Multi-agent collaboration system
-
-</td>
-</tr>
-<tr>
-<td>
-
-**🔒 Secure & Scalable AWS Infrastructure**
-- OAuth2 JWT authentication system
-- Enterprise-grade security (HTTPS, encryption)
-- AWS ECS, RDS, S3 integration
-- Auto-scaling and high availability
-
-</td>
-<td>
-
-**🎨 Modern Educational Interface**
-- Glassmorphism design system
-- Fully responsive across all devices
-- Intuitive drag-and-drop interactions
-- Accessibility-compliant UI/UX
-
-</td>
-</tr>
-</table>
-
-## Architecture
-
-```mermaid
-graph TB
-    A[React Frontend] --> B[FastAPI Backend]
-    B --> C[PostgreSQL]
-    B --> D[Redis Cache]
-    B --> E[Amazon Q Developer]
-    B --> F[AWS S3]
-    G[Docker] --> H[AWS ECS]
-```
-
-**🏆 Hackathon Tech Stack**
-- **AI Integration**: **Amazon Q Developer** (Primary), **Kiro Agent Orchestration**
-- **Backend**: FastAPI, PostgreSQL, Redis, Celery
-- **Frontend**: React 18, Tailwind CSS, React Router
-- **Infrastructure**: AWS ECS Fargate, RDS PostgreSQL, S3, ALB
-- **DevOps**: Docker, Terraform, GitHub Actions, ECR
-- **Security**: JWT Authentication, CORS, HTTPS-ready
-
-## 📖 Documentation
-
-- 🏗️ [Architecture Overview](docs/architecture.md)
-- 🚀 [Setup Guide](docs/setup-guide.md)
-- 🌐 [Deployment Guide](docs/deployment.md)
-- 🤖 [Agent Orchestration](backend/agents/)
-- 📊 [API Documentation](http://localhost:8000/docs)
+**Amazon Q Integration** - AI-powered curriculum generation  
+**Smart Content Processing** - Transform PDFs and videos into structured curricula  
+**Automated Assessments** - Generate quizzes aligned with Bloom's taxonomy  
+**Real-time Analytics** - Student progress tracking and insights  
+**Agent Orchestration** - Kiro-powered adaptive learning paths  
 
 ## Quick Start
 
-### Prerequisites
-
 ```bash
-# Required
-Docker & Docker Compose
-Node.js 18+
-Python 3.11+
-AWS CLI (for deployment)
-```
-
-### Local Development
-
-```bash
-# Clone and setup
 git clone https://github.com/reuben-idan/EdweavePack.git
 cd EdweavePack
 cp .env.example .env
-
-# Start all services
 make up
-
-# Or run demo with sample data
-make demo
 ```
 
-**Access Points**
-- Frontend: http://localhost:3000
-- API: http://localhost:8000
-- Docs: http://localhost:8000/docs
+## Architecture
 
-### Manual Setup
+| Component | Technology |
+|-----------|------------|
+| AI Services | Amazon Bedrock, Comprehend, Textract |
+| Backend | FastAPI, PostgreSQL, Redis |
+| Frontend | React 18, Tailwind CSS |
+| Infrastructure | AWS ECS, RDS, S3, ALB |
+| DevOps | Docker, Terraform, ECR |
 
-<details>
-<summary>Backend Development</summary>
-
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate  # Windows
-source venv/bin/activate  # Unix
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-</details>
-
-<details>
-<summary>Frontend Development</summary>
-
-```bash
-cd frontend
-npm install
-npm start
-```
-</details>
-
-## API Documentation
-
-### Core Endpoints
+## API Reference
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/auth/register` | Teacher registration |
+| `POST` | `/api/auth/register` | User registration |
 | `POST` | `/api/auth/token` | Authentication |
-| `POST` | `/api/curriculum/` | Create curriculum |
-| `GET` | `/api/curriculum/` | List curricula |
-| `POST` | `/api/curriculum/upload` | Upload materials |
-| `GET` | `/api/assessment/{id}` | Get assessment |
-| `POST` | `/api/assessment/{id}/submit` | Submit answers |
+| `POST` | `/api/curriculum/` | Create AI curriculum |
+| `POST` | `/api/files/simple-upload` | Upload materials |
 | `GET` | `/api/analytics/dashboard` | Analytics data |
 
-**Interactive Documentation**: Available at `/docs` when running locally
+## AWS Global Vibe Hackathon 2025
 
-## Testing
+**Track**: AI in Education  
+**Technology**: Amazon Q Developer  
+**Innovation**: AI-driven educational content transformation  
 
-```bash
-# Run all tests
-make test
+## Legal
 
-# Individual test suites
-make test-backend
-make test-frontend
-```
+**Copyright** © 2025 EdweavePack. All rights reserved.
 
-## Deployment
+**License**: MIT License - see [LICENSE](LICENSE) file for details.
 
-### Infrastructure
+**Disclaimer**: This software is provided "as is" without warranty of any kind. Use at your own risk.
 
-```bash
-# Setup AWS credentials
-aws configure
+**Privacy**: Personal data processing complies with applicable privacy laws. No data stored without explicit consent.
 
-# Deploy with Terraform
-cd infrastructure
-terraform init && terraform apply
-```
+**Educational Compliance**: FERPA and COPPA compliant for educational institutions.
 
-### CI/CD Pipeline
-
-Push to `main` branch triggers:
-1. Automated testing
-2. Docker image build
-3. ECR deployment
-4. ECS service update
-
-## Security
-
-- **Authentication**: OAuth2 + JWT tokens
-- **Transport**: HTTPS enforcement
-- **Data**: Encryption at rest
-- **Secrets**: AWS Secrets Manager
-- **Validation**: Input sanitization
-- **CORS**: Configured protection
-
-## Contributing
-
-1. Fork the repository
-2. Create feature branch: `git checkout -b feature/name`
-3. Commit changes: `git commit -m 'Add feature'`
-4. Push branch: `git push origin feature/name`
-5. Submit Pull Request
-
-**Development Guidelines**
-- Follow existing code style
-- Add tests for new features
-- Update documentation
-- Ensure CI passes
-
-## Roadmap
-
-- [ ] Multi-language support
-- [ ] Advanced ML analytics
-- [ ] LMS integrations
-- [ ] Mobile applications
-- [ ] Real-time collaboration
-- [ ] AI tutoring system
-
-## License
-
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## 🚀 AWS Global Vibe Hackathon 2025
-
-**🏆 Submission Details**
-- **Track**: AI in Education
-- **Primary Technology**: Amazon Q Developer
-- **Secondary Technology**: Kiro Agent Orchestration
-- **Submission Deadline**: December 1, 2025
-- **Innovation Focus**: Transforming educational content creation with AI
-
-**🎯 Hackathon Highlights**
-- ✅ **Amazon Q Developer Integration**: Comprehensive AI-powered development workflow
-- ✅ **Live Deployment**: Fully functional application on AWS infrastructure
-- ✅ **Real-world Impact**: Addresses actual educational challenges
-- ✅ **Technical Innovation**: Advanced agent orchestration and AI content generation
-- ✅ **Scalable Architecture**: Enterprise-ready AWS cloud deployment
-
-## 🚀 Deployment
-
-**Repository Status**: ✅ **READY FOR DEPLOYMENT**
-- **Codebase**: Clean and deployment-ready
-- **Dependencies**: All requirements specified
-- **Configuration**: Environment variables configured
-- **Docker**: Production-ready containers
-- **Documentation**: Complete setup guides available
-
-**Ready for AWS Deployment**:
-- Clean repository without old deployment artifacts
-- Production-ready Docker containers
-- Comprehensive infrastructure as code
-- Scalable microservices architecture
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/reuben-idan/EdweavePack/issues)
-- **Documentation**: [docs/](docs/)
-- **Demo Guide**: [demo-script.md](demo/demo-script.md)
-- **Local API Docs**: [http://localhost:8000/docs](http://localhost:8000/docs) (when running locally)
+**Liability**: EdweavePack shall not be liable for any damages arising from the use of this software.
 
 ---
 
 <div align="center">
 
-<img src="logo.png" alt="EdweavePack" width="64" height="64">
+**Professional Educational Technology Solution**
 
-**🏆 AWS Global Vibe: AI Coding Hackathon 2025**
-
-**Built for educators worldwide** 🌍
-
-*Empowering teachers with Amazon Q Developer and AI-driven educational technology*
-
-**Ready for AWS Deployment →**
-
-**Submission Deadline: December 1, 2025** ⏰
+[Live Application](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com) • [Technical Support](mailto:support@edweavepack.com)
 
 </div>

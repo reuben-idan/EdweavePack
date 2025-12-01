@@ -46,7 +46,7 @@ export const AuthProvider = ({ children }) => {
         formData.append('password', credentials.password);
         
         const response = await authAPI.login(formData);
-        const { access_token } = response.data;
+        const { access_token, user } = response.data;
         
         localStorage.setItem('token', access_token);
         

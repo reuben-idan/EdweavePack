@@ -1,11 +1,59 @@
-FROM python:3.11-slim
+# Production-optimized FastAPI Backend with AWS AI
+FROM python:3.11-slim as builder
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+
+# Copy requirements first for better caching
 COPY requirements-minimal.txt requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Production stage
+FROM python:3.11-slim
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && groupadd -r appuser && useradd -r -g appuser appuser
+
+WORKDIR /app
+
+# Copy installed packages from builder
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/local/bin /usr/local/bin
+
+# Copy application code
 COPY . .
-# Use an unprivileged user
-RUN adduser --disabled-password appuser
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV ENVIRONMENT=production
+ENV AWS_DEFAULT_REGION=eu-north-1
+
+# Create necessary directories
+RUN mkdir -p /app/logs && \
+    chown -R appuser:appuser /app
+
+# Switch to non-root user
 USER appuser
+
+# Expose port
 EXPOSE 8000
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Start application
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
