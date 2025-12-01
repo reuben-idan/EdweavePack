@@ -138,7 +138,7 @@
 }
 
 .glass-input {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -146,19 +146,21 @@
   padding: 16px 20px;
   font-weight: 500;
   font-size: 16px;
-  color: var(--text-primary);
+  color: #0F172A !important;
   transition: all 0.3s ease;
 }
 
 .glass-input:focus {
   border-color: var(--edu-primary);
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #0F172A !important;
 }
 
 .glass-input::placeholder {
-  color: var(--text-tertiary);
+  color: #64748B !important;
   font-weight: 400;
+  opacity: 0.8;
 }
 
 /* Educational Gradient Backgrounds */
@@ -265,31 +267,37 @@
 }
 
 .text-gray-900, .text-gray-900 * {
-  color: var(--text-primary) !important;
+  color: #0F172A !important;
 }
 
 .text-gray-800, .text-gray-800 * {
-  color: var(--text-primary) !important;
+  color: #1E293B !important;
 }
 
 .text-gray-700, .text-gray-700 * {
-  color: var(--text-secondary) !important;
+  color: #334155 !important;
 }
 
 .text-gray-600, .text-gray-600 * {
-  color: var(--text-secondary) !important;
+  color: #475569 !important;
 }
 
 .text-gray-500, .text-gray-500 * {
-  color: var(--text-tertiary) !important;
+  color: #64748B !important;
 }
 
 .text-gray-400, .text-gray-400 * {
-  color: var(--text-tertiary) !important;
+  color: #94A3B8 !important;
 }
 
 .text-gray-300, .text-gray-300 * {
-  color: var(--text-tertiary) !important;
+  color: #CBD5E1 !important;
+}
+
+/* Ensure placeholder text is always visible */
+.placeholder-gray-500::placeholder {
+  color: #64748B !important;
+  opacity: 0.8 !important;
 }
 
 /* Navigation specific text fixes */
@@ -326,7 +334,7 @@
 }
 
 .edu-input {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 2px solid rgba(255, 255, 255, 0.3);
@@ -334,7 +342,7 @@
   padding: 16px 20px;
   font-weight: 500;
   font-size: 16px;
-  color: var(--text-primary);
+  color: #0F172A !important;
   transition: all 0.3s ease;
   width: 100%;
 }
@@ -342,8 +350,14 @@
 .edu-input:focus {
   border-color: var(--edu-primary);
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.1);
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #0F172A !important;
   outline: none;
+}
+
+.edu-input::placeholder {
+  color: #64748B !important;
+  opacity: 0.8;
 }
 
 /* Educational Cards */
@@ -546,7 +560,13 @@ a {
 
 /* Form elements */
 input, textarea, select {
-  color: var(--text-primary) !important;
+  color: #0F172A !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #64748B !important;
+  opacity: 0.8;
 }
 
 /* Override any remaining white text */
@@ -556,6 +576,35 @@ input, textarea, select {
 
 .text-white\/60 {
   color: var(--text-tertiary) !important;
+}
+
+/* Force input text visibility in all contexts */
+.glass-card input,
+.glass input,
+form input {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #0F172A !important;
+  font-weight: 500 !important;
+}
+
+.glass-card input::placeholder,
+.glass input::placeholder,
+form input::placeholder {
+  color: #64748B !important;
+  opacity: 0.8 !important;
+}
+
+/* Specific fixes for login/register forms */
+.glass-card .glass-input {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #0F172A !important;
+  border: 2px solid rgba(37, 99, 235, 0.2) !important;
+}
+
+.glass-card .glass-input:focus {
+  background: white !important;
+  color: #0F172A !important;
+  border-color: #2563EB !important;
 }
 
 /* Educational theme cards */
@@ -637,6 +686,40 @@ input, textarea, select {
   background: var(--glass-bg-strong);
   backdrop-filter: var(--glass-backdrop);
   -webkit-backdrop-filter: var(--glass-backdrop);
+}
+
+/* Login and Registration Form Input Fixes */
+input[type="email"],
+input[type="password"],
+input[type="text"],
+select {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #0F172A !important;
+  font-weight: 500 !important;
+  font-size: 16px !important;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+select:focus {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #0F172A !important;
+  border-color: #2563EB !important;
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="text"]::placeholder {
+  color: #64748B !important;
+  opacity: 0.8 !important;
+  font-weight: 400 !important;
+}
+
+/* Ensure select dropdown text is visible */
+select option {
+  background: white !important;
+  color: #0F172A !important;
 }
 
 /* Apple-style Toast Notifications */
