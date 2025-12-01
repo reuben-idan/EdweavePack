@@ -3,7 +3,7 @@ const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 // Updated production URL for enhanced AI deployment
 export const API_BASE_URL = IS_PRODUCTION 
-  ? 'http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com'
+  ? 'https://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com'
   : 'http://localhost:8001';
 export const IS_PRODUCTION_ENV = IS_PRODUCTION;
 export const ENABLE_LOGGING = !IS_PRODUCTION;

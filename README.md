@@ -6,16 +6,16 @@
 
 **AI-Powered Educational Content Platform**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Available-brightgreen)](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Available-brightgreen)](https://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com)
 [![AWS](https://img.shields.io/badge/AWS-Deployed-orange)](https://aws.amazon.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 [![Hackathon](https://img.shields.io/badge/AWS_Global_Vibe-2025-gold)](https://dorahacks.io/hackathon/aws-global-vibe)
-[![Status](https://img.shields.io/badge/Status-Production-success)](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com)
-[![API](https://img.shields.io/badge/API-Operational-green)](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com/docs)
+[![Status](https://img.shields.io/badge/Status-Production-success)](https://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com)
+[![API](https://img.shields.io/badge/API-Operational-green)](https://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com/docs)
 
 **Transform teaching materials into intelligent curricula with Amazon Q Developer**
 
-[Try Live Demo](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com) • [API Documentation](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com/docs)
+[Try Live Demo](https://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com) • [API Documentation](https://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com/docs)
 
 </div>
 
@@ -82,6 +82,6 @@ make up
 
 **Professional Educational Technology Solution**
 
-[Live Application](http://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com) • [Technical Support](mailto:support@edweavepack.com)
+[Live Application](https://edweavepack-alb-1731617972.eu-north-1.elb.amazonaws.com) • [Technical Support](mailto:support@edweavepack.com)
 
 </div>
